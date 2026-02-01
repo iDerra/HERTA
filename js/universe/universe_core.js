@@ -16,7 +16,6 @@ window.Core = {
         this.currentLayer = 0;
         this.currentNode = 0;
         this.map[0][0].status = 'active'; 
-        this.updateSelectables(0, 0);
         
         window.UniverseUI.renderMap(this.map);
         this.loadRoom(this.map[0][0]);

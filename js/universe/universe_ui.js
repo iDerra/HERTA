@@ -27,6 +27,13 @@ window.UniverseUI = {
     },
 
     renderMap: function(mapData) {
+        this.mapOverlay.onclick = (e) => {
+            if (e.target.closest('button')) return;
+            if (this.mapOverlay.classList.contains('minimized')) {
+                this.toggleMap(true);
+            }
+        };
+
         this.mapNodesContainer.innerHTML = '';
         this.mapSvg.innerHTML = '';
         const totalLayers = mapData.length;
