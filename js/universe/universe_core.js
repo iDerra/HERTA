@@ -103,13 +103,11 @@ window.Core = {
                 if (this.bossStage >= 3) {
                     setTimeout(() => {
                         window.UniverseUI.animateSuccess(() => {
-                            alert("🎉 ¡HAS DERROTADO AL BOSS Y COMPLETADO EL UNIVERSO! 🎉");
-                            location.href = '../index.html';
+                            window.UniverseUI.showModal("¡VICTORIA!", "Has derrotado al Boss y completado el Universo Simulado.", "Salir", () => location.href = '../index.html');
                         });
                     }, 1000);
                 } else {
                     setTimeout(() => {
-                        alert(`¡Buen golpe! Al jefe le quedan ${3 - this.bossStage} vidas.`);
                         window.UniverseUI.renderScene(this.bossData[this.bossStage], true, 3 - this.bossStage);
                     }, 1000);
                 }
@@ -126,8 +124,7 @@ window.Core = {
             this.updateHUD();
             window.UniverseUI.animateFail();
             if(this.energy <= 0) {
-                alert("💀 Energía crítica. Herta te desconecta de la simulación.");
-                location.reload();
+                window.UniverseUI.showModal("DESCONEXIÓN", "Energía crítica. Herta te desconecta de la simulación.", "Reiniciar", () => location.reload());
             }
         }
     },

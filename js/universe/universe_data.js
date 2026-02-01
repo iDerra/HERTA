@@ -115,6 +115,23 @@ window.UniverseData = {
                 break;
         }
 
+        p.c = String(p.c);
+        const seen = new Set();
+        seen.add(p.c);
+        
+        p.w = p.w.map(opt => {
+            let val = String(opt);
+            let safety = 0;
+            while (seen.has(val) && safety < 10) {
+                const newVal = val.replace(/-?\d+(\.\d+)?/, m => parseFloat(m) + 1);
+                if (newVal === val) val += "*";
+                else val = newVal;
+                safety++;
+            }
+            seen.add(val);
+            return val;
+        });
+
         const allOpts = [p.c, ...p.w].sort(() => Math.random() - 0.5);
         
         return {

@@ -5,9 +5,10 @@ window.BridgeCore = {
     levelMatrix: [], 
     placedItems: [], 
     robotPos: { r: 0, c: 0 },
+    robotRot: 0,
     isSimulating: false,
     simulationInterval: null,
-    CELL_SIZE: 40,
+    CELL_SIZE: 50,
 
     init: function() {
         this.currentLevelIdx = 0;
@@ -23,6 +24,7 @@ window.BridgeCore = {
         this.inventory = [];
         this.placedItems = [];
         clearInterval(this.simulationInterval);
+        this.robotRot = 0;
 
         this.levelMatrix = levelData.matrix.map(row => row.split(''));
 
@@ -70,12 +72,12 @@ window.BridgeCore = {
                 unit = "m";
             } else if (challengeType === 2) {
                 const price = 5;
-                question = `El material cuesta <b>${price}€/m²</b>. ¿Cuál es el coste total?`;
+                question = `Bloque (${b}m x ${h}m). El material cuesta <b>${price}€/m²</b>. ¿Cuál es el coste total?`;
                 answer = (b * h) * price;
                 unit = "€";
             } else {
                 const density = 2;
-                question = `La densidad es <b>${density}kg/m²</b>. ¿Cuánto pesa el bloque?`;
+                question = `Bloque (${b}m x ${h}m). La densidad es <b>${density}kg/m²</b>. ¿Cuánto pesa el bloque?`;
                 answer = (b * h) * density;
                 unit = "kg";
             }
@@ -87,7 +89,7 @@ window.BridgeCore = {
                 unit = "m²";
             } else {
                 const price = 10;
-                question = `Este material reforzado cuesta <b>${price}€/m²</b>. ¿Coste total?`;
+                question = `Rampa (Base ${b}, Altura ${h}). Este material reforzado cuesta <b>${price}€/m²</b>. ¿Coste total?`;
                 answer = ((b * h) / 2) * price;
                 unit = "€";
             }
@@ -219,6 +221,7 @@ window.BridgeCore = {
         
         if (currentFloorRow === null) {
             this.robotPos.r += 1; 
+            this.robotRot = 15;
             this.updateRobotVisuals();
             if (currR+1 < this.levelMatrix.length && this.levelMatrix[currR+1][currC] === 'w') this.failLevel("¡Agua!");
             else if (currR+1 >= this.levelMatrix.length) this.failLevel("¡Vacío!");
@@ -227,6 +230,7 @@ window.BridgeCore = {
 
         if (currR < currentFloorRow - 1) {
             this.robotPos.r += 1;
+            this.robotRot = 0;
             this.updateRobotVisuals();
             return;
         }
@@ -235,6 +239,7 @@ window.BridgeCore = {
 
         if (nextFloorRow === null) {
             this.robotPos.c += 1;
+            this.robotRot = 15;
             this.updateRobotVisuals();
             return;
         }
@@ -244,6 +249,11 @@ window.BridgeCore = {
         if (rise <= 1) {
             this.robotPos.c += 1;
             this.robotPos.r = nextFloorRow - 1; 
+            
+            if (rise === 1) this.robotRot = -45;
+            else if (rise < 0) this.robotRot = 30;
+            else this.robotRot = 0;
+
             this.updateRobotVisuals();
             if (this.levelMatrix[this.robotPos.r][this.robotPos.c] === 'm') this.winLevel();
         } else {
@@ -267,24 +277,44 @@ window.BridgeCore = {
         if(robot) {
             robot.style.top = (this.robotPos.r * this.CELL_SIZE) + 'px';
             robot.style.left = (this.robotPos.c * this.CELL_SIZE) + 'px';
+            
+            const scale = this.isSimulating ? 1.1 : 1;
+            robot.style.transform = `scale(${scale}) rotate(${this.robotRot || 0}deg)`;
         }
     },
 
     failLevel: function(msg) {
         clearInterval(this.simulationInterval);
         document.getElementById('robot').classList.add('falling');
-        setTimeout(() => alert(msg), 500);
     },
     winLevel: function() {
         clearInterval(this.simulationInterval);
         document.getElementById('robot').classList.remove('moving');
-        document.getElementById('msg-overlay').classList.remove('hidden');
+        
+        const overlay = document.getElementById('msg-overlay');
+        const title = document.getElementById('msg-title');
+        const btn = overlay.querySelector('button');
+
+        if (this.currentLevelIdx >= window.BridgeLevels.length - 1) {
+            title.innerText = "¡Juego Completado! 🎉";
+            btn.innerText = "Volver al Menú";
+            btn.onclick = () => location.href = '../index.html';
+        } else {
+            title.innerText = "¡Nivel Completado!";
+            btn.innerText = "Siguiente Nivel ➡";
+            btn.onclick = () => window.BridgeCore.nextLevel();
+        }
+
+        overlay.classList.remove('hidden');
     },
     nextLevel: function() {
         document.getElementById('msg-overlay').classList.add('hidden');
         this.currentLevelIdx++;
-        if (this.currentLevelIdx < window.BridgeLevels.length) this.loadLevel(this.currentLevelIdx);
-        else { alert("¡Juego Terminado!"); location.href = '../index.html'; }
+        if (this.currentLevelIdx < window.BridgeLevels.length) {
+            this.loadLevel(this.currentLevelIdx);
+        } else {
+            location.href = '../index.html';
+        }
     }
 };
 

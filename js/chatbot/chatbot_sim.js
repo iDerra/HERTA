@@ -299,6 +299,7 @@ document.getElementById('sim-user-input')?.addEventListener('keypress', function
 
 window.initChatGreeting = function() {
     const container = document.getElementById('chat-history-container');
+    showTyping(false);
     if(container.children.length === 0) {
         const menu = getMainMenu();
         addBubbleWithCommands(menu.text, menu.commands);

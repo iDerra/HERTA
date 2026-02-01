@@ -5,14 +5,15 @@ window.BridgeUI = {
         const container = document.getElementById('level-grid');
         if(!container) return;
         container.innerHTML = '';
+        const cs = window.BridgeCore.CELL_SIZE;
 
         const rows = matrix.length;
         const cols = matrix[0].length;
         
-        container.style.gridTemplateRows = `repeat(${rows}, 40px)`;
-        container.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
-        container.style.width = (cols * 40) + 'px';
-        container.style.height = (rows * 40) + 'px';
+        container.style.gridTemplateRows = `repeat(${rows}, ${cs}px)`;
+        container.style.gridTemplateColumns = `repeat(${cols}, ${cs}px)`;
+        container.style.width = (cols * cs) + 'px';
+        container.style.height = (rows * cs) + 'px';
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
@@ -33,22 +34,25 @@ window.BridgeUI = {
         const robot = document.createElement('div');
         robot.id = 'robot';
         robot.className = 'robot-avatar';
+        robot.style.width = cs + 'px';
+        robot.style.height = cs + 'px';
         robot.innerHTML = `<div class="robot-body"></div><div class="robot-wheel w1"></div><div class="robot-wheel w2"></div>`;
         container.appendChild(robot);
     },
 
     renderPlacedItems: function(items) {
         const container = document.getElementById('level-grid');
+        const cs = window.BridgeCore.CELL_SIZE;
         
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = item.type === 'rect' ? 'placed-rect' : 'placed-ramp';
             
             el.style.position = 'absolute';
-            el.style.left = (item.c * 40) + 'px';
-            el.style.top = (item.r * 40) + 'px';
-            el.style.width = (item.w * 40) + 'px';
-            el.style.height = (item.h * 40) + 'px';
+            el.style.left = (item.c * cs) + 'px';
+            el.style.top = (item.r * cs) + 'px';
+            el.style.width = (item.w * cs) + 'px';
+            el.style.height = (item.h * cs) + 'px';
 
             el.style.pointerEvents = 'none'; 
 

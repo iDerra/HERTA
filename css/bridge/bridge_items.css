@@ -47,18 +47,20 @@
     top: 0; 
     left: 0; 
     z-index: 100;
-    transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.4s linear;
+    transition: top 0.4s linear, left 0.4s linear, transform 0.4s linear;
 }
 
 .robot-body {
-    width: 100%; 
-    height: 100%; 
-    background-image: url('../../images/avatar_robot.png');
+    width: 150%; 
+    height: 150%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background-image: url('../../images/coche_robot.png');
     background-size: contain; 
     background-repeat: no-repeat; 
     background-position: center bottom;
     filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
 }
 
-.robot-avatar.moving { transform: scale(1.1); }
 .robot-avatar.falling { transform: rotate(45deg) scale(0.8); opacity: 0; transition: top 1s ease-in, opacity 1s, transform 1s; }

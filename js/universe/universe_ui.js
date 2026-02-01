@@ -8,6 +8,22 @@ window.UniverseUI = {
     
     battleStage: document.querySelector('.battle-stage'),
     
+    showModal: function(title, text, btnText, callback) {
+        const overlay = document.getElementById('msg-overlay');
+        document.getElementById('msg-title').innerText = title;
+        document.getElementById('msg-text').innerText = text;
+        const btn = document.getElementById('msg-btn');
+        btn.innerText = btnText || "Continuar";
+        
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.onclick = () => {
+            if(callback) callback();
+        };
+        overlay.classList.remove('hidden');
+    },
+
     toggleMap: function(show) {
         if (show) {
             this.mapOverlay.classList.remove('minimized');
