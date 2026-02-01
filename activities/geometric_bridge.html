@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HERTA - Constructor de Puentes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/bridge/bridge.css">
+    <link rel="stylesheet" href="../css/bridge/bridge_items.css">
+    <link rel="stylesheet" href="../css/bridge/bridge_ui.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>Constructor de Puentes</h1>
+            <div class="hud-stats">
+                <div class="stat-box">🏗️ Nivel <span id="level-val">1</span></div>
+                <div class="stat-box">📦 Materiales: <span id="inventory-count">0</span></div>
+            </div>
+        </div>
+        <div>
+            <button onclick="window.BridgeCore.toggleSimulation()" class="btn-play">▶ SIMULAR</button>
+            <button onclick="location.href='../index.html'" class="btn-back">Salir</button>
+        </div>
+    </header>
+
+    <main class="game-container">
+        
+        <div class="blueprint-world">
+            <div class="sky-bg"></div>
+            <div id="level-grid" class="level-grid"></div>
+        </div>
+
+        <div class="builder-ui">
+            
+            <div class="panel-section inventory-section">
+                <h3>Tu Inventario</h3>
+                <div id="inventory-grid" class="inventory-grid">
+                    <div class="empty-msg">Fabrica piezas primero</div>
+                </div>
+            </div>
+
+            <div class="panel-section fabricator-section">
+                <h3>Fabricador de Ingeniería</h3>
+                
+                <div class="fabricator-controls">
+                    <div id="config-step">
+                        <div class="shape-selector">
+                            <button class="shape-btn active" onclick="window.BridgeUI.selectShapeType('rect')">🟦 Bloque</button>
+                            <button class="shape-btn" onclick="window.BridgeUI.selectShapeType('tri')">◢ Rampa</button>
+                        </div>
+                        
+                        <div class="inputs-row">
+                            <div class="input-group">
+                                <label>Base (m)</label>
+                                <input type="number" id="inp-base" min="1" max="5" value="2">
+                            </div>
+                            <div class="input-group">
+                                <label>Altura (m)</label>
+                                <input type="number" id="inp-height" min="1" max="5" value="1">
+                            </div>
+                        </div>
+
+                        <button onclick="window.BridgeCore.initCrafting()" class="btn-craft">⚙️ CALCULAR Y FABRICAR</button>
+                    </div>
+
+                    <div id="challenge-step" class="math-challenge hidden">
+                        <div class="challenge-header">⚠️ Verificación Requerida</div>
+                        <p id="challenge-question">Calculando...</p>
+                        
+                        <div class="challenge-input-row">
+                            <input type="number" id="inp-answer" placeholder="Respuesta">
+                            <span id="challenge-unit">u</span>
+                        </div>
+                        
+                        <div class="challenge-actions">
+                            <button onclick="window.BridgeCore.verifyAndCraft()" class="btn-verify">✅ Confirmar</button>
+                            <button onclick="window.BridgeCore.cancelCrafting()" class="btn-cancel">❌</button>
+                        </div>
+                        <p id="challenge-error" class="error-msg"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="msg-overlay" class="overlay hidden">
+        <div class="msg-box">
+            <h2 id="msg-title">¡Nivel Completado!</h2>
+            <button onclick="window.BridgeCore.nextLevel()">Siguiente Nivel ➡</button>
+        </div>
+    </div>
+
+    <script src="../js/bridge/bridge_data.js"></script>
+    <script src="../js/bridge/bridge_ui.js"></script>
+    <script src="../js/bridge/bridge_core.js"></script>
+</body>
+</html>

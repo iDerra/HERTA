@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HERTA - Universo Simulado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/universe/simulated_universe.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>Universo Simulado: Sector Lógico</h1>
+            <div class="hud-stats">
+                <div class="stat-box">⚡ <span id="energy-val">100%</span></div>
+                <div class="stat-box">🚩 Sala <span id="room-val">1</span></div>
+            </div>
+        </div>
+        <button onclick="location.href='../index.html'" class="btn-back">Salir</button>
+    </header>
+
+    <main class="game-container">
+        
+        <div id="viewport-3d" class="viewport">
+            <div class="battle-bg"></div>
+            
+            <div class="battle-stage"></div>
+
+            <div id="control-panel" class="battle-panel hidden">
+                <div class="panel-left">
+                    <span id="panel-type" class="badge">FÍSICA</span>
+                    <h3 id="panel-title" style="margin: 0 0 10px 0; color: var(--u-gold);">Enemigo</h3>
+                    <p id="panel-question" style="margin: 0;">...</p>
+                </div>
+                <div id="panel-options" class="panel-right"></div>
+            </div>
+        </div>
+
+        <div id="map-interface" class="map-overlay minimized">
+            <div class="map-controls">
+                <button onclick="window.UniverseUI.zoomMap(0.1)">➕</button>
+                <button onclick="window.UniverseUI.zoomMap(-0.1)">➖</button>
+                <button onclick="window.UniverseUI.toggleMap(false)" class="btn-close-map">✖</button>
+            </div>
+            
+            <div class="map-viewport">
+                <div id="map-content" class="map-transform-layer">
+                    <svg id="map-connections"></svg>
+                    <div id="map-nodes"></div>
+                </div>
+            </div>
+            
+            <div class="map-hint" onclick="window.UniverseUI.toggleMap(true)">📍 Toca para Ampliar Mapa</div>
+        </div>
+
+        <div id="fx-overlay" class="fx-layer"></div>
+
+    </main>
+
+    <script src="../js/universe/universe_data.js"></script>
+    <script src="../js/universe/universe_ui.js"></script>
+    <script src="../js/universe/universe_core.js"></script>
+</body>
+</html>

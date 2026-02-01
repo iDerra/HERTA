@@ -1,0 +1,64 @@
+/* RECTANGLE */
+.cell-rect {
+    background: var(--b-block);
+    box-shadow: inset 0 0 0 1px #d35400;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px);
+    cursor: pointer;
+    z-index: 5;
+}
+
+/* RAMP */
+.cell-ramp {
+    background: var(--b-ramp);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+    position: relative;
+    z-index: 5;
+}
+
+.cell-ramp::after {
+    content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+    background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.1) 100%);
+}
+
+/* GOAL */
+.cell-goal { 
+    background: var(--b-goal); 
+    border: 2px dashed white; 
+    opacity: 0.9; 
+    animation: pulseGoal 1s infinite alternate; 
+    border-radius: 50%; 
+    transform: scale(0.8); 
+}
+@keyframes pulseGoal { from { transform: scale(0.7); } to { transform: scale(0.8); } }
+
+/* WATER */
+.cell-water { 
+    background: var(--b-water); 
+    opacity: 0.6; 
+    border-top: 3px solid rgba(255,255,255,0.5); 
+    animation: waterFlow 2s infinite linear; 
+}
+
+/* ROBOT */
+.robot-avatar {
+    position: absolute; 
+    width: 40px; 
+    height: 40px; 
+    top: 0; 
+    left: 0; 
+    z-index: 100;
+    transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.4s linear;
+}
+
+.robot-body {
+    width: 100%; 
+    height: 100%; 
+    background-image: url('../../images/avatar_robot.png');
+    background-size: contain; 
+    background-repeat: no-repeat; 
+    background-position: center bottom;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.robot-avatar.moving { transform: scale(1.1); }
+.robot-avatar.falling { transform: rotate(45deg) scale(0.8); opacity: 0; transition: top 1s ease-in, opacity 1s, transform 1s; }

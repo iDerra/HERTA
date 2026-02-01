@@ -1,0 +1,202 @@
+/* --- HERTA LIGHT & MODERN THEME --- */
+:root {
+    --herta-main: #6c5ce7;    
+    --herta-dark: #4834d4;   
+    --herta-gold: #fdcb6e;    
+    --herta-accent: #a29bfe;  
+    --bg-color: #f4f7f6;      
+    --card-bg: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --success: #00b894;
+    --danger: #ff7675;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif; 
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: radial-gradient(#dfe6e9 1.5px, transparent 1.5px);
+    background-size: 24px 24px; 
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background: #e1d8ff;
+    color: var(--herta-dark);
+    text-align: center;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+    border-bottom: 3px solid var(--herta-main);
+    position: relative;
+    z-index: 10;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--herta-main);
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.menu-container {
+    flex: 1; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; 
+    padding: 2rem;
+    gap: 2rem; 
+}
+
+.card {
+    background: var(--card-bg);
+    width: 300px;
+    padding: 2rem;
+    border-radius: 20px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-8px); 
+    box-shadow: 0 15px 35px rgba(108, 92, 231, 0.15); 
+    border-color: var(--herta-accent);
+}
+
+.card h2 {
+    margin-bottom: 1rem;
+    color: var(--herta-dark);
+    font-size: 1.4rem;
+}
+
+.card p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+
+.language { 
+    background-color: #E3F2FD; 
+    color: #1565C0;            
+}
+
+.math { 
+    background-color: #FFEBEE; 
+    color: #C62828;           
+}
+
+.tech { 
+    background-color: #F3E5F5; 
+    color: #6A1B9A;            
+}
+
+.biology { 
+    background-color: #E8F5E9; 
+    color: #2E7D32;            
+}
+
+.physics { 
+    background-color: #FFF9C4; 
+    color: #F57F17;           
+}
+
+.chemestry { 
+    background-color: #d6fef3; 
+    color: #90dcfd;            
+}
+
+
+.card.locked {
+    opacity: 0.6;
+    background-color: #f1f2f6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.card.locked:hover { transform: none; }
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: white;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    border-top: 1px solid #eee;
+}
+
+button {
+    background-color: var(--herta-main);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2);
+}
+
+button:hover {
+    background-color: var(--herta-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.3);
+}
+
+button:active { transform: translateY(0); }
+
+input, select {
+    padding: 12px 15px;
+    border: 2px solid #dfe6e9;
+    border-radius: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+input:focus, select:focus {
+    border-color: var(--herta-main);
+    outline: none;
+}
+
+@media (max-width: 600px) {
+    header h1 { font-size: 1.8rem; }
+    .card { width: 100%; }
+    .menu-container { padding: 1rem; }
+}

@@ -1,0 +1,181 @@
+.builder-ui { 
+    flex: 0 0 260px; 
+    height: 260px; 
+    background: #2c3e50; 
+    display: flex; 
+    border-top: 4px solid #f1c40f; 
+    color: white; 
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.2); 
+    z-index: 50; 
+}
+
+.panel-section { 
+    flex: 1; 
+    padding: 15px; 
+    border-right: 1px solid rgba(255,255,255,0.1); 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.panel-section h3 { 
+    margin: 0 0 10px 0; 
+    color: #3498db; 
+    font-size: 1rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+    padding-bottom: 5px; 
+}
+
+.fabricator-controls { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    height: 100%; 
+}
+
+.shape-selector { display: flex; gap: 5px; }
+
+.shape-btn { 
+    background: rgba(255,255,255,0.1); 
+    border: 1px solid #7f8c8d; 
+    color: white; 
+    padding: 6px; 
+    flex: 1; 
+    cursor: pointer; 
+    border-radius: 4px; 
+    font-size: 0.8rem; 
+}
+.shape-btn.active { background: #3498db; border-color: white; font-weight: bold; }
+.shape-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.math-box { 
+    background: rgba(0,0,0,0.3); 
+    padding: 10px; 
+    border-radius: 6px; 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+}
+
+.inputs-row { 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    margin-bottom: 5px; 
+}
+
+.input-group label { 
+    font-size: 0.8rem; 
+    margin-right: 5px; 
+    color: #ccc; 
+}
+
+.input-group input { 
+    width: 50px; 
+    background: #333; 
+    border: 1px solid #555; 
+    color: white; 
+    text-align: center; 
+    border-radius: 4px; 
+    padding: 4px; 
+}
+
+.result-row { 
+    background: #27ae60; 
+    color: white; 
+    padding: 8px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    text-align: center; 
+    font-size: 0.9rem; 
+}
+
+.btn-craft { 
+    width: 100%; 
+    background: #f1c40f; 
+    color: #2c3e50;
+    border: none; 
+    padding: 10px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border-radius: 4px; 
+    text-transform: uppercase; 
+    margin-top: auto; 
+}
+
+.btn-craft:hover { background: #f39c12; }
+
+.inventory-grid { display: flex; gap: 8px; flex-wrap: wrap; align-content: flex-start; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; flex: 1; overflow-y: auto; }
+.inv-item { width: 50px; height: 40px; background: var(--b-block); border: 2px solid rgba(255,255,255,0.7); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; color: white; font-weight: bold; }
+.inv-item:hover { transform: translateY(-2px); }
+.inv-item.selected { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.5); }
+.empty-msg { width: 100%; text-align: center; color: #7f8c8d; font-style: italic; margin-top: 20px; }
+
+.overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 200; display: flex; justify-content: center; align-items: center; }
+.overlay.hidden { display: none; }
+.msg-box { background: white; padding: 30px; border-radius: 10px; text-align: center; color: #333; min-width: 300px; }
+.msg-box h2 { margin-top: 0; color: #27ae60; }
+.msg-box button { margin-top: 15px; padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer; font-size: 1rem; border-radius: 4px; }
+
+.placed-rect {
+    background: var(--b-block);
+    border: 2px solid #d35400;
+    box-sizing: border-box;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px);
+    z-index: 5;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.placed-ramp {
+    background: var(--b-ramp);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+    z-index: 5;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.hidden { display: none !important; }
+
+.math-challenge {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #f1c40f;
+    padding: 10px;
+    border-radius: 6px;
+    animation: fadeIn 0.3s;
+    display: flex; flex-direction: column; gap: 8px;
+    height: 100%;
+}
+
+.challenge-header {
+    font-size: 0.8rem; text-transform: uppercase; color: #f1c40f; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;
+}
+
+#challenge-question {
+    font-size: 0.9rem; margin: 5px 0; color: white; line-height: 1.4;
+}
+
+.challenge-input-row {
+    display: flex; gap: 5px; align-items: center;
+}
+.challenge-input-row input {
+    flex: 1; padding: 8px; background: white; color: #333; border: none; border-radius: 4px; font-weight: bold;
+}
+#challenge-unit { color: #ccc; font-size: 0.8rem; }
+
+.challenge-actions {
+    display: flex; gap: 5px;
+}
+
+.btn-verify {
+    flex: 2; background: #27ae60; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;
+}
+.btn-verify:hover { background: #2ecc71; }
+
+.btn-cancel {
+    flex: 1; background: #c0392b; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;
+}
+
+.error-msg {
+    color: #e74c3c; font-size: 0.8rem; margin: 0; text-align: center; min-height: 1rem;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }

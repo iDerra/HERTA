@@ -1,0 +1,147 @@
+:root {
+    --b-bg: #2c3e50;
+    --b-grid: #34495e;
+    --b-line: rgba(255,255,255,0.15);
+    --b-ground: #27ae60;
+    --b-block: #e67e22;
+    --b-ramp: #e74c3c;
+    --b-goal: #f1c40f;
+    --b-water: #3498db;
+}
+
+html, body {
+    background: var(--b-bg);
+    color: white;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex; 
+    flex-direction: column;
+}
+
+/* HEADER */
+header {
+    flex: 0 0 auto; 
+    height: 60px;
+    background: #2c3e50 !important;
+    border-bottom: 2px solid #f1c40f !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+}
+
+header h1 {
+    font-size: 1.2rem !important;
+    margin: 0 !important;
+    color: white !important;
+    text-transform: uppercase; 
+}
+
+header p { display: none; }
+
+.header-content { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+}
+
+.hud-stats { 
+    display: flex; 
+    gap: 15px; 
+    font-size: 0.9rem; 
+}
+
+.stat-box { 
+    background: rgba(255,255,255,0.1); 
+    padding: 4px 10px; 
+    border-radius: 4px; 
+    border: 1px solid rgba(255,255,255,0.2); 
+}
+
+.btn-play { 
+    background: #2ecc71; 
+    color: white; 
+    border: none; 
+    padding: 6px 15px; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    border-bottom: 3px solid #1e8449; 
+    margin-right: 10px; 
+    font-size: 0.9rem; 
+}
+
+.btn-play:active { 
+    transform: translateY(2px); 
+    border-bottom: 0; 
+    margin-bottom: 3px; 
+}
+
+.btn-back { 
+    background: transparent; 
+    border: 1px solid #7f8c8d;
+    color: #bdc3c7; 
+    padding: 6px 15px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 0.9rem; 
+}
+
+.btn-back:hover { 
+    background: rgba(255,255,255,0.1); 
+    color: white; 
+}
+
+/* WORLD */
+.game-container { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    position: relative; 
+    background-color: #3498db; 
+}
+
+.blueprint-world { 
+    width: 100%; 
+    height: 100%; 
+    position: relative; 
+    overflow: hidden; 
+}
+
+.sky-bg { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    background: radial-gradient(circle at center, #3498db 0%, #2980b9 100%); 
+}
+
+/* GRID */
+.level-grid {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    background: rgba(44, 62, 80, 0.5);
+    border: 3px solid rgba(255,255,255,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    gap: 0px; 
+}
+
+/* CELLS */
+.grid-cell {
+    width: 40px; height: 40px;
+    box-sizing: border-box;
+    position: relative;
+    outline: 1px solid var(--b-line); 
+}
+
+.cell-solid {
+    background: var(--b-ground);
+    box-shadow: inset 0 0 0 1px #1e8449; 
+    z-index: 1;
+}
