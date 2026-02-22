@@ -12,9 +12,16 @@ window.Core = {
     bossData: [], 
 
     init: function() {
-        window.UniverseUI.showAvatarSelection(['us_avatar1.webp', 'us_avatar2.webp', 'us_avatar3.webp'], (selected) => {
-            this.avatar = selected;
-            this.startSimulation();
+        const avatars = ['us_avatar1.webp', 'us_avatar2.webp', 'us_avatar3.webp'];
+        const preloadList = avatars.map(a => `../images/universe/${a}`);
+        
+        window.UniverseUI.showLoading();
+        window.UniverseUI.preloadImages(preloadList, () => {
+            window.UniverseUI.hideLoading();
+            window.UniverseUI.showAvatarSelection(avatars, (selected) => {
+                this.avatar = selected;
+                this.startSimulation();
+            });
         });
     },
 
@@ -91,15 +98,37 @@ window.Core = {
     },
 
     loadRoom: function(node) {
-        if (node.type === 'boss') {
-            this.isBossFight = true;
-            this.bossStage = 0;
-            this.bossData = node.bossQuestions;
-            window.UniverseUI.renderScene(this.bossData[0], true, 3);
-        } else {
-            this.isBossFight = false;
-            window.UniverseUI.renderScene(node.data, false);
-        }
+        const assets = [];
+        // Player assets
+        assets.push(`../images/universe/${this.avatar}`);
+        assets.push(`../images/universe/${this.avatar.replace(/(\.[^.]+)$/, '_base$1')}`);
+
+        // Enemy assets
+        const collectAssets = (data) => {
+            if (data.visual && data.visual.img) {
+                assets.push(`../images/universe/${data.visual.img}`);
+                assets.push(`../images/universe/${data.visual.img.replace(/(\.[^.]+)$/, '_base$1')}`);
+            }
+        };
+
+        if (node.type === 'boss') node.bossQuestions.forEach(q => collectAssets(q));
+        else collectAssets(node.data);
+
+        const uniqueAssets = [...new Set(assets)];
+
+        window.UniverseUI.showLoading();
+        window.UniverseUI.preloadImages(uniqueAssets, () => {
+            window.UniverseUI.hideLoading();
+            if (node.type === 'boss') {
+                this.isBossFight = true;
+                this.bossStage = 0;
+                this.bossData = node.bossQuestions;
+                window.UniverseUI.renderScene(this.bossData[0], true, 3);
+            } else {
+                this.isBossFight = false;
+                window.UniverseUI.renderScene(node.data, false);
+            }
+        });
     },
 
     solveProblem: function(isCorrect) {

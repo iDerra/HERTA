@@ -8,6 +8,35 @@ window.UniverseUI = {
     
     battleStage: document.querySelector('.battle-stage'),
     
+    showLoading: function() {
+        let overlay = document.getElementById('loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'loading-overlay';
+            overlay.innerHTML = `<div class="loader"></div><div class="loading-text">Cargando Simulación...</div>`;
+            document.body.appendChild(overlay);
+        }
+        overlay.classList.remove('hidden');
+    },
+
+    hideLoading: function() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.classList.add('hidden');
+    },
+
+    preloadImages: function(urls, callback) {
+        let loaded = 0;
+        const total = urls.length;
+        if (total === 0) { callback(); return; }
+        
+        const check = () => { loaded++; if (loaded === total) callback(); };
+        urls.forEach(url => {
+            const img = new Image();
+            img.onload = check; img.onerror = check;
+            img.src = url;
+        });
+    },
+
     showAvatarSelection: function(avatars, callback) {
         const overlay = document.createElement('div');
         overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white;";
