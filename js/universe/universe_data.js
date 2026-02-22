@@ -1,11 +1,11 @@
 const OBSTACLES = {
-    PHYSICS:   { emoji: "⚡", color: "#f1c40f", name: "Constructo Volt" },
-    CHEMISTRY: { emoji: "🧪", color: "#00b894", name: "Slime Ácido" },
-    BIOLOGY:   { emoji: "🧬", color: "#e056fd", name: "Virus Mutante" },
+    PHYSICS:   { emoji: "⚡", color: "#f1c40f", name: "Constructo Volt", img: "us_enemy_physics.PNG" },
+    CHEMISTRY: { emoji: "🧪", color: "#00b894", name: "Slime Ácido", img: "us_enemy_chemestry.PNG" },
+    BIOLOGY:   { emoji: "🧬", color: "#e056fd", name: "Virus Mutante", img: "us_enemy_biology.PNG" },
     ASTRO:     { emoji: "🪐", color: "#0984e3", name: "Vigilante Estelar" },
-    MATH:      { emoji: "📐", color: "#e17055", name: "Gólem Geométrico" },
-    TECH:      { emoji: "💻", color: "#74b9ff", name: "Bot Corrupto" },
-    BOSS:      { emoji: "👿", color: "#ff7675", name: "BOSS: Bestia del Juicio" }
+    MATH:      { emoji: "📐", color: "#e17055", name: "Gólem Geométrico", img: "us_enemy_math.PNG" },
+    TECH:      { emoji: "💻", color: "#74b9ff", name: "Bot Corrupto", img: "us_enemy_tech.PNG" },
+    BOSS:      { emoji: "👿", color: "#ff7675", name: "BOSS: Bestia del Juicio", img: "us_enemy_boss.PNG" }
 };
 
 window.UniverseData = {

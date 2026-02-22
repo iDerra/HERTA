@@ -8,6 +8,27 @@ window.UniverseUI = {
     
     battleStage: document.querySelector('.battle-stage'),
     
+    showAvatarSelection: function(avatars, callback) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white;";
+        
+        let html = `<h2 style='margin-bottom:30px; font-family:sans-serif;'>Elige tu Avatar</h2><div style='display:flex; gap:30px;'>`;
+        avatars.forEach(av => {
+            html += `<div class='av-opt' data-av='${av}' style='cursor:pointer; border:4px solid transparent; border-radius:10px; padding:5px; transition:0.3s;'>
+                <img src='../images/universe/${av}' style='width:200px; height:200px; object-fit:contain; display:block; background:rgba(255,255,255,0.1); border-radius:5px;'>
+            </div>`;
+        });
+        html += `</div>`;
+        overlay.innerHTML = html;
+        document.body.appendChild(overlay);
+
+        overlay.querySelectorAll('.av-opt').forEach(el => {
+            el.onclick = () => { document.body.removeChild(overlay); callback(el.dataset.av); };
+            el.onmouseover = () => el.style.borderColor = '#0984e3';
+            el.onmouseout = () => el.style.borderColor = 'transparent';
+        });
+    },
+
     showModal: function(title, text, btnText, callback) {
         const overlay = document.getElementById('msg-overlay');
         document.getElementById('msg-title').innerText = title;
@@ -97,10 +118,12 @@ window.UniverseUI = {
     renderScene: function(data, isBoss, bossHealth = 0) {
         this.battleStage.innerHTML = ''; 
 
+        const avatarBase = window.Core.avatar.replace(/(\.[^.]+)$/, '_base$1');
+
         this.battleStage.innerHTML += `
-            <div class="base base-player"></div>
+            <div class="base base-player" style="background-image: url('../images/universe/${avatarBase}'); background-size: 100%; background-repeat: no-repeat; background-position: center;"></div>
             <div class="player-char">
-                <div class="char-body"><div class="char-img"></div></div>
+                <div class="char-body"><div class="char-img" style="background-image: url('../images/universe/${window.Core.avatar}'); background-size: contain; background-repeat: no-repeat; background-position: center bottom;"></div></div>
             </div>
             <div class="hp-box hp-player">
                 <span class="hp-name">Herta (Tú)</span>
@@ -112,11 +135,21 @@ window.UniverseUI = {
         const currentHp = isBoss ? bossHealth : 1;
         const hpPercent = (currentHp / maxHp) * 100;
         
+        const enemyContent = data.visual.img 
+            ? `<img src="../images/universe/${data.visual.img}" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));">`
+            : `<div class="enemy-emoji">${data.visual.emoji}</div>`;
+
+        let enemyBaseStyle = '';
+        if (data.visual.img) {
+            const enemyBase = data.visual.img.replace(/(\.[^.]+)$/, '_base$1');
+            enemyBaseStyle = `style="background-image: url('../images/universe/${enemyBase}'); background-size: contain; background-repeat: no-repeat; background-position: center;"`;
+        }
+
         this.battleStage.innerHTML += `
-            <div class="base base-enemy"></div>
+            <div class="base base-enemy" ${enemyBaseStyle}></div>
             <div class="obstacle-pos">
                 <div id="enemy-sprite" class="enemy-sprite">
-                    <div class="enemy-emoji">${data.visual.emoji}</div>
+                    ${enemyContent}
                 </div>
             </div>
             <div class="hp-box hp-enemy" id="enemy-hp-box">

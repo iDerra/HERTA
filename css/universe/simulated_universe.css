@@ -11,17 +11,23 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden
 
 /* HEADER HUD */
 header {
-    flex: 0 0 auto;
-    background: linear-gradient(90deg, #2c3e50, #000);
-    border-bottom: 3px solid var(--u-purple);
-    padding: 10px 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 20px;
     z-index: 100;
-    display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    display: flex; justify-content: flex-start; align-items: center;
+    box-shadow: none;
+    pointer-events: none;
+    gap: 15px;
 }
-header h1 { color: white; font-size: 1.2rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-style: italic; }
-.stat-box { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 5px; color: var(--u-gold); font-weight: bold; border: 2px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 1.1rem; }
-.btn-back { background: #c0392b; border: none; color: white; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+header > * { pointer-events: auto; }
+header h1 { color: white; font-size: 1.2rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-style: italic; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
+.stat-box { display: none; }
+.btn-back { background: #c0392b; border: none; color: white; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.5); order: -1; }
 
 /* --- BATTLE VIEWPORT --- */
 .game-container { flex: 1; position: relative; overflow: hidden; }
@@ -29,18 +35,25 @@ header h1 { color: white; font-size: 1.2rem; margin: 0; text-transform: uppercas
 .viewport {
     width: 100%; height: 100%;
     position: relative;
-    background: radial-gradient(circle at center, #4b4b60 0%, #1a1a2e 100%);
+    background: radial-gradient(circle at center, #34344a 0%, #1a1a2e 60%, #000000 100%);
     overflow: hidden;
     perspective: 1000px;
 }
 
 .battle-bg {
     position: absolute; width: 100%; height: 100%;
-    background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(142, 68, 173, 0.15) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0, 210, 211, 0.15) 1px, transparent 1px);
     background-size: 80px 80px;
     transform: perspective(500px) rotateX(20deg) scale(1.5);
     transform-origin: center 80%;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+    animation: gridScroll 15s linear infinite;
+}
+
+@keyframes gridScroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 80px; }
 }
 
 .battle-stage {
@@ -51,21 +64,16 @@ header h1 { color: white; font-size: 1.2rem; margin: 0; text-transform: uppercas
 
 .base {
     position: absolute;
-    width: 250px; height: 80px;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.4);
-    border: 3px solid rgba(255,255,255,0.2);
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    transform: rotateX(60deg);
+    width: 40vh; height: 40vh;
 }
-.base-player { bottom: 33%; left: 10%; border-color: var(--u-gold); background: radial-gradient(circle, rgba(241, 196, 15, 0.2), transparent); }
-.base-enemy { top: 25%; right: 10%; border-color: var(--u-danger); background: radial-gradient(circle, rgba(231, 76, 60, 0.2), transparent); }
+.base-player { bottom: 10%; left: 5%;}
+.base-enemy { top: 5%; right: 15%; }
 
 .player-char {
     position: absolute; 
     bottom: 35%; 
     left: 15%; 
-    width: 160px; height: 160px; 
+    width: 20vh; height: 30vh; 
     z-index: 20; 
     transition: transform 0.3s;
 }
@@ -87,23 +95,23 @@ header h1 { color: white; font-size: 1.2rem; margin: 0; text-transform: uppercas
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
 }
 
-.obstacle-pos { position: absolute; top: 15%; right: 15%; z-index: 15; }
-.enemy-sprite { width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; animation: floatEnemy 3s infinite ease-in-out; transition: all 0.5s; }
+.obstacle-pos { position: absolute; top: 5%; right: 25%; z-index: 15; }
+.enemy-sprite { width: 20vh; height: 30vh; display: flex; justify-content: center; align-items: center; animation: floatEnemy 3s infinite ease-in-out; transition: all 0.5s; }
 .enemy-emoji { font-size: 8rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); transition: transform 0.2s; }
 
 .hp-box {
-    position: absolute; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; border-left: 5px solid; width: 200px; color: white;
+    position: absolute; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; border-left: 5px solid; width: 150px; color: white;
     font-family: 'Poppins', sans-serif; box-shadow: 0 5px 10px rgba(0,0,0,0.5); transition: opacity 0.5s;
 }
-.hp-enemy { top: 10%; left: 5%; border-color: var(--u-danger); }
-.hp-player { bottom: 45%; right: 5%; border-color: var(--u-gold); }
+.hp-enemy { top: 20%; right: 0%; border-color: var(--u-danger); }
+.hp-player { bottom: 60%; left: 30%; border-color: var(--u-gold); }
 .hp-name { font-size: 0.9rem; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; }
 .hp-bar-bg { width: 100%; height: 10px; background: #555; border-radius: 5px; overflow: hidden; }
 .hp-bar-fill { height: 100%; width: 100%; transition: width 0.5s; }
 
 .battle-panel {
     position: absolute; bottom: 0; left: 0; width: 100%; 
-    height: 28%;
+    height: 20%;
     background: linear-gradient(to bottom, #2c3e50, #1a1a2e); border-top: 4px solid var(--u-purple); z-index: 50;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.5); display: flex; transition: transform 0.3s;
 }
