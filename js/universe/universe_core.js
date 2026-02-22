@@ -5,14 +5,14 @@ window.Core = {
     currentLayer: 0,
     currentNode: 0,
     energy: 100,
-    avatar: 'us_avatar1.PNG',
+    avatar: 'us_avatar1.webp',
     
     isBossFight: false,
     bossStage: 0, 
     bossData: [], 
 
     init: function() {
-        window.UniverseUI.showAvatarSelection(['us_avatar1.PNG', 'us_avatar2.PNG', 'us_avatar3.PNG'], (selected) => {
+        window.UniverseUI.showAvatarSelection(['us_avatar1.webp', 'us_avatar2.webp', 'us_avatar3.webp'], (selected) => {
             this.avatar = selected;
             this.startSimulation();
         });
