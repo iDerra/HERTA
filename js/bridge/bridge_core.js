@@ -19,6 +19,11 @@ window.BridgeCore = {
         const levelData = window.BridgeLevels[idx];
         if(!levelData) return;
 
+        // Asegurar que volvemos a la vista 2D ocultando el canvas 3D
+        const canvas3d = document.getElementById('sim-3d-canvas');
+        if(canvas3d) canvas3d.classList.add('hidden');
+        document.getElementById('level-grid').classList.remove('hidden');
+
         document.getElementById('level-val').innerText = idx + 1;
         this.isSimulating = false;
         this.inventory = [];
@@ -200,13 +205,35 @@ window.BridgeCore = {
 
     toggleSimulation: function() {
         if (this.isSimulating) {
+            // Si ya estaba simulando, volvemos a 2D y reiniciamos
+            const canvas3d = document.getElementById('sim-3d-canvas');
+            if(canvas3d) canvas3d.classList.add('hidden');
+            document.getElementById('level-grid').classList.remove('hidden');
+            
             this.loadLevel(this.currentLevelIdx);
             return;
         }
+        
         this.isSimulating = true;
         document.querySelector('.btn-play').innerText = "⏹ REINICIAR";
         document.getElementById('robot').classList.add('moving');
-        this.simulationInterval = setInterval(() => this.stepPhysics(), 400);
+        
+        document.getElementById('level-grid').classList.add('hidden');
+        const canvas3d = document.getElementById('sim-3d-canvas');
+        if(canvas3d) {
+            canvas3d.classList.remove('hidden');
+            
+            // ---> AÑADE ESTA LÍNEA <---
+            // Fuerza a recalcular el tamaño del canvas ahora que es visible
+            window.dispatchEvent(new Event('resize')); 
+            
+            // ¡Aquí le pasamos tu mapa al motor 3D!
+            window.Bridge3D.buildScene(this.levelMatrix);
+            // Actualizamos la posición inicial del robot en 3D para evitar el bug de teletransporte
+            this.updateRobotVisuals();
+        }
+
+        this.simulationInterval = setInterval(() => this.stepPhysics(), 500);
     },
 
     stepPhysics: function() {
@@ -273,6 +300,13 @@ window.BridgeCore = {
     },
 
     updateRobotVisuals: function() {
+        // --- NUEVO CÓDIGO 3D ---
+        if (this.isSimulating && window.Bridge3D) {
+            window.Bridge3D.updateRobot(this.robotPos.r, this.robotPos.c, this.robotRot);
+        }
+        // -----------------------
+
+        // Lógica original 2D
         const robot = document.getElementById('robot');
         if(robot) {
             robot.style.top = (this.robotPos.r * this.CELL_SIZE) + 'px';
