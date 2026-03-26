@@ -39,22 +39,25 @@ window.UniverseUI = {
 
     showAvatarSelection: function(avatars, callback) {
         const overlay = document.createElement('div');
-        overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white;";
+        // Le asignamos una clase para controlarlo desde el CSS
+        overlay.className = 'avatar-select-overlay';
         
-        let html = `<h2 style='margin-bottom:30px; font-family:sans-serif;'>Elige tu Avatar</h2><div style='display:flex; gap:30px;'>`;
+        let html = `<h2>ELIGE TU AVATAR</h2><div class='avatar-container'>`;
         avatars.forEach(av => {
-            html += `<div class='av-opt' data-av='${av}' style='cursor:pointer; border:4px solid transparent; border-radius:10px; padding:5px; transition:0.3s;'>
-                <img src='../images/universe/${av}' style='width:200px; height:200px; object-fit:contain; display:block; background:rgba(255,255,255,0.1); border-radius:5px;'>
+            html += `<div class='av-opt' data-av='${av}'>
+                <img src='../images/universe/${av}'>
             </div>`;
         });
         html += `</div>`;
+        
         overlay.innerHTML = html;
         document.body.appendChild(overlay);
 
         overlay.querySelectorAll('.av-opt').forEach(el => {
-            el.onclick = () => { document.body.removeChild(overlay); callback(el.dataset.av); };
-            el.onmouseover = () => el.style.borderColor = '#0984e3';
-            el.onmouseout = () => el.style.borderColor = 'transparent';
+            el.onclick = () => { 
+                document.body.removeChild(overlay); 
+                callback(el.dataset.av); 
+            };
         });
     },
 
@@ -145,6 +148,12 @@ window.UniverseUI = {
     },
 
     renderScene: function(data, isBoss, bossHealth = 0) {
+        const bgNum = Math.floor(Math.random() * 3) + 1;
+        const viewport = document.getElementById('viewport-3d');
+        if (viewport) {
+            viewport.style.backgroundImage = `url('../images/universe/us_background${bgNum}.webp')`;
+        }
+
         this.battleStage.innerHTML = ''; 
 
         const avatarBase = window.Core.avatar.replace(/(\.[^.]+)$/, '_base$1');
