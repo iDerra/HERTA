@@ -1,4 +1,4 @@
-const MAP_CONFIG = { layers: 6 }; 
+const MAP_CONFIG = { layers: 11 }; 
 
 window.Core = {
     map: [],
@@ -7,9 +7,9 @@ window.Core = {
     energy: 100,
     avatar: 'us_avatar1.webp',
     
-    isBossFight: false,
+    combatType: 'normal',
     bossStage: 0, 
-    bossData: [], 
+    combatData: [],
 
     init: function() {
         const avatars = ['us_avatar1.webp', 'us_avatar2.webp', 'us_avatar3.webp'];
@@ -45,13 +45,27 @@ window.Core = {
             const layerNodes = [];
             const count = Math.random() > 0.6 ? 3 : 2; 
             for (let j = 0; j < count; j++) {
+                const isSemiBoss = Math.random() < 0.25;
+                let dataResult;
+                if (isSemiBoss) {
+                    const prob1 = window.UniverseData.generateProblem();
+                    let prob2 = window.UniverseData.generateProblem();
+                    // Ensure the second problem has the same subject but different question
+                    while (prob2.subject !== prob1.subject || prob2.question === prob1.question) {
+                        prob2 = window.UniverseData.generateProblem();
+                    }
+                    dataResult = [prob1, prob2];
+                } else {
+                    dataResult = window.UniverseData.generateProblem();
+                }
+
                 layerNodes.push({
                     id: `${i}-${j}`,
-                    type: 'normal',
+                    type: isSemiBoss ? 'semiboss' : 'normal',
                     x: (j + 1) / (count + 1),
                     connections: [],
                     status: 'locked', 
-                    data: window.UniverseData.generateProblem()
+                    data: dataResult
                 });
             }
             this.map.push(layerNodes);
@@ -112,6 +126,7 @@ window.Core = {
         };
 
         if (node.type === 'boss') node.bossQuestions.forEach(q => collectAssets(q));
+        else if (node.type === 'semiboss') node.data.forEach(q => collectAssets(q));
         else collectAssets(node.data);
 
         const uniqueAssets = [...new Set(assets)];
@@ -120,32 +135,46 @@ window.Core = {
         window.UniverseUI.preloadImages(uniqueAssets, () => {
             window.UniverseUI.hideLoading();
             if (node.type === 'boss') {
-                this.isBossFight = true;
+                this.combatType = 'boss';
                 this.bossStage = 0;
-                this.bossData = node.bossQuestions;
-                window.UniverseUI.renderScene(this.bossData[0], true, 3);
+                this.combatData = node.bossQuestions;
+                window.UniverseUI.renderScene(this.combatData[0], 'boss', 3);
+            } else if (node.type === 'semiboss') {
+                this.combatType = 'semiboss';
+                this.bossStage = 0;
+                this.combatData = node.data;
+                window.UniverseUI.renderScene(this.combatData[0], 'semiboss', 2);
             } else {
-                this.isBossFight = false;
-                window.UniverseUI.renderScene(node.data, false);
+                this.combatType = 'normal';
+                window.UniverseUI.renderScene(node.data, 'normal');
             }
         });
     },
 
     solveProblem: function(isCorrect) {
         if (isCorrect) {
-            if (this.isBossFight) {
+            if (this.combatType === 'boss' || this.combatType === 'semiboss') {
+                const totalStages = this.combatType === 'boss' ? 3 : 2;
                 this.bossStage++;
-                window.UniverseUI.animateBossHit(3 - this.bossStage); 
+                window.UniverseUI.animateBossHit(totalStages - this.bossStage, totalStages); 
                 
-                if (this.bossStage >= 3) {
+                if (this.bossStage >= totalStages) {
                     setTimeout(() => {
                         window.UniverseUI.animateSuccess(() => {
-                            window.UniverseUI.showModal("¡VICTORIA!", "Has derrotado al Boss y completado el Universo Simulado.", "Salir", () => location.href = '../index.html');
+                            if (this.combatType === 'boss') {
+                                window.UniverseUI.showModal("¡VICTORIA!", "Has derrotado al Boss y completado el Universo Simulado.", "Salir", () => location.href = '../index.html');
+                            } else {
+                                this.energy = Math.min(100, this.energy + 50);
+                                this.updateHUD();
+                                this.updateSelectables(this.currentLayer, this.currentNode);
+                                window.UniverseUI.renderMap(this.map);
+                                window.UniverseUI.toggleMap(true);
+                            }
                         });
                     }, 1000);
                 } else {
                     setTimeout(() => {
-                        window.UniverseUI.renderScene(this.bossData[this.bossStage], true, 3 - this.bossStage);
+                        window.UniverseUI.renderScene(this.combatData[this.bossStage], this.combatType, totalStages - this.bossStage);
                     }, 1000);
                 }
 
@@ -157,7 +186,8 @@ window.Core = {
                 });
             }
         } else {
-            this.energy -= (this.isBossFight ? 30 : 20);
+            const damage = this.combatType === 'boss' ? 30 : (this.combatType === 'semiboss' ? 25 : 20);
+            this.energy -= damage;
             this.updateHUD();
             window.UniverseUI.animateFail();
             if(this.energy <= 0) {
@@ -169,6 +199,12 @@ window.Core = {
     updateHUD: function() {
         const el = document.getElementById('energy-val');
         el.innerText = this.energy + '%';
+        
+        const roomEl = document.getElementById('room-val');
+        if (roomEl) {
+            roomEl.innerText = (this.currentLayer + 1);
+        }
+
         const playerHpBar = document.querySelector('.hp-player .hp-bar-fill');
         if(playerHpBar) {
             playerHpBar.style.width = this.energy + '%';

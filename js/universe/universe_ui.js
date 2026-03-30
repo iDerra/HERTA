@@ -117,7 +117,7 @@ window.UniverseUI = {
                 el.className = `map-node ${node.status} ${node.type}`;
                 el.style.left = `${xPos}%`;
                 el.style.top = `${yPct}%`;
-                el.innerHTML = node.type === 'boss' ? '👿' : (node.type === 'start' ? '🏠' : lIdx);
+                el.innerHTML = node.type === 'boss' ? '👿' : (node.type === 'semiboss' ? '⚔️' : (node.type === 'start' ? '🏠' : lIdx));
                 
                 if (node.status === 'selectable') {
                     el.onclick = (e) => {
@@ -147,7 +147,7 @@ window.UniverseUI = {
         });
     },
 
-    renderScene: function(data, isBoss, bossHealth = 0) {
+    renderScene: function(data, combatType, enemyHealth = 0) {
         const bgNum = Math.floor(Math.random() * 3) + 1;
         const viewport = document.getElementById('viewport-3d');
         if (viewport) {
@@ -169,13 +169,18 @@ window.UniverseUI = {
             </div>
         `;
 
-        const maxHp = isBoss ? 3 : 1;
-        const currentHp = isBoss ? bossHealth : 1;
+        const isBoss = combatType === 'boss';
+        const isSemiBoss = combatType === 'semiboss';
+
+        const maxHp = isBoss ? 3 : (isSemiBoss ? 2 : 1);
+        const currentHp = (isBoss || isSemiBoss) ? enemyHealth : 1;
         const hpPercent = (currentHp / maxHp) * 100;
         
+        let spriteStyle = isSemiBoss ? 'width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 0 20px rgba(255, 60, 0, 0.8)); transform: scale(1.15);' : 'width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));';
+
         const enemyContent = data.visual.img 
-            ? `<img src="../images/universe/${data.visual.img}" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));">`
-            : `<div class="enemy-emoji">${data.visual.emoji}</div>`;
+            ? `<img src="../images/universe/${data.visual.img}" style="${spriteStyle}">`
+            : `<div class="enemy-emoji" style="${isSemiBoss ? 'transform: scale(1.3); text-shadow: 0 0 20px rgba(255,60,0,0.8);' : ''}">${data.visual.emoji}</div>`;
 
         let enemyBaseStyle = '';
         if (data.visual.img) {
@@ -214,7 +219,7 @@ window.UniverseUI = {
         });
     },
 
-    animateBossHit: function(remainingLives) {
+    animateBossHit: function(remainingLives, totalLives) {
         const sprite = document.getElementById('enemy-sprite');
         sprite.style.filter = "brightness(5) sepia(1) hue-rotate(-50deg) saturate(5)"; 
         sprite.animate([
@@ -224,7 +229,7 @@ window.UniverseUI = {
         setTimeout(() => sprite.style.filter = "none", 300);
         
         const hpFill = document.getElementById('enemy-hp-fill');
-        const pct = (remainingLives / 3) * 100;
+        const pct = (remainingLives / totalLives) * 100;
         hpFill.style.width = `${pct}%`;
     },
 
