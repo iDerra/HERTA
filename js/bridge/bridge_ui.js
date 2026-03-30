@@ -25,6 +25,10 @@ window.BridgeUI = {
                 if (char === 'm') cell.classList.add('cell-goal');
                 if (char === 'w') cell.classList.add('cell-water');
                 
+                // Marcadores 5x5 para guiar al usuario
+                if ((c + 1) % 5 === 0) cell.classList.add('grid-mark-x');
+                if ((r + 1) % 5 === 0) cell.classList.add('grid-mark-y');
+                
                 cell.onclick = () => window.BridgeCore.placeBlock(r, c);
 
                 container.appendChild(cell);

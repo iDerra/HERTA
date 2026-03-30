@@ -2,7 +2,7 @@
 .cell-rect {
     background: var(--b-block);
     box-shadow: inset 0 0 0 1px #d35400;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px);
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0, 0, 0, 0.1) 5px, rgba(0, 0, 0, 0.1) 10px);
     cursor: pointer;
     z-index: 5;
 }
@@ -16,51 +16,59 @@
 }
 
 .cell-ramp::after {
-    content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-    background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.1) 100%);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 60%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 /* GOAL */
-.cell-goal { 
-    background: var(--b-goal); 
-    border: 2px dashed white; 
-    opacity: 0.9; 
-    animation: pulseGoal 1s infinite alternate; 
-    border-radius: 50%; 
-    transform: scale(0.8); 
+.cell-goal {
+    background-image: url('../../images/bridge_finish_2d.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    transform: scale(0.9);
 }
-@keyframes pulseGoal { from { transform: scale(0.7); } to { transform: scale(0.8); } }
 
 /* WATER */
-.cell-water { 
-    background: var(--b-water); 
-    opacity: 0.6; 
-    border-top: 3px solid rgba(255,255,255,0.5); 
-    animation: waterFlow 2s infinite linear; 
+.cell-water {
+    background: var(--b-water);
+    opacity: 0.6;
+    border-top: 3px solid rgba(255, 255, 255, 0.5);
+    animation: waterFlow 2s infinite linear;
 }
 
 /* ROBOT */
 .robot-avatar {
-    position: absolute; 
-    width: 40px; 
-    height: 40px; 
-    top: 0; 
-    left: 0; 
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 0;
+    left: 0;
     z-index: 100;
     transition: top 0.4s linear, left 0.4s linear, transform 0.4s linear;
 }
 
 .robot-body {
-    width: 150%; 
-    height: 150%;
+    width: 200%;
+    height: 200%;
     position: absolute;
     left: 0;
     bottom: 0;
-    background-image: url('../../images/coche_robot.png');
-    background-size: contain; 
-    background-repeat: no-repeat; 
+    background-image: url('../../images/bridge_2d_car.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
     background-position: center bottom;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 
-.robot-avatar.falling { transform: rotate(45deg) scale(0.8); opacity: 0; transition: top 1s ease-in, opacity 1s, transform 1s; }
+.robot-avatar.falling {
+    transform: rotate(45deg) scale(0.8);
+    opacity: 0;
+    transition: top 1s ease-in, opacity 1s, transform 1s;
+}
