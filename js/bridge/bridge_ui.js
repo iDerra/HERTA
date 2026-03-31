@@ -22,6 +22,7 @@ window.BridgeUI = {
                 cell.className = 'grid-cell';
 
                 if (char === 'x') cell.classList.add('cell-solid');
+                if (char === 'n') cell.classList.add('cell-natural-ramp');
                 if (char === 'm') cell.classList.add('cell-goal');
                 if (char === 'w') cell.classList.add('cell-water');
                 

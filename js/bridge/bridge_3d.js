@@ -28,7 +28,7 @@ window.Bridge3D = {
 
         // 1. Crear Escena
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xE0F7FA); // Color del cielo
+        this.scene.background = null; // Quitar color estático para permitir background CSS transparente
 
         // 2. Crear Cámara Isométrica (Ortográfica)
         // Usamos un fallback por si el canvas está oculto (tamaño 0) al inicializar
@@ -44,8 +44,17 @@ window.Bridge3D = {
         this.camera.lookAt(this.scene.position);
 
         // 3. Crear Renderizador
-        this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        // alpha: true permite que el fondo HTML de la web se renderice debajo del modelo 3D
+        this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         this.renderer.setSize(width, height);
+        this.renderer.setClearColor(0x000000, 0); // Totalmente transparente
+        
+        // Configurar la imagen de fondo dinámicamente sobre la capa CSS del Viewport
+        // La imagen de nubes se coloca arriba abarcando el 100% del ancho, apoyada por un gradiente de caída
+        canvas.style.backgroundImage = "url('../images/bridge_background.webp'), linear-gradient(to bottom, #e0f7fa 0%, #81d4fa 100%)";
+        canvas.style.backgroundSize = "100% auto, 100% 100%";
+        canvas.style.backgroundPosition = "top center, center";
+        canvas.style.backgroundRepeat = "no-repeat, no-repeat";
 
         // Para que se re-escale si se cambia el tamaño de la ventana
         window.addEventListener('resize', () => {
@@ -144,60 +153,117 @@ window.Bridge3D = {
         // Geometría base para bloques
         const boxGeo = new THREE.BoxGeometry(this.blockSize, this.blockSize, this.blockSize);
 
-        const rows = levelMatrix.length;
-        const cols = levelMatrix[0].length;
+        // Fetch de los datos del nivel actual para leer las 3 matrices (Delantera, Central, Trasera)
+        // Usamos el índice actual almacenado en el Core
+        const idx = window.BridgeCore.currentLevelIdx;
+        const currentLevel = window.BridgeLevels[idx] || window.BridgeLevels[0];
+        
+        const matrixCenter = currentLevel.matrixCenter;
+        // Fallback por si hay algún mapa antiguo que aún no está migrado
+        const matrixLeft = currentLevel.matrixLeft || matrixCenter;
+        const matrixRight = currentLevel.matrixRight || matrixCenter;
 
-        // Centrar el mapa en la coordenada (0,0,0)
-        // No necesitamos offsets fijos aquí, calcularemos x,y dinámicamente
-        // para centrar la estructura verticalmente.
+        const rows = matrixCenter.length;
+        const cols = matrixCenter[0].length;
 
         // 1. Renderizar Elementos Estáticos del Nivel (Tierra, Agua, Meta)
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                const cell = levelMatrix[r][c];
-                if (cell === '') continue; // Vacío
+                
+                // Iteramos por profundidad: Derecha (Z=-1), Centro (Z=0), Izquierda (Z=1)
+                for (let dz = -1; dz <= 1; dz++) {
+                    const currentMatrix = (dz === -1) ? matrixRight : (dz === 1 ? matrixLeft : matrixCenter);
+                    const cell = currentMatrix[r] ? currentMatrix[r][c] : '.';
 
-                // Saltamos los bloques del usuario ('r', 't') porque los renderizaremos como objetos completos después
-                if (cell === 'r' || cell === 't') continue;
+                    if (!cell || cell === '.' || cell === 'o' || cell === 'r' || cell === 't') continue;
 
-                let material, zScale = 1;
-
-                // Definir material y forma según el tipo de celda
-                if (cell === 'x') { // Tierra
-                    material = new THREE.MeshLambertMaterial({ color: this.colors.tierra });
-                    zScale = 3;
-                } else if (cell === 'w') { // Agua
-                    material = new THREE.MeshLambertMaterial({ color: this.colors.agua, transparent: true, opacity: 0.8 });
-                    zScale = 3;
-                    // El agua no necesita ajuste de altura especial en vertical, es un bloque más
-                } else if (cell === 'm') { // Meta
-                    const texture = new THREE.TextureLoader().load('../images/bridge_finish.webp');
-                    const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-                    const sprite = new THREE.Sprite(spriteMat);
-
-                    const x = ((c - cols / 2) * this.blockSize);
+                    // Coordenadas base
+                    const x = (c - cols / 2) * this.blockSize;
                     const y = (rows / 2 - r) * this.blockSize;
 
-                    sprite.position.set(x + (0.5 * this.blockSize), y + (1.0 * this.blockSize), 1.0 * this.blockSize);
-                    sprite.scale.set(this.blockSize * 3.0, this.blockSize * 3.0, 1);
-                    this.scene.add(sprite);
-                    continue; // Saltamos la creación del bloque `mesh` común inferior
-                } else {
-                    continue; // Ignora los espacios vacíos ('.') u otros caracteres
+                    if (cell === 'x' || cell === 'n') {
+                        // Calcular profundidad relativa a esta matriz específica
+                        let depthFromSurface = 0;
+                        for (let i = r - 1; i >= 0; i--) {
+                            const upperCell = currentMatrix[i] ? currentMatrix[i][c] : '.';
+                            if (upperCell === 'x' || upperCell === 'n') {
+                                depthFromSurface++;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        let baseHex;
+                        if (depthFromSurface === 0) {
+                            baseHex = this.colors.tierra; // Verde
+                        } else if (depthFromSurface === 1 || depthFromSurface === 2) {
+                            baseHex = 0x8D6E63; // Marrón
+                        } else {
+                            baseHex = 0x757575; // Gris
+                        }
+
+                        const depthFactor = 1.0 - Math.min((r / (rows * 1.5)), 0.1); 
+                        const material = new THREE.MeshStandardMaterial({ 
+                            color: new THREE.Color(baseHex).multiplyScalar(depthFactor), 
+                            flatShading: true, roughness: 0.8, metalness: 0.1 
+                        });
+
+                        let mesh;
+                        if (cell === 'n') {
+                            const shape = new THREE.Shape();
+                            shape.moveTo(0, 0); shape.lineTo(this.blockSize, 0); shape.lineTo(this.blockSize, this.blockSize); shape.lineTo(0, 0);
+                            const geo = new THREE.ExtrudeGeometry(shape, { depth: this.blockSize, bevelEnabled: false });
+                            mesh = new THREE.Mesh(geo, material);
+                            mesh.position.set(x - 0.5 * this.blockSize, y - 0.5 * this.blockSize, dz * this.blockSize - 0.5 * this.blockSize);
+                        } else {
+                            const geo = new THREE.BoxGeometry(this.blockSize, this.blockSize, this.blockSize);
+                            mesh = new THREE.Mesh(geo, material);
+                            mesh.position.set(x, y, dz * this.blockSize);
+                            mesh.scale.set(0.98, 0.98, 0.98); 
+                        }
+                        this.scene.add(mesh);
+
+                    } else if (cell === 'w') {
+                        // Verificador de adyacencia 3D para el agua (Culling de caras internas)
+                        const isWater = (rr, cc, ddz) => {
+                            // Si nos salimos del sándwich de 3 capas (-1, 0, 1), no hay agua (aire)
+                            if (ddz < -1 || ddz > 1) return false;
+                            const m = (ddz === -1) ? matrixRight : (ddz === 1 ? matrixLeft : matrixCenter);
+                            // Verificador de límites r y c
+                            if (!m || !m[rr] || cc < 0 || cc >= m[rr].length) return false;
+                            return m[rr][cc] === 'w';
+                        };
+
+                        const matVis = new THREE.MeshStandardMaterial({ 
+                            color: this.colors.agua, transparent: true, opacity: 0.6, 
+                            flatShading: true, roughness: 0.1, metalness: 0.5 
+                        });
+                        const matInvis = new THREE.MeshBasicMaterial({ visible: false });
+                        
+                        // Orden de caras Three.js: [px (+X), nx (-X), py (+Y), ny (-Y), pz (+Z), nz (-Z)]
+                        const mats = [
+                            isWater(r, c + 1, dz) ? matInvis : matVis, // Derecha
+                            isWater(r, c - 1, dz) ? matInvis : matVis, // Izquierda
+                            isWater(r - 1, c, dz) ? matInvis : matVis, // Arriba
+                            isWater(r + 1, c, dz) ? matInvis : matVis, // Abajo
+                            isWater(r, c, dz + 1) ? matInvis : matVis, // Frente (Z+)
+                            isWater(r, c, dz - 1) ? matInvis : matVis  // Fondo (Z-)
+                        ];
+
+                        const mesh = new THREE.Mesh(boxGeo, mats);
+                        mesh.position.set(x, y, dz * this.blockSize);
+                        this.scene.add(mesh);
+
+                    } else if (cell === 'm' && dz === 0) {
+                        // Meta 
+                        const texture = new THREE.TextureLoader().load('../images/bridge_finish.webp');
+                        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                        const sprite = new THREE.Sprite(spriteMat);
+                        sprite.position.set(x + (0.5 * this.blockSize), y + (1.0 * this.blockSize), 1.0 * this.blockSize);
+                        sprite.scale.set(this.blockSize * 3.0, this.blockSize * 3.0, 1);
+                        this.scene.add(sprite);
+                    }
                 }
-
-                const mesh = new THREE.Mesh(boxGeo, material);
-
-                // Mapear Coordenadas 2D (c, r) a 3D (x, y, z) VERTICAL
-                // X = Columnas (izquierda a derecha)
-                // Y = Filas (Invertido: r=0 es arriba, r=max es abajo)
-                const x = (c - cols / 2) * this.blockSize;
-                const y = (rows / 2 - r) * this.blockSize;
-
-                mesh.position.set(x, y, 0);
-                mesh.scale.z = zScale;
-
-                this.scene.add(mesh);
             }
         }
 
@@ -208,8 +274,13 @@ window.Bridge3D = {
                 const w = item.w * this.blockSize;
                 const h = item.h * this.blockSize;
                 const geo = new THREE.BoxGeometry(w, h, this.blockSize);
-                const mat = new THREE.MeshLambertMaterial({ color: this.colors.bloque });
+                // Usamos StandardMaterial con flatShading para dar un brillo premium de tipo plástico de construcción low poly
+                const mat = new THREE.MeshStandardMaterial({ color: this.colors.bloque, roughness: 0.3, metalness: 0.1, flatShading: true });
                 const mesh = new THREE.Mesh(geo, mat);
+
+                // Bordes para simular piezas ensamblables (Blueprint aesthetic)
+                const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0x4e342e, opacity: 0.5, transparent: true, linewidth: 2 }));
+                mesh.add(edges);
 
                 // Calcular posición central del bloque grande
                 const centerC = item.c + (item.w - 1) / 2;
@@ -234,8 +305,13 @@ window.Bridge3D = {
                 shape.lineTo(0, 0);
 
                 const geo = new THREE.ExtrudeGeometry(shape, { depth: this.blockSize, bevelEnabled: false });
-                const mat = new THREE.MeshLambertMaterial({ color: this.colors.rampa });
+                // Aplicar Flat Shading Low Poly
+                const mat = new THREE.MeshStandardMaterial({ color: this.colors.rampa, roughness: 0.3, metalness: 0.1, flatShading: true });
                 const mesh = new THREE.Mesh(geo, mat);
+
+                // Líneas de contorno encajable
+                const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xbf360c, opacity: 0.5, transparent: true, linewidth: 2 }));
+                mesh.add(edges);
 
                 // Posición (Esquina inferior izquierda del bounding box)
                 const x = (item.c - cols / 2 - 0.5) * this.blockSize;

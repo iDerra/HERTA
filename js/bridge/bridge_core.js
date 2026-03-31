@@ -116,7 +116,7 @@ window.BridgeCore = {
             this.robotBody = null;
         }
 
-        this.levelMatrix = levelData.matrix.map(row => row.split(''));
+        this.levelMatrix = levelData.matrixCenter.map(row => row.split(''));
 
         for (let r = 0; r < this.levelMatrix.length; r++) {
             for (let c = 0; c < this.levelMatrix[r].length; c++) {
@@ -369,6 +369,18 @@ window.BridgeCore = {
                         friction: 0.1, // Baja fricción para facilitar deslizar
                         restitution: 0.0 // No rebotar
                     }));
+                } else if (cell === 'n') {
+                    // Cuerpo estático rampa de tierra (Sube hacia la derecha)
+                    const vertices = [
+                        { x: -S / 2, y: S / 2 },  // Esquina inferior izquierda
+                        { x: S / 2, y: S / 2 },   // Esquina inferior derecha
+                        { x: S / 2, y: -S / 2 }   // Esquina superior derecha
+                    ];
+                    bodies.push(Matter.Bodies.fromVertices(c * S + S / 2, r * S + S / 2, [vertices], {
+                        isStatic: true,
+                        friction: 0.1,
+                        restitution: 0.0
+                    }, true));
                 } else if (cell === 'w') {
                     // Detector agua (Sensor)
                     bodies.push(Matter.Bodies.rectangle(c * S + S / 2, r * S + S / 2, S, S, {
