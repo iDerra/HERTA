@@ -232,6 +232,11 @@ window.BridgeCore = {
 
         const item = this.inventory[this.selectedItemIdx];
 
+        // Validar inclinación máxima de rampas: si h > w la pendiente supera 45° y el vehículo no puede subirla
+        if (item.type === 'tri' && item.h > item.w) {
+            return alert("⚠️ Rampa demasiado empinada. La inclinación máxima es 1:1 (45°). Usa una base ≥ altura.");
+        }
+
         const startR = clickR - item.h + 1;
         const startC = clickC;
 
@@ -253,10 +258,30 @@ window.BridgeCore = {
             }
         }
 
+        // Detectar si hay un bloque sólido 'x' a la izquierda de la rampa (solo para triángulos)
+        let mirrored = false;
+        if (item.type === 'tri') {
+            const leftC = startC - 1;
+            if (leftC >= 0) {
+                // Comprobar si alguna fila de la rampa tiene un 'x' a la izquierda
+                for (let r = startR; r <= startR + item.h - 1; r++) {
+                    if (r >= 0 && r < this.levelMatrix.length && this.levelMatrix[r][leftC] === 'x') {
+                        mirrored = true;
+                        break;
+                    }
+                }
+            }
+        }
+
         for (let j = 0; j < item.w; j++) {
             let colHeight = item.h;
             if (item.type === 'tri') {
-                colHeight = Math.ceil(((j + 1) / item.w) * item.h);
+                if (mirrored) {
+                    // Rampa reflejada: la altura crece de derecha a izquierda
+                    colHeight = Math.ceil(((item.w - j) / item.w) * item.h);
+                } else {
+                    colHeight = Math.ceil(((j + 1) / item.w) * item.h);
+                }
             }
 
             for (let k = 0; k < colHeight; k++) {
@@ -271,7 +296,8 @@ window.BridgeCore = {
             r: startR,
             c: startC,
             w: item.w,
-            h: item.h
+            h: item.h,
+            mirrored: mirrored
         });
 
         this.inventory.splice(this.selectedItemIdx, 1);
@@ -408,8 +434,16 @@ window.BridgeCore = {
             } else if (item.type === 'tri') {
                 const w = item.w * S;
                 const h = item.h * S;
-                // Vértices de cuña rectángula: esquina inferior izq(0,h), esquina inferior der(w,h), esquina superior der(w,0)
-                const verts = [{ x: 0, y: h }, { x: w, y: h }, { x: w, y: 0 }];
+                let verts;
+                if (item.mirrored) {
+                    // Rampa reflejada: cuña que sube de derecha a izquierda (baja hacia la derecha)
+                    // Esquina inferior izq(0,h), esquina inferior der(w,h), esquina superior izq(0,0)
+                    verts = [{ x: 0, y: h }, { x: w, y: h }, { x: 0, y: 0 }];
+                } else {
+                    // Rampa normal: cuña que sube hacia la derecha
+                    // Esquina inferior izq(0,h), esquina inferior der(w,h), esquina superior der(w,0)
+                    verts = [{ x: 0, y: h }, { x: w, y: h }, { x: w, y: 0 }];
+                }
                 const vBody = Matter.Bodies.fromVertices(0, 0, [verts], { isStatic: true, friction: 0.1 });
 
                 // Alinearlo a sus límites

@@ -136,6 +136,12 @@
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 }
 
+/* Rampa reflejada: sube de derecha a izquierda, baja hacia la derecha */
+.placed-ramp-mirrored {
+    clip-path: polygon(0% 100%, 100% 100%, 0% 0%);
+    background: linear-gradient(225deg, #e74c3c 0%, #c0392b 100%);
+}
+
 .hidden { display: none !important; }
 
 .math-challenge {

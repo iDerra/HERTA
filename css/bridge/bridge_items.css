@@ -27,12 +27,11 @@
 
 /* GOAL */
 .cell-goal {
-    background-image: url('../../images/bridge_finish_2d.webp');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: transparent;
-    transform: scale(0.9);
+    background-color: rgba(255, 202, 40, 0.45);
+    border: 2px solid rgba(255, 202, 40, 0.9);
+    box-sizing: border-box;
+    box-shadow: inset 0 0 8px rgba(255, 220, 80, 0.5);
+    animation: goalPulse 1.5s ease-in-out infinite;
 }
 
 /* WATER */
@@ -71,4 +70,9 @@
     transform: rotate(45deg) scale(0.8);
     opacity: 0;
     transition: top 1s ease-in, opacity 1s, transform 1s;
+}
+
+@keyframes goalPulse {
+    0%, 100% { background-color: rgba(255, 202, 40, 0.35); box-shadow: inset 0 0 6px rgba(255, 220, 80, 0.4); }
+    50%       { background-color: rgba(255, 202, 40, 0.65); box-shadow: inset 0 0 14px rgba(255, 220, 80, 0.8); }
 }

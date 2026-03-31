@@ -51,7 +51,13 @@ window.BridgeUI = {
         
         items.forEach(item => {
             const el = document.createElement('div');
-            el.className = item.type === 'rect' ? 'placed-rect' : 'placed-ramp';
+            if (item.type === 'rect') {
+                el.className = 'placed-rect';
+            } else if (item.mirrored) {
+                el.className = 'placed-ramp placed-ramp-mirrored';
+            } else {
+                el.className = 'placed-ramp';
+            }
             
             el.style.position = 'absolute';
             el.style.left = (item.c * cs) + 'px';

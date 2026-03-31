@@ -48,7 +48,7 @@ window.Bridge3D = {
         this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         this.renderer.setSize(width, height);
         this.renderer.setClearColor(0x000000, 0); // Totalmente transparente
-        
+
         // Configurar la imagen de fondo dinámicamente sobre la capa CSS del Viewport
         // La imagen de nubes se coloca arriba abarcando el 100% del ancho, apoyada por un gradiente de caída
         canvas.style.backgroundImage = "url('../images/bridge_background.webp'), linear-gradient(to bottom, #e0f7fa 0%, #81d4fa 100%)";
@@ -157,7 +157,7 @@ window.Bridge3D = {
         // Usamos el índice actual almacenado en el Core
         const idx = window.BridgeCore.currentLevelIdx;
         const currentLevel = window.BridgeLevels[idx] || window.BridgeLevels[0];
-        
+
         const matrixCenter = currentLevel.matrixCenter;
         // Fallback por si hay algún mapa antiguo que aún no está migrado
         const matrixLeft = currentLevel.matrixLeft || matrixCenter;
@@ -169,7 +169,7 @@ window.Bridge3D = {
         // 1. Renderizar Elementos Estáticos del Nivel (Tierra, Agua, Meta)
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                
+
                 // Iteramos por profundidad: Derecha (Z=-1), Centro (Z=0), Izquierda (Z=1)
                 for (let dz = -1; dz <= 1; dz++) {
                     const currentMatrix = (dz === -1) ? matrixRight : (dz === 1 ? matrixLeft : matrixCenter);
@@ -202,10 +202,10 @@ window.Bridge3D = {
                             baseHex = 0x757575; // Gris
                         }
 
-                        const depthFactor = 1.0 - Math.min((r / (rows * 1.5)), 0.1); 
-                        const material = new THREE.MeshStandardMaterial({ 
-                            color: new THREE.Color(baseHex).multiplyScalar(depthFactor), 
-                            flatShading: true, roughness: 0.8, metalness: 0.1 
+                        const depthFactor = 1.0 - Math.min((r / (rows * 1.5)), 0.1);
+                        const material = new THREE.MeshStandardMaterial({
+                            color: new THREE.Color(baseHex).multiplyScalar(depthFactor),
+                            flatShading: true, roughness: 0.8, metalness: 0.1
                         });
 
                         let mesh;
@@ -219,7 +219,7 @@ window.Bridge3D = {
                             const geo = new THREE.BoxGeometry(this.blockSize, this.blockSize, this.blockSize);
                             mesh = new THREE.Mesh(geo, material);
                             mesh.position.set(x, y, dz * this.blockSize);
-                            mesh.scale.set(0.98, 0.98, 0.98); 
+                            mesh.scale.set(0.98, 0.98, 0.98);
                         }
                         this.scene.add(mesh);
 
@@ -234,12 +234,12 @@ window.Bridge3D = {
                             return m[rr][cc] === 'w';
                         };
 
-                        const matVis = new THREE.MeshStandardMaterial({ 
-                            color: this.colors.agua, transparent: true, opacity: 0.6, 
-                            flatShading: true, roughness: 0.1, metalness: 0.5 
+                        const matVis = new THREE.MeshStandardMaterial({
+                            color: this.colors.agua, transparent: true, opacity: 0.6,
+                            flatShading: true, roughness: 0.1, metalness: 0.5
                         });
                         const matInvis = new THREE.MeshBasicMaterial({ visible: false });
-                        
+
                         // Orden de caras Three.js: [px (+X), nx (-X), py (+Y), ny (-Y), pz (+Z), nz (-Z)]
                         const mats = [
                             isWater(r, c + 1, dz) ? matInvis : matVis, // Derecha
@@ -255,13 +255,19 @@ window.Bridge3D = {
                         this.scene.add(mesh);
 
                     } else if (cell === 'm' && dz === 0) {
-                        // Meta 
-                        const texture = new THREE.TextureLoader().load('../images/bridge_finish.webp');
-                        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-                        const sprite = new THREE.Sprite(spriteMat);
+                        // Meta: sprite con imagen, proporción correcta calculada al cargar la textura
+                        const sprite = new THREE.Sprite();
                         sprite.position.set(x + (0.5 * this.blockSize), y + (1.0 * this.blockSize), 1.0 * this.blockSize);
-                        sprite.scale.set(this.blockSize * 3.0, this.blockSize * 3.0, 1);
                         this.scene.add(sprite);
+
+                        new THREE.TextureLoader().load('../images/bridge_finish.webp', (texture) => {
+                            const img = texture.image;
+                            const aspect = img.width / img.height;
+                            const spriteH = this.blockSize * 3.0;
+                            const spriteW = spriteH * aspect;
+                            sprite.material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                            sprite.scale.set(spriteW, spriteH, 1);
+                        });
                     }
                 }
             }
@@ -297,12 +303,21 @@ window.Bridge3D = {
                 const w = item.w * this.blockSize;
                 const h = item.h * this.blockSize;
 
-                // Crear forma triangular (Cuña) que ocupa todo el espacio
+                // Crear forma triangular (Cuña): normal sube a la derecha, reflejada sube a la izquierda
                 const shape = new THREE.Shape();
-                shape.moveTo(0, 0);
-                shape.lineTo(w, 0);
-                shape.lineTo(w, h);
-                shape.lineTo(0, 0);
+                if (item.mirrored) {
+                    // Rampa reflejada: vértice superior en la esquina izquierda → baja hacia la derecha
+                    shape.moveTo(0, 0);
+                    shape.lineTo(w, 0);
+                    shape.lineTo(0, h);
+                    shape.lineTo(0, 0);
+                } else {
+                    // Rampa normal: vértice superior en la esquina derecha → sube hacia la derecha
+                    shape.moveTo(0, 0);
+                    shape.lineTo(w, 0);
+                    shape.lineTo(w, h);
+                    shape.lineTo(0, 0);
+                }
 
                 const geo = new THREE.ExtrudeGeometry(shape, { depth: this.blockSize, bevelEnabled: false });
                 // Aplicar Flat Shading Low Poly
