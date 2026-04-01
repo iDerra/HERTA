@@ -1,202 +1,529 @@
-/* --- HERTA LIGHT & MODERN THEME --- */
+/* ============================================================
+   HERTA — Style Principal
+   Estética: Honkai Star Rail × Low-Poly × Dark Academia
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+
+/* ── TOKENS ── */
 :root {
-    --herta-main: #6c5ce7;    
-    --herta-dark: #4834d4;   
-    --herta-gold: #fdcb6e;    
-    --herta-accent: #a29bfe;  
-    --bg-color: #f4f7f6;      
-    --card-bg: #ffffff;
-    --text-main: #2d3436;
-    --text-muted: #636e72;
-    --success: #00b894;
-    --danger: #ff7675;
+    /* Paleta Herta */
+    --h-bg: #0d0d1a;
+    /* Negro-violeta profundo */
+    --h-surface: #13132b;
+    /* Superficie de cards */
+    --h-border: rgba(180, 155, 255, 0.15);
+    --h-purple: #7c5cbf;
+    /* Púrpura Herta */
+    --h-lavender: #b49bff;
+    /* Lavanda suave */
+    --h-gold: #f0c060;
+    /* Dorado marioneta */
+    --h-gold-dark: #c49030;
+    --h-star: #e8ddff;
+    /* Blanco estrellado */
+    --h-muted: rgba(200, 185, 255, 0.45);
+
+    /* Tags */
+    --tag-lang: #3b4fc8;
+    --tag-math: #b83060;
+    --tag-tech: #6a3cbf;
+    --tag-physics: #c87820;
+    --tag-bio: #2a8050;
+
+    /* Tipografías */
+    --font-body: 'Nunito', 'Segoe UI', sans-serif;
+    --font-head: 'Space Grotesk', 'Nunito', sans-serif;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-* {
+/* ── RESET ── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif; 
 }
 
+/* ── FONDO ── */
+html,
 body {
-    background-color: var(--bg-color);
-    background-image: radial-gradient(#dfe6e9 1.5px, transparent 1.5px);
-    background-size: 24px 24px; 
-    color: var(--text-main);
+    width: 100%;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    background: var(--h-bg);
+    color: var(--h-star);
+    overflow-x: hidden;
+}
+
+/* Canvas de estrellas — capa inferior */
+#star-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Imagen de fondo opcional — colócala en images/herta_bg.webp */
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-image: url('../images/herta_bg.webp');
+    background-size: cover;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    opacity: 0.18;
+    /* Sutil: la imagen se ve bajo el contenido sin saturarlo */
+    pointer-events: none;
+}
+
+/* Neblina inferior para que las tarjetas se lean bien */
+.bg-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            var(--h-bg) 0%,
+            transparent 40%,
+            transparent 60%,
+            var(--h-bg) 100%);
+}
+
+/* Contenedor principal (encima del canvas) */
+.page-wrapper {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-header {
-    background: #e1d8ff;
-    color: var(--herta-dark);
-    text-align: center;
-    padding: 1.5rem 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
-    border-bottom: 3px solid var(--herta-main);
+
+/* ── HEADER ── */
+.site-header {
+    padding: 1.8rem 2.5rem 1.4rem;
+    border-bottom: 1px solid var(--h-border);
+    background: linear-gradient(180deg, rgba(20, 15, 45, 0.95) 0%, rgba(13, 13, 26, 0.0) 100%);
     position: relative;
-    z-index: 10;
 }
 
-header h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--herta-main);
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
-
-header p {
-    color: var(--text-muted);
-    font-size: 1rem;
-}
-
-.menu-container {
-    flex: 1; 
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-wrap: wrap; 
-    padding: 2rem;
-    gap: 2rem; 
-}
-
-.card {
-    background: var(--card-bg);
-    width: 300px;
-    padding: 2rem;
-    border-radius: 20px; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    cursor: pointer; 
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 2px solid transparent;
-    display: flex;
-    flex-direction: column;
     justify-content: space-between;
 }
 
+/* Bloque logo */
+.logo-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo-mark {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--h-purple) 0%, var(--h-lavender) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(124, 92, 191, 0.5), 0 0 0 1px rgba(180, 155, 255, 0.3);
+    position: relative;
+}
+
+/* Brillo superior del logo */
+.logo-mark::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    width: 60%;
+    height: 35%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px 8px 50% 50%;
+}
+
+.logo-title {
+    display: block;
+    font-family: var(--font-head);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    /* Degradado texto dorado-lavanda */
+    background: linear-gradient(90deg, var(--h-gold) 0%, var(--h-lavender) 60%, white 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--h-muted);
+    letter-spacing: 0.04em;
+    margin-top: 1px;
+    font-weight: 400;
+}
+
+/* Decoración header — anillos concéntricos */
+.header-deco {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deco-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(180, 155, 255, 0.3);
+    animation: spinRing 12s linear infinite;
+}
+
+.ring-1 {
+    width: 58px;
+    height: 58px;
+    border-top-color: var(--h-lavender);
+    border-right-color: transparent;
+    animation-duration: 8s;
+}
+
+.ring-2 {
+    width: 72px;
+    height: 72px;
+    border-bottom-color: var(--h-gold);
+    border-left-color: transparent;
+    animation-duration: 14s;
+    animation-direction: reverse;
+}
+
+.deco-star {
+    font-size: 1.1rem;
+    color: var(--h-gold);
+    animation: pulseStar 3s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes spinRing {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulseStar {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+}
+
+
+/* ── SECCIÓN INTRO ── */
+.menu-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem 1.5rem;
+}
+
+.section-intro {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--h-muted);
+}
+
+
+/* ── GRID DE TARJETAS ── */
+.menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 1050px;
+    width: 100%;
+}
+
+
+/* ── TARJETA ── */
+.card {
+    position: relative;
+    width: 290px;
+    background: linear-gradient(145deg, rgba(25, 20, 55, 0.85) 0%, rgba(18, 15, 40, 0.9) 100%);
+    border: 1px solid var(--h-border);
+    border-radius: 16px;
+    padding: 1.8rem 1.6rem 1.4rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+        box-shadow 0.25s,
+        border-color 0.25s;
+    overflow: hidden;
+}
+
+/* Brillo de hover (glow que sube desde abajo) */
+.card-glow {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, var(--h-purple) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s, bottom 0.4s;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.card:hover .card-glow {
+    opacity: 0.55;
+    bottom: -20px;
+}
+
 .card:hover {
-    transform: translateY(-8px); 
-    box-shadow: 0 15px 35px rgba(108, 92, 231, 0.15); 
-    border-color: var(--herta-accent);
+    transform: translateY(-6px) scale(1.02);
+    border-color: rgba(180, 155, 255, 0.45);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(124, 92, 191, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.card h2 {
-    margin-bottom: 1rem;
-    color: var(--herta-dark);
-    font-size: 1.4rem;
+/* Línea superior de acento */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--h-lavender), transparent);
+    opacity: 0.5;
+    border-radius: 0 0 4px 4px;
+    transition: opacity 0.3s, left 0.3s, right 0.3s;
 }
 
-.card p {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    font-size: 0.95rem;
+.card:hover::before {
+    left: 5%;
+    right: 5%;
+    opacity: 1;
 }
 
+/* Tarjeta destacada (puentes) — borde dorado */
+.card-featured {
+    border-color: rgba(240, 192, 96, 0.25);
+}
+
+.card-featured .card-glow {
+    background: radial-gradient(ellipse, var(--h-gold) 0%, transparent 70%);
+}
+
+.card-featured::before {
+    background: linear-gradient(90deg, transparent, var(--h-gold), transparent);
+    opacity: 0.6;
+}
+
+/* Icono grande */
+.card-icon {
+    font-size: 2.4rem;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* Cuerpo de texto */
+.card-body {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+}
+
+.card-body h2 {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.45rem;
+    letter-spacing: -0.01em;
+}
+
+.card-body p {
+    font-size: 0.875rem;
+    color: var(--h-muted);
+    line-height: 1.55;
+}
+
+/* Footer de la tarjeta — tags */
+.card-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Flecha de navegación */
+.card-arrow {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    font-size: 1rem;
+    color: var(--h-lavender);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1;
+}
+
+.card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* ── TAGS ── */
 .tag {
     display: inline-block;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-right: 5px;
-    margin-bottom: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: 1px solid transparent;
+}
+
+.language {
+    background: rgba(59, 79, 200, 0.25);
+    color: #a0aaff;
+    border-color: rgba(59, 79, 200, 0.4);
+}
+
+.math {
+    background: rgba(184, 48, 96, 0.25);
+    color: #ffaacc;
+    border-color: rgba(184, 48, 96, 0.4);
+}
+
+.tech {
+    background: rgba(106, 60, 191, 0.25);
+    color: #c8aaff;
+    border-color: rgba(106, 60, 191, 0.4);
+}
+
+.physics {
+    background: rgba(200, 120, 32, 0.25);
+    color: #ffd080;
+    border-color: rgba(200, 120, 32, 0.4);
+}
+
+.biology {
+    background: rgba(42, 128, 80, 0.25);
+    color: #80ffaa;
+    border-color: rgba(42, 128, 80, 0.4);
 }
 
 
-.language { 
-    background-color: #E3F2FD; 
-    color: #1565C0;            
-}
-
-.math { 
-    background-color: #FFEBEE; 
-    color: #C62828;           
-}
-
-.tech { 
-    background-color: #F3E5F5; 
-    color: #6A1B9A;            
-}
-
-.biology { 
-    background-color: #E8F5E9; 
-    color: #2E7D32;            
-}
-
-.physics { 
-    background-color: #FFF9C4; 
-    color: #F57F17;           
-}
-
-.chemestry { 
-    background-color: #d6fef3; 
-    color: #90dcfd;            
-}
-
-
-.card.locked {
-    opacity: 0.6;
-    background-color: #f1f2f6;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-.card.locked:hover { transform: none; }
-
-footer {
+/* ── FOOTER ── */
+.site-footer {
     text-align: center;
-    padding: 1.5rem;
-    background-color: white;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    border-top: 1px solid #eee;
+    padding: 1.2rem;
+    font-size: 0.75rem;
+    color: var(--h-muted);
+    border-top: 1px solid var(--h-border);
+    letter-spacing: 0.05em;
 }
 
+.footer-star {
+    color: var(--h-gold);
+}
+
+
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+    .site-header {
+        padding: 1.2rem 1.2rem 1rem;
+    }
+
+    .logo-title {
+        font-size: 1.4rem;
+    }
+
+    .logo-sub {
+        display: none;
+    }
+
+    .header-deco {
+        display: none;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .menu-section {
+        padding: 1.2rem 1rem 1rem;
+    }
+}
+
+
+/* ── UTILIDADES heredadas por actividades ── */
+.card.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Estilos globales de botón usados por las actividades */
 button {
-    background-color: var(--herta-main);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
+    font-family: var(--font-body);
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2);
 }
 
-button:hover {
-    background-color: var(--herta-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.3);
-}
-
-button:active { transform: translateY(0); }
-
-input, select {
-    padding: 12px 15px;
-    border: 2px solid #dfe6e9;
-    border-radius: 10px;
-    width: 100%;
-    margin-bottom: 10px;
-    transition: border-color 0.3s;
-    font-size: 0.95rem;
-    background: #fff;
-}
-
-input:focus, select:focus {
-    border-color: var(--herta-main);
-    outline: none;
-}
-
-@media (max-width: 600px) {
-    header h1 { font-size: 1.8rem; }
-    .card { width: 100%; }
-    .menu-container { padding: 1rem; }
+input,
+select {
+    font-family: var(--font-body);
 }

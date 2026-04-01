@@ -3,43 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HERTA - Main Menu</title>
+    <title>HERTA — Herramienta Educativa</title>
+    <meta name="description" content="HERTA: plataforma de actividades educativas interactivas para secundaria.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header>
-        <h1>HERTA</h1>
-        <p>Herramienta Educativa de Robótica y Tecnología Aplicada</p>
-    </header>
+    <!-- Canvas de partículas de fondo -->
+    <canvas id="star-canvas"></canvas>
 
-    <main class="menu-container">
-        
-        <div class="card" onclick="location.href='activities/chatbot.html';">
-            <h2>🤖 Simulador Chatbot</h2>
-            <p>Enseña sintaxis a una IA para gestionar una tienda.</p>
-            <span class="tag language">Lengua</span>
-            <span class="tag tech">Tecnología</span>
-        </div>
+    <!-- Fondo con imagen (si existe) -->
+    <div class="bg-layer"></div>
 
-        <div class="card" onclick="location.href='activities/geometric_bridge.html';">
-            <h2>🏎️ Carrera Geométrica</h2>
-            <p>Construye puentes y rampas usando geometría.</p>
-            <span class="tag math">Mates</span>
-            <span class="tag tech">Tecnología</span>
-        </div>
+    <div class="page-wrapper">
 
-        <div class="card" onclick="location.href='activities/simulated_universe.html';">
-            <h2>🧩 Universo Simulado</h2>
-            <p>Exploración y repaso general</p>
-            <span class="tag physics">STEM</span>
-        </div>
+        <!-- HEADER -->
+        <header class="site-header">
+            <div class="header-inner">
+                <div class="logo-block">
+                    <span class="logo-mark">H</span>
+                    <div class="logo-text">
+                        <span class="logo-title">HERTA</span>
+                        <span class="logo-sub">Herramienta Educativa de Robótica y Tecnología Aplicada</span>
+                    </div>
+                </div>
+                <!-- Decoración geométrica: engranaje / estrella -->
+                <div class="header-deco" aria-hidden="true">
+                    <div class="deco-ring ring-1"></div>
+                    <div class="deco-ring ring-2"></div>
+                    <div class="deco-star">✦</div>
+                </div>
+            </div>
+        </header>
 
-    </main>
-    
+        <!-- SECCIÓN PRINCIPAL -->
+        <main class="menu-section">
+
+            <div class="section-intro">
+                <p class="section-label">✦ Selecciona una actividad ✦</p>
+            </div>
+
+            <div class="menu-container">
+
+                <!-- Tarjeta 1: Chatbot -->
+                <article class="card" id="card-chatbot" onclick="location.href='activities/chatbot.html';" role="button" tabindex="0" aria-label="Ir a Simulador Chatbot">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🤖</div>
+                    <div class="card-body">
+                        <h2>Simulador Chatbot</h2>
+                        <p>Enseña sintaxis a una IA para que gestione una tienda virtual.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag language">Lengua</span>
+                        <span class="tag tech">Tecnología</span>
+                    </div>
+                    <div class="card-arrow" aria-hidden="true">→</div>
+                </article>
+
+                <!-- Tarjeta 2: Puentes -->
+                <article class="card card-featured" id="card-bridge" onclick="location.href='activities/geometric_bridge.html';" role="button" tabindex="0" aria-label="Ir a Carrera Geométrica">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🏎️</div>
+                    <div class="card-body">
+                        <h2>Carrera Geométrica</h2>
+                        <p>Construye puentes y rampas usando geometría para que el vehículo llegue a la meta.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag math">Mates</span>
+                        <span class="tag tech">Tecnología</span>
+                    </div>
+                    <div class="card-arrow" aria-hidden="true">→</div>
+                </article>
+
+                <!-- Tarjeta 3: Universo -->
+                <article class="card" id="card-universe" onclick="location.href='activities/simulated_universe.html';" role="button" tabindex="0" aria-label="Ir a Universo Simulado">
+                    <div class="card-glow"></div>
+                    <div class="card-icon">🧩</div>
+                    <div class="card-body">
+                        <h2>Universo Simulado</h2>
+                        <p>Exploración y repaso general de contenidos mediante combate estratégico.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag physics">STEM</span>
+                    </div>
+                    <div class="card-arrow" aria-hidden="true">→</div>
+                </article>
+
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <p>HERTA &mdash; Proyecto educativo TFM &bull; <span class="footer-star">✦</span></p>
+        </footer>
+
+    </div>
+
+    <script>
+        // === Partículas de estrellas en canvas ===
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        const NUM_STARS = 120;
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function randomStar() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.4 + 0.3,
+                alpha: Math.random() * 0.7 + 0.15,
+                speed: Math.random() * 0.004 + 0.002,
+                phase: Math.random() * Math.PI * 2,
+            };
+        }
+
+        function initStars() {
+            stars = Array.from({ length: NUM_STARS }, randomStar);
+        }
+
+        function drawStars(t) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (const s of stars) {
+                const pulse = s.alpha * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(200, 185, 255, ${pulse})`;
+                ctx.fill();
+            }
+        }
+
+        let raf;
+        function loop(t) {
+            drawStars(t);
+            raf = requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', () => { resize(); initStars(); });
+        resize();
+        initStars();
+        requestAnimationFrame(loop);
+
+        // === Accesibilidad: activar tarjetas con Enter/Space ===
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') card.click();
+            });
+        });
+    </script>
+
 </body>
 </html>
