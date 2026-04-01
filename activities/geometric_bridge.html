@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="../css/bridge/bridge_items.css">
     <link rel="stylesheet" href="../css/bridge/bridge_ui.css">
 </head>
+
 <body>
 
     <header>
@@ -20,45 +22,52 @@
             </div>
         </div>
         <div class="header-actions">
-            <button onclick="window.BridgeCore.playTutorial()" class="btn-back hidden" id="btn-tutorial" title="Volver a hacer el tutorial">📖 Tutorial</button>
-            <button onclick="window.BridgeCore.skipLevel()" class="btn-back hidden" id="btn-skip" title="Saltar nivel actual">⏭️ Saltar</button>
+            <button onclick="window.BridgeCore.playTutorial()" class="btn-back hidden" id="btn-tutorial"
+                title="Volver a hacer el tutorial">📖 Tutorial</button>
+            <button onclick="window.BridgeCore.skipLevel()" class="btn-back hidden" id="btn-skip"
+                title="Saltar nivel actual">⏭️ Saltar</button>
             <button onclick="window.BridgeCore.toggleSimulation()" class="btn-play">▶ SIMULAR</button>
             <button onclick="location.href='../index.html'" class="btn-back">Salir</button>
         </div>
     </header>
 
     <main class="game-container">
-        
+
         <div class="blueprint-world">
             <div class="sky-bg"></div>
             <div id="level-grid" class="level-grid"></div>
-            <canvas id="sim-3d-canvas" class="hidden" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10;"></canvas>
-            
-            <div id="zoom-controls" class="zoom-controls hidden" style="position: absolute; bottom: 20px; right: 20px; z-index: 20; display: flex; flex-direction: column; gap: 10px;">
-                <button onclick="window.Bridge3D.zoomIn()" style="width: 45px; height: 45px; font-size: 24px; font-weight: bold; background: rgba(255,255,255,0.9); border: 2px solid #ccc; border-radius: 8px; cursor: pointer; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">+</button>
-                <button onclick="window.Bridge3D.zoomOut()" style="width: 45px; height: 45px; font-size: 24px; font-weight: bold; background: rgba(255,255,255,0.9); border: 2px solid #ccc; border-radius: 8px; cursor: pointer; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">-</button>
+            <canvas id="sim-3d-canvas" class="hidden"
+                style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10;"></canvas>
+
+            <div id="zoom-controls" class="zoom-controls hidden"
+                style="position: absolute; bottom: 20px; right: 20px; z-index: 20; display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="window.Bridge3D.zoomIn()"
+                    style="width: 45px; height: 45px; font-size: 24px; font-weight: bold; background: rgba(255,255,255,0.9); border: 2px solid #ccc; border-radius: 8px; cursor: pointer; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">+</button>
+                <button onclick="window.Bridge3D.zoomOut()"
+                    style="width: 45px; height: 45px; font-size: 24px; font-weight: bold; background: rgba(255,255,255,0.9); border: 2px solid #ccc; border-radius: 8px; cursor: pointer; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s;">-</button>
             </div>
         </div>
 
         <div class="builder-ui">
-            
+
             <div class="panel-section inventory-section">
-                <h3>Tu Inventario</h3>
+                <h3>Inventario</h3>
                 <div id="inventory-grid" class="inventory-grid">
                     <div class="empty-msg">Fabrica piezas primero</div>
                 </div>
             </div>
 
             <div class="panel-section fabricator-section">
-                <h3>Fabricador de Ingeniería</h3>
-                
+                <h3>Fabricador de Piezas</h3>
+
                 <div class="fabricator-controls">
                     <div id="config-step">
                         <div class="shape-selector">
-                            <button class="shape-btn active" onclick="window.BridgeUI.selectShapeType('rect')">🟦 Bloque</button>
+                            <button class="shape-btn active" onclick="window.BridgeUI.selectShapeType('rect')">🟦
+                                Bloque</button>
                             <button class="shape-btn" onclick="window.BridgeUI.selectShapeType('tri')">◢ Rampa</button>
                         </div>
-                        
+
                         <div class="inputs-row">
                             <div class="input-group">
                                 <label>Base (m)</label>
@@ -70,18 +79,19 @@
                             </div>
                         </div>
 
-                        <button onclick="window.BridgeCore.initCrafting()" class="btn-craft">⚙️ CALCULAR Y FABRICAR</button>
+                        <button onclick="window.BridgeCore.initCrafting()" class="btn-craft">⚙️ CALCULAR Y
+                            FABRICAR</button>
                     </div>
 
                     <div id="challenge-step" class="math-challenge hidden">
                         <div class="challenge-header">⚠️ Verificación Requerida</div>
                         <p id="challenge-question">Calculando...</p>
-                        
+
                         <div class="challenge-input-row">
                             <input type="number" id="inp-answer" placeholder="Respuesta">
                             <span id="challenge-unit">u</span>
                         </div>
-                        
+
                         <div class="challenge-actions">
                             <button onclick="window.BridgeCore.verifyAndCraft()" class="btn-verify">✅ Confirmar</button>
                             <button onclick="window.BridgeCore.cancelCrafting()" class="btn-cancel">❌</button>
@@ -109,4 +119,5 @@
     <script src="../js/bridge/bridge_ui.js"></script>
     <script src="../js/bridge/bridge_core.js"></script>
 </body>
+
 </html>

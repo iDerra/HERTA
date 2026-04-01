@@ -25,6 +25,19 @@ window.BridgeUI = {
                 if (char === 'n') cell.classList.add('cell-natural-ramp');
                 if (char === 'm') cell.classList.add('cell-goal');
                 if (char === 'w') cell.classList.add('cell-water');
+
+                // Oscurecer bloques sólidos según cuántos bloques sólidos hay encima
+                if (char === 'x' || char === 'n') {
+                    let depth = 0;
+                    for (let i = r - 1; i >= 0; i--) {
+                        const above = matrix[i][c];
+                        if (above === 'x' || above === 'n') depth++;
+                        else break;
+                    }
+                    // brightness: 1.0 en superficie → 0.5 con 5+ bloques encima
+                    const brightness = Math.max(0.5, 1.0 - depth * 0.10);
+                    cell.style.setProperty('--cell-brightness', brightness);
+                }
                 
                 // Marcadores 5x5 para guiar al usuario
                 if ((c + 1) % 5 === 0) cell.classList.add('grid-mark-x');
@@ -48,6 +61,7 @@ window.BridgeUI = {
     renderPlacedItems: function(items) {
         const container = document.getElementById('level-grid');
         const cs = window.BridgeCore.CELL_SIZE;
+        const matrix = window.BridgeCore.levelMatrix;
         
         items.forEach(item => {
             const el = document.createElement('div');
@@ -64,6 +78,19 @@ window.BridgeUI = {
             el.style.top = (item.r * cs) + 'px';
             el.style.width = (item.w * cs) + 'px';
             el.style.height = (item.h * cs) + 'px';
+
+            // Oscurecer según bloques sólidos que hay encima del borde superior del item
+            if (matrix) {
+                const topRow = item.r;
+                let depth = 0;
+                for (let i = topRow - 1; i >= 0; i--) {
+                    const above = matrix[i] ? matrix[i][item.c] : null;
+                    if (above === 'x' || above === 'n') depth++;
+                    else break;
+                }
+                const brightness = Math.max(0.5, 1.0 - depth * 0.10);
+                el.style.setProperty('--cell-brightness', brightness);
+            }
 
             el.style.pointerEvents = 'none'; 
 

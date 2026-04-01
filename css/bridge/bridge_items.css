@@ -1,69 +1,71 @@
-/* RECTANGLE */
+/* ============================================================
+   BRIDGE — ITEMS (celdas de mundo + robot)
+   ============================================================ */
+
+/* ── BLOQUES COLOCADOS POR EL JUGADOR ── */
 .cell-rect {
     background: var(--b-block);
-    box-shadow: inset 0 0 0 1px #d35400;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0, 0, 0, 0.1) 5px, rgba(0, 0, 0, 0.1) 10px);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2), inset -2px -3px 0 rgba(0,0,0,0.2);
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent, transparent 6px,
+        rgba(0,0,0,0.06) 6px, rgba(0,0,0,0.06) 12px
+    );
     cursor: pointer;
     z-index: 5;
 }
 
-/* RAMP */
+/* ── RAMPA (desde inventario — no usada directamente en grid, pero mantenida) ── */
 .cell-ramp {
     background: var(--b-ramp);
     clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
     position: relative;
     z-index: 5;
 }
-
 .cell-ramp::after {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, transparent 60%, rgba(0, 0, 0, 0.1) 100%);
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.12) 100%);
 }
 
-/* GOAL */
+/* ── META ── */
 .cell-goal {
-    background-color: rgba(255, 202, 40, 0.45);
-    border: 2px solid rgba(255, 202, 40, 0.9);
+    background-color: rgba(255, 210, 63, 0.35);
+    border: 2px solid rgba(255, 210, 63, 0.85);
     box-sizing: border-box;
-    box-shadow: inset 0 0 8px rgba(255, 220, 80, 0.5);
-    animation: goalPulse 1.5s ease-in-out infinite;
+    box-shadow: inset 0 0 10px rgba(255, 220, 80, 0.4);
+    animation: goalPulse 1.4s ease-in-out infinite;
+    z-index: 2;
 }
 
-/* WATER */
+/* ── AGUA ── */
 .cell-water {
-    background: var(--b-water);
-    opacity: 0.6;
-    border-top: 3px solid rgba(255, 255, 255, 0.5);
-    animation: waterFlow 2s infinite linear;
+    background: linear-gradient(180deg, var(--b-water) 0%, #2a8abf 100%);
+    opacity: 0.75;
+    border-top: 2px solid rgba(255, 255, 255, 0.45);
+    animation: waterFlow 2.5s infinite linear;
 }
 
-/* ROBOT */
+/* ── ROBOT ── */
 .robot-avatar {
     position: absolute;
     width: 40px;
     height: 40px;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     z-index: 100;
     transition: top 0.4s linear, left 0.4s linear, transform 0.4s linear;
 }
 
 .robot-body {
-    width: 200%;
-    height: 200%;
+    width: 200%; height: 200%;
     position: absolute;
-    left: 0;
-    bottom: 0;
+    left: 0; bottom: 0;
     background-image: url('../../images/bridge_2d_car.webp');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center bottom;
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
 }
 
 .robot-avatar.falling {
@@ -72,7 +74,19 @@
     transition: top 1s ease-in, opacity 1s, transform 1s;
 }
 
+/* ── ANIMACIONES ── */
 @keyframes goalPulse {
-    0%, 100% { background-color: rgba(255, 202, 40, 0.35); box-shadow: inset 0 0 6px rgba(255, 220, 80, 0.4); }
-    50%       { background-color: rgba(255, 202, 40, 0.65); box-shadow: inset 0 0 14px rgba(255, 220, 80, 0.8); }
+    0%, 100% {
+        background-color: rgba(255, 210, 63, 0.25);
+        box-shadow: inset 0 0 6px rgba(255, 220, 80, 0.3);
+    }
+    50% {
+        background-color: rgba(255, 210, 63, 0.6);
+        box-shadow: inset 0 0 18px rgba(255, 220, 80, 0.8), 0 0 8px rgba(255,210,63,0.4);
+    }
+}
+
+@keyframes waterFlow {
+    0%   { background-position: 0 0; }
+    100% { background-position: 40px 0; }
 }

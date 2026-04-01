@@ -13,11 +13,11 @@ window.Bridge3D = {
 
     // Diccionario de colores para los materiales
     colors: {
-        tierra: 0x8BC34A, // Verde claro (x)
-        agua: 0x29B6F6,   // Azul (w)
+        tierra: 0xA5D86A, // Verde tierra más claro y vivo
+        agua: 0x45B0E8,   // Azul agua más luminoso
         meta: 0xFFCA28,   // Amarillo (m)
-        bloque: 0x8D6E63, // Marrón (sq)
-        rampa: 0xFF7043,  // Naranja (tr)
+        bloque: 0xF0913A, // Naranja bloque más luminoso
+        rampa: 0xFF6B6B,  // Coral rampa más brillante
         robot: 0xE91E63   // Rosa/Rojo (coche)
     },
 
@@ -51,7 +51,7 @@ window.Bridge3D = {
 
         // Configurar la imagen de fondo dinámicamente sobre la capa CSS del Viewport
         // La imagen de nubes se coloca arriba abarcando el 100% del ancho, apoyada por un gradiente de caída
-        canvas.style.backgroundImage = "url('../images/bridge_background.webp'), linear-gradient(to bottom, #e0f7fa 0%, #81d4fa 100%)";
+        canvas.style.backgroundImage = "url('../images/bridge_background.webp'), linear-gradient(160deg, #1a3a5c 0%, #1e6fa8 40%, #3498db 70%, #76c8f5 100%)";
         canvas.style.backgroundSize = "100% auto, 100% 100%";
         canvas.style.backgroundPosition = "top center, center";
         canvas.style.backgroundRepeat = "no-repeat, no-repeat";
@@ -195,14 +195,17 @@ window.Bridge3D = {
 
                         let baseHex;
                         if (depthFromSurface === 0) {
-                            baseHex = this.colors.tierra; // Verde
-                        } else if (depthFromSurface === 1 || depthFromSurface === 2) {
-                            baseHex = 0x8D6E63; // Marrón
+                            baseHex = this.colors.tierra; // Verde - superficie
+                        } else if (depthFromSurface === 1) {
+                            baseHex = 0xA0785A; // Marrón tierra superior
+                        } else if (depthFromSurface === 2 || depthFromSurface === 3) {
+                            baseHex = 0x7A5C44; // Marrón tierra profundo
                         } else {
-                            baseHex = 0x757575; // Gris
+                            baseHex = 0x8A8A8A; // Gris piedra profunda
                         }
 
-                        const depthFactor = 1.0 - Math.min((r / (rows * 1.5)), 0.1);
+                        // Factor de oscurecimiento adicional: -10% de brillo por cada nivel de profundidad
+                        const depthFactor = Math.max(0.5, 1.0 - depthFromSurface * 0.10);
                         const material = new THREE.MeshStandardMaterial({
                             color: new THREE.Color(baseHex).multiplyScalar(depthFactor),
                             flatShading: true, roughness: 0.8, metalness: 0.1
@@ -219,7 +222,6 @@ window.Bridge3D = {
                             const geo = new THREE.BoxGeometry(this.blockSize, this.blockSize, this.blockSize);
                             mesh = new THREE.Mesh(geo, material);
                             mesh.position.set(x, y, dz * this.blockSize);
-                            mesh.scale.set(0.98, 0.98, 0.98);
                         }
                         this.scene.add(mesh);
 
