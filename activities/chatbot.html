@@ -1,146 +1,196 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HERTA - Chatbot</title>
+    <title>HERTA - Chatbot Pro</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-        
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/chatbot/chatbot_layout.css">
     <link rel="stylesheet" href="../css/chatbot/chatbot_sim.css">
     <link rel="stylesheet" href="../css/chatbot/chatbot_train.css">
 </head>
+
 <body>
 
-    <header>
-        <div style="justify-content: space-between; align-items: center;">
-            <h1>Simulador Chatbot</h1>
-        </div>
-        <div style="margin-top: 10px;">
-            <button onclick="location.href='../index.html'" style="background: rgba(0,0,0,0.3); font-size: 0.9rem;">
-                ⬅ Volver al Menú
-            </button>
-            <button onclick="resetActivity()" 
-                    style="background: #e74c3c; font-size: 0.8rem; border-bottom-color: #c0392b;">
-                🗑️ Reiniciar Actividad
-            </button>
+    <div id="cb-dynamic-bg" class="chatbot-bg-layer"></div>
+    <div class="chatbot-bg-overlay"></div>
+
+    <header class="main-header glass-panel">
+        <div class="header-top">
+            <div class="header-title">
+                <h1>Simulador Chatbot</h1>
+            </div>
+            <div class="header-controls">
+                <button class="btn-ctrl" onclick="location.href='../index.html'">Menú Principal</button>
+                <button class="btn-ctrl btn-danger" onclick="resetActivity()">Reiniciar</button>
+            </div>
         </div>
     </header>
 
-    <nav class="tabs-container">
-        <button class="tab-btn active" data-target="tab-config" onclick="switchTab('tab-config')">1. Configuración</button>
-        <button class="tab-btn" id="btn-train" data-target="tab-train" onclick="switchTab('tab-train')" disabled>2. Entrenamiento 🔒</button>
-        <button class="tab-btn" id="btn-chat" data-target="tab-chat" onclick="switchTab('tab-chat')" disabled>3. Simulación 🔒</button>
-    </nav>
-
     <main>
-        <section id="tab-config" class="tab-content active">
-            <h2>🏢 Crea tu Negocio</h2>
-            <div id="status-panel" class="status-box"></div> <div style="margin: 20px 0;">
-                <label>Nombre de la tienda:</label>
-                <input type="text" id="shop-name-input" placeholder="Ej: Tienda IA" oninput="updateShopName()">
+        <nav class="tabs-nav">
+            <button class="tab-link active" data-target="tab-config"
+                onclick="switchTab('tab-config')">Configuración</button>
+            <button class="tab-link" id="btn-train" data-target="tab-train" onclick="switchTab('tab-train')"
+                disabled>Entrenamiento</button>
+            <button class="tab-link" id="btn-chat" data-target="tab-chat" onclick="switchTab('tab-chat')"
+                disabled>Simulación</button>
+        </nav>
+
+        <section id="tab-config" class="tab-content active glass-panel">
+            <h2>Configura tu negocio</h2>
+
+            <div id="status-panel" class="status-box">Define el nombre y tipo de tu tienda para empezar.</div>
+
+            <div class="config-grid">
+                <div class="config-form">
+                    <div class="form-group">
+                        <label>Tipo de Tienda</label>
+                        <select id="shop-type-select" onchange="updateShopVisual()">
+                            <option value="tech">Tecnología (Gadgets & Futuro)</option>
+                            <option value="bakery">Pastelería (Dulces & Pan)</option>
+                            <option value="sports">Deporte (Ropa & Equipo)</option>
+                            <option value="fashion">Moda (Estilo & Diseño)</option>
+                            <option value="magic">Alquimia (Pociones & Magia)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre de la tienda</label>
+                        <input type="text" id="shop-name-input" placeholder="Ej: Tienda de Herta"
+                            oninput="updateShopName()">
+                    </div>
+                </div>
+
+                <div class="config-preview">
+                    <div id="shop-visual-container" class="shop-visual-preview">
+                    </div>
+                </div>
             </div>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            
-            <h3>📦 Inventario (Base de Datos)</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="prod-name" placeholder="Producto (Sustantivo)" style="flex: 2;">
-                <input type="number" id="prod-price" placeholder="Precio (€)" style="flex: 1;">
-                <input type="text" id="prod-feature" placeholder="Característica (Adjetivo)" style="flex: 2;">
+
+            <div class="divider"></div>
+
+            <h2> Inventario y productos</h2>
+            <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros.</p>
+
+            <div class="inventory-controls glass-subpanel">
+                <input type="text" id="prod-name" placeholder="Producto (Ej: Zapatillas)" class="flex-2">
+                <input type="number" id="prod-price" placeholder="Precio (€)" class="flex-1">
+                <input type="text" id="prod-feature" placeholder="Atributo (Ej: Cómodas)" class="flex-2">
+                <button onclick="addProduct()" class="btn-primary">+ Añadir</button>
             </div>
-            <button onclick="addProduct()" style="width: 100%; margin-top: 10px;">+ Añadir a la Base de Datos</button>
-            <div id="products-list-ui" style="margin-top: 20px;"></div>
+
+            <div id="products-list-ui" class="products-list"></div>
         </section>
 
-        <section id="tab-train" class="tab-content">
-            
+        <section id="tab-train" class="tab-content glass-panel">
+            <img src="../images/chatbot_bot.webp" class="robot-side-avatar" alt="Robot Asistente">
+
             <div id="training-classification-ui" style="display: none;">
-                <h2>🔍 Paso 1: Clasificación Gramatical</h2>
-                <p>Para que la IA hable bien, necesita saber el género y número de tus productos.</p>
-                
-                <div class="classification-container">
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <h2>Paso 1: Clasificación</h2>
+                <p class="subtitle">Clasifica el género y número de tus productos para mejorar la precisión.</p>
+
+                <div class="table-container glass-subpanel">
+                    <table>
                         <thead>
-                            <tr style="background: #f4f4f8; color: #666;">
-                                <th style="padding: 10px; text-align: left;">Producto</th>
-                                <th style="padding: 10px;">Género</th>
-                                <th style="padding: 10px;">Número</th>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Género</th>
+                                <th class="text-center">Número</th>
                             </tr>
                         </thead>
-                        <tbody id="classification-list">
-                            </tbody>
+                        <tbody id="classification-list"></tbody>
                     </table>
                 </div>
 
-                <div style="text-align: center; margin-top: 30px;">
-                    <button onclick="saveClassificationAndStart()" style="background: var(--herta-main); width: 250px;">
-                        💾 Guardar y Empezar Entrenamiento
-                    </button>
+                <div class="center-action">
+                    <button class="btn-primary btn-large" onclick="saveClassificationAndStart()">Guardar y
+                        Continuar</button>
                 </div>
             </div>
 
             <div id="training-game-wrapper" style="display: none;">
-                <h2>🧠 Paso 2: Entrenamiento Sintáctico</h2>
-                <p>Analiza <strong>todas</strong> las palabras de la oración.</p>
-                
-                <div id="training-complete-msg" style="display: none; text-align: center; padding: 40px; background: #e8f8f5; border-radius: 12px;">
-                    <h3 style="color: #27ae60; font-size: 2rem; margin-bottom: 10px;">🎉 ¡Sesión Finalizada!</h3>
-                    <p>Has analizado correctamente 5 frases.</p>
-                    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
-                        <button onclick="startTrainingRound()" style="background: #34495e;">🔄 Analizar otras 5 frases</button>
-                        <button onclick="switchTab('tab-chat')" style="background: var(--herta-main);">💬 Ir a la Simulación</button>
+                <h2>Paso 2: Análisis Sintáctico</h2>
+                <p class="subtitle">Enséñale a la IA a identificar las partes de la oración.</p>
+
+                <div id="training-complete-msg" class="completion-msg glass-subpanel" style="display: none;">
+                    <h3>¡Entrenamiento Completado!</h3>
+                    <p>Tu IA está lista para interactuar con los clientes.</p>
+                    <div class="action-group">
+                        <button class="btn-secondary" onclick="startTrainingRound()">Repasar</button>
+                        <button class="btn-primary" onclick="switchTab('tab-chat')">Probar Chatbot</button>
                     </div>
                 </div>
 
                 <div id="training-game-ui">
-                    <div class="progress-bar-container">
-                        <div id="train-progress-fill" style="width: 0%; height: 100%; background: var(--herta-main); transition: width 0.3s;"></div>
-                    </div>
-                    <p style="text-align: center; margin-bottom: 15px; color: #666;">Frase <span id="current-sentence-num">1</span> de 5</p>
-
-                    <div class="tools-grid">
-                        <button class="tool-btn tool-noun selected" onclick="selectTool('noun')">🟣 Sustantivo (Producto)</button>
-                        <button class="tool-btn tool-adj" onclick="selectTool('adj')">🟡 Adjetivo (Característica)</button>
-                        <button class="tool-btn tool-verb" onclick="selectTool('verb')">🔵 Verbo</button>
-                        <button class="tool-btn tool-det" onclick="selectTool('det')">🟢 Determinante</button>
-                        <button class="tool-btn tool-other" onclick="selectTool('other')">⚪ Otros</button>
+                    <div class="progress-wrapper">
+                        <p class="progress-text">ORACIÓN <span id="current-sentence-num">1</span> DE 5</p>
+                        <div class="progress-bar-container">
+                            <div id="train-progress-fill"></div>
+                        </div>
                     </div>
 
-                    <div class="training-area">
+                    <div class="tools-grid glass-subpanel">
+                        <button class="tool-btn tool-noun selected" onclick="selectTool('noun')">Sustantivo</button>
+                        <button class="tool-btn tool-adj" onclick="selectTool('adj')">Adjetivo</button>
+                        <button class="tool-btn tool-verb" onclick="selectTool('verb')">Verbo</button>
+                        <button class="tool-btn tool-det" onclick="selectTool('det')">Deter.</button>
+                        <button class="tool-btn tool-other" onclick="selectTool('other')">Otros</button>
+                    </div>
+
+                    <div class="training-area glass-subpanel">
                         <div id="sentence-container" class="sentence-display"></div>
-                        <div id="feedback-msg" style="min-height: 25px; font-weight: bold; margin-top: 15px;"></div>
+                        <div id="feedback-msg"></div>
                     </div>
 
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="validateSentence()" style="width: 200px;">Validar Análisis</button>
+                    <div class="center-action">
+                        <button class="btn-primary btn-large" onclick="validateSentence()">Comprobar Sintaxis</button>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <section id="tab-chat" class="tab-content">
-            <h2 style="text-align: center; margin-bottom: 20px;">💬 Simulación en Vivo</h2>
-            
-            <div class="chat-container" style="position: relative;"> <div id="cart-indicator" class="cart-indicator" onclick="simulateUserClick('ver cesta')">
+
+        <section id="tab-chat" class="tab-content glass-panel">
+            <img src="../images/chatbot_bot.webp" class="robot-side-avatar" alt="Robot Asistente">
+
+            <div class="chat-section-header">
+                <h2 id="chat-shop-name-title">Tienda IA</h2>
+                <p id="chat-shop-type-subtitle" class="soft-subtitle">Asistente Virtual Activo</p>
+            </div>
+
+            <div class="chat-container glass-subpanel">
+                <div id="cart-indicator" class="cart-indicator" onclick="simulateUserClick('ver cesta')">
                     🛒 <span id="cart-count">0</span>
                 </div>
 
                 <div id="chat-history-container" class="chat-history"></div>
-                
-                <div id="typing-indicator" class="typing-indicator">Escribiendo...</div>
+
+                <div id="typing-indicator" class="typing-indicator">
+                    Escribiendo...
+                </div>
 
                 <div class="chat-input-area">
-                    <input type="text" id="sim-user-input" placeholder="Ej: Hola, quiero añadir unas zapatillas...">
-                    <button onclick="handleUserMessage()" style="border-radius: 50%; width: 50px; height: 50px; padding: 0; display: flex; align-items: center; justify-content: center;">➤</button>
+                    <input type="text" id="sim-user-input" placeholder="Escribe tu mensaje aquí...">
+                    <button onclick="handleUserMessage()" class="btn-send">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
                 </div>
             </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button onclick="location.reload()" style="background: #95a5a6; font-size: 0.8rem;">Reiniciar Chat</button>
+
+            <div class="center-action" style="margin-top: 20px;">
+                <button class="btn-text-only" onclick="location.reload()">Limpiar conversación</button>
             </div>
         </section>
     </main>
@@ -151,16 +201,48 @@
     <script src="../js/chatbot/chatbot_train.js"></script>
 
     <script>
+        function updateShopVisual() {
+            const select = document.getElementById('shop-type-select');
+            const visual = document.getElementById('shop-visual-container');
+            const bgLayer = document.getElementById('cb-dynamic-bg');
+            if (!select || !visual) return;
+
+            const type = select.value;
+            const imgPath = `../images/shop_${type}_bg.webp`;
+
+            if (bgLayer) {
+                bgLayer.style.backgroundImage = `url("${imgPath}")`;
+            }
+
+            visual.style.backgroundImage = `url("${imgPath}")`;
+            visual.innerHTML = "";
+
+            const subtitle = document.getElementById('chat-shop-type-subtitle');
+            if (subtitle) {
+                const labels = {
+                    tech: 'Tecnología Avanzada',
+                    bakery: 'Pastelería Artesanal',
+                    sports: 'Ropa Deportiva',
+                    fashion: 'Boutique de Moda',
+                    magic: 'Bazar de Hechizos'
+                };
+                subtitle.innerText = labels[type];
+            }
+        }
+
+        updateShopVisual();
+
         const originalSwitchTab = window.switchTab;
-        window.switchTab = function(tabId) {
-            originalSwitchTab(tabId); 
-            
+        window.switchTab = function (tabId) {
+            if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
+
             if (tabId === 'tab-chat') {
                 setTimeout(() => {
-                    if(typeof initChatGreeting === 'function') initChatGreeting();
+                    if (typeof initChatGreeting === 'function') initChatGreeting();
                 }, 100);
             }
         }
     </script>
 </body>
+
 </html>

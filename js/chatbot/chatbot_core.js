@@ -33,7 +33,7 @@ window.switchTab = function(tabId) {
     if (btn && btn.disabled) return;
 
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
 
     document.getElementById(tabId).classList.add('active');
     if(btn) btn.classList.add('active');
