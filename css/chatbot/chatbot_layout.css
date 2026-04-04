@@ -344,6 +344,7 @@ select:focus {
     padding: 20px;
     align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 10px;
 }
 
 .flex-1 {

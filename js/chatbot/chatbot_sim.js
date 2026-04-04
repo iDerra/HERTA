@@ -1,25 +1,25 @@
 let chatState = {
-    conversationStage: 'IDLE', 
+    conversationStage: 'IDLE',
     cart: [],
-    pendingProduct: null 
+    pendingProduct: null
 };
 
 function removeAccents(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-window.handleUserMessage = function() {
+window.handleUserMessage = function () {
     const inputEl = document.getElementById('sim-user-input');
     const text = inputEl.value.trim();
     if (!text) return;
 
     addBubble(text, 'user');
-    inputEl.value = ""; 
+    inputEl.value = "";
     showTyping(true);
 
     setTimeout(() => {
         let response;
-        
+
         if (chatState.conversationStage === 'WAITING_RETURN_PRODUCT') {
             response = handleReturnProductInput(text);
         } else if (chatState.conversationStage === 'WAITING_DATE') {
@@ -31,13 +31,13 @@ window.handleUserMessage = function() {
         }
 
         showTyping(false);
-        
+
         if (typeof response === 'object') {
             addBubbleWithCommands(response.text, response.commands);
         } else {
             addBubble(response, 'bot');
         }
-        
+
         updateCartUI();
 
     }, 800);
@@ -48,14 +48,14 @@ function generateBotResponse(userText) {
 
     if (cleanText.includes("cesta") || cleanText.includes("carrito") || cleanText.includes("ver compra")) return showCart();
     if (cleanText.includes("pagar") || cleanText.includes("finalizar") || cleanText.includes("comprar todo")) return processCheckout();
-    
+
     if (cleanText.includes("catalogo") || cleanText.includes("articulos") || cleanText.includes("1")) {
         const list = window.shopData.products.map(p => `- ${p.name} (${p.price}€)`).join("<br>");
         return `📦 <b>Artículos disponibles:</b><br>${list}`;
     }
 
     if (cleanText.includes("envio") || cleanText.includes("gastos") || cleanText.includes("2")) return "🚚 <b>Política de Envíos:</b><br>Coste fijo: 5€.<br><b>¡GRATIS</b> si la cesta supera los 50€!";
-    
+
     if (cleanText.includes("devolver") || cleanText.includes("devolucion") || cleanText.includes("3")) {
         chatState.conversationStage = 'WAITING_RETURN_PRODUCT';
         return "🔄 <b>Solicitud de Devolución.</b><br>Por favor, indícame: <b>¿Qué artículo quieres devolver?</b>";
@@ -65,7 +65,7 @@ function generateBotResponse(userText) {
     const mentionsProduct = inventory.some(p => cleanText.includes(removeAccents(p.name.toLowerCase())));
 
     if (!mentionsProduct && (cleanText.includes("anadir") || cleanText.includes("comprar") || cleanText.includes("4"))) {
-        if(inventory.length === 0) return "El catálogo está vacío.";
+        if (inventory.length === 0) return "El catálogo está vacío.";
         const productCommands = inventory.map(p => `➕ Añadir ${p.name} ${p.feature}`);
         return {
             text: "Selecciona un producto para añadirlo directamente a tu cesta:",
@@ -96,7 +96,7 @@ function processAddToCart(cleanText) {
     }
 
     const featureKey = removeAccents(foundProduct.feature.toLowerCase());
-    
+
     if (cleanText.includes(featureKey)) {
         return addToCart(foundProduct);
     } else {
@@ -113,7 +113,7 @@ function handleSpecificationLogic(userText) {
     const cleanText = removeAccents(userText.toLowerCase());
     const pending = chatState.pendingProduct;
 
-    chatState.conversationStage = 'IDLE'; 
+    chatState.conversationStage = 'IDLE';
     chatState.pendingProduct = null;
 
     if (!pending) return getMainMenu();
@@ -186,20 +186,20 @@ function processCheckout() {
 
 function updateCartUI() {
     const countEl = document.getElementById('cart-count');
-    if(countEl) countEl.innerText = chatState.cart.length;
+    if (countEl) countEl.innerText = chatState.cart.length;
 }
 
 function handleReturnProductInput(text) {
     const cleanText = removeAccents(text.toLowerCase());
     const inventory = window.shopData.products;
 
-    const foundProduct = inventory.find(p => 
+    const foundProduct = inventory.find(p =>
         cleanText.includes(removeAccents(p.name.toLowerCase()))
     );
 
     if (foundProduct) {
         chatState.conversationStage = 'WAITING_DATE';
-        
+
         return `Entendido, tramitando devolución de: <b>${foundProduct.name}</b>.<br>Ahora necesito la <b>fecha de compra</b> (DD/MM/AAAA) para verificar la garantía.`;
     } else {
         if (cleanText.includes("cancelar") || cleanText.includes("menu")) {
@@ -239,50 +239,82 @@ function handleReturnDateLogic(dateText) {
 
 function getMainMenu() {
     return {
-        text: `¡Hola! Soy el asistente virtual de <b>${window.shopData.name || 'la tienda'}</b>.`,
+        text: `¡Hola! Soy Herta, el asistente virtual de <b>${window.shopData.name || 'la tienda'}</b>.`,
         commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "3. 🔄 Devolución", "4. ➕ Añadir a la cesta"]
     };
 }
 
+function createMessageWrapper(type) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `chat-message-wrapper wrapper-${type}`;
+
+    const botName = window.shopData && window.shopData.name ? window.shopData.name : 'Asistente IA';
+
+    let avatarHTML = '';
+    if (type === 'bot') {
+        avatarHTML = `
+            <div class="chat-avatar-container avatar-bot-container">
+                <img src="../images/chatbot_bot.webp" class="chat-avatar" alt="Bot"> 
+                <span class="chat-name">Herta</span>
+            </div>`;
+    } else {
+        avatarHTML = `
+            <div class="chat-avatar-container avatar-user-container">
+                <span class="chat-name">Usuario</span> 
+                <div class="chat-avatar emoji-avatar">👤</div>
+            </div>`;
+    }
+
+    wrapper.innerHTML = avatarHTML;
+    return wrapper;
+}
+
 function addBubble(text, type) {
     const container = document.getElementById('chat-history-container');
+    const wrapper = createMessageWrapper(type);
+
     const bubble = document.createElement('div');
     bubble.className = `chat-bubble bubble-${type}`;
     bubble.innerHTML = text;
-    container.appendChild(bubble);
+
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
     container.scrollTop = container.scrollHeight;
 }
 
 function addBubbleWithCommands(text, commands) {
     const container = document.getElementById('chat-history-container');
+    const wrapper = createMessageWrapper('bot');
+
     const bubble = document.createElement('div');
     bubble.className = `chat-bubble bubble-bot`;
-    
+
     let html = text + `<div class="command-list">`;
     commands.forEach(cmd => {
         let cleanCmd = cmd.replace(/^[0-9.]+\s/, '').replace(/^[^\w\s]/, '').trim();
         let valToSend = cmd;
-        
-        if(cmd.includes("Cesta")) valToSend = "ver cesta";
-        if(cmd.includes("Finalizar")) valToSend = "finalizar";
-        if(cmd.includes("Añadir")) valToSend = cmd; 
-        if(cmd.includes("Consultar")) valToSend = "1";
-        if(cmd.includes("Gastos")) valToSend = "2";
-        if(cmd.includes("Devolución")) valToSend = "3";
-        if(cmd.includes("Sí,")) valToSend = "si"; 
-        if(cmd.includes("No,")) valToSend = "no";
-        if(cmd.includes("4.")) valToSend = "4";
+
+        if (cmd.includes("Cesta")) valToSend = "ver cesta";
+        if (cmd.includes("Finalizar")) valToSend = "finalizar";
+        if (cmd.includes("Añadir")) valToSend = cmd;
+        if (cmd.includes("Consultar")) valToSend = "1";
+        if (cmd.includes("Gastos")) valToSend = "2";
+        if (cmd.includes("Devolución")) valToSend = "3";
+        if (cmd.includes("Sí,")) valToSend = "si";
+        if (cmd.includes("No,")) valToSend = "no";
+        if (cmd.includes("4.")) valToSend = "4";
 
         html += `<div class="command-item" onclick="simulateUserClick('${valToSend}')">${cmd}</div>`;
     });
     html += `</div>`;
 
     bubble.innerHTML = html;
-    container.appendChild(bubble);
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
     container.scrollTop = container.scrollHeight;
 }
 
-window.simulateUserClick = function(text) {
+window.simulateUserClick = function (text) {
     const inputEl = document.getElementById('sim-user-input');
     inputEl.value = text;
     handleUserMessage();
@@ -290,17 +322,17 @@ window.simulateUserClick = function(text) {
 
 function showTyping(show) {
     const indicator = document.getElementById('typing-indicator');
-    if(indicator) indicator.style.display = show ? 'block' : 'none';
+    if (indicator) indicator.style.display = show ? 'block' : 'none';
 }
 
 document.getElementById('sim-user-input')?.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') window.handleUserMessage();
 });
 
-window.initChatGreeting = function() {
+window.initChatGreeting = function () {
     const container = document.getElementById('chat-history-container');
     showTyping(false);
-    if(container.children.length === 0) {
+    if (container.children.length === 0) {
         const menu = getMainMenu();
         addBubbleWithCommands(menu.text, menu.commands);
     }

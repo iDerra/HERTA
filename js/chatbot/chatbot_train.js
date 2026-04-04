@@ -1,19 +1,19 @@
 let trainState = {
     currentIndex: 0,
-    currentTool: 'noun', 
-    sentences: [], 
+    currentTool: 'noun',
+    sentences: [],
     totalSentences: 5
 };
 
 const dummyInventory = [
     { name: "telescopio", feature: "potente", gender: 'M', number: 'S' },
     { name: "poción", feature: "mágica", gender: 'F', number: 'S' },
-    { name: "mapas", feature: "estelares", gender: 'M', number: 'P' }, 
+    { name: "mapas", feature: "estelares", gender: 'M', number: 'P' },
     { name: "botas", feature: "gravitatorias", gender: 'F', number: 'P' }
 ];
 
 
-window.checkTrainingStatus = function() {
+window.checkTrainingStatus = function () {
     const btnChat = document.getElementById('btn-chat');
     if (btnChat) {
         const isTrained = window.shopData && window.shopData.isTrained;
@@ -22,20 +22,23 @@ window.checkTrainingStatus = function() {
     }
 }
 
-window.initTrainingView = function() {
+window.initTrainingView = function () {
     const unclassified = window.shopData.products.filter(p => !p.gender || !p.number);
 
     const classUI = document.getElementById('training-classification-ui');
     const gameWrapper = document.getElementById('training-game-wrapper');
+    const sideAvatar = document.getElementById('train-side-avatar');
 
     if (unclassified.length > 0) {
         classUI.style.display = 'block';
         gameWrapper.style.display = 'none';
+        if(sideAvatar) sideAvatar.style.display = 'block';
         renderClassificationTable();
     } else {
         classUI.style.display = 'none';
         gameWrapper.style.display = 'block';
-        
+        if(sideAvatar) sideAvatar.style.display = 'none';
+
         const gameUI = document.getElementById('training-game-ui');
         const msgUI = document.getElementById('training-complete-msg');
 
@@ -43,7 +46,7 @@ window.initTrainingView = function() {
             gameUI.style.display = 'none';
             msgUI.style.display = 'block';
         } else {
-            if(trainState.sentences.length === 0) window.startTrainingRound();
+            if (trainState.sentences.length === 0) window.startTrainingRound();
         }
     }
 }
@@ -55,7 +58,7 @@ function renderClassificationTable() {
     window.shopData.products.forEach(p => {
         const gM = (p.gender === 'M' || !p.gender) ? 'selected' : '';
         const gF = (p.gender === 'F') ? 'selected' : '';
-        
+
         const nS = (p.number === 'S' || !p.number) ? 'selected' : '';
         const nP = (p.number === 'P') ? 'selected' : '';
 
@@ -80,11 +83,11 @@ function renderClassificationTable() {
     });
 }
 
-window.saveClassificationAndStart = function() {
+window.saveClassificationAndStart = function () {
     window.shopData.products.forEach(p => {
         const gSelect = document.getElementById(`gender-${p.id}`);
         const nSelect = document.getElementById(`number-${p.id}`);
-        
+
         if (gSelect && nSelect) {
             p.gender = gSelect.value;
             p.number = nSelect.value;
@@ -96,21 +99,14 @@ window.saveClassificationAndStart = function() {
 }
 
 
-window.startTrainingRound = function() {
+window.startTrainingRound = function () {
     trainState.currentIndex = 0;
     trainState.sentences = generateSentenceBatch();
-    
+
     document.getElementById('training-game-ui').style.display = 'block';
     document.getElementById('training-complete-msg').style.display = 'none';
-    
-    loadCurrentSentence();
-}
 
-window.selectTool = function(toolType) {
-    trainState.currentTool = toolType;
-    document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('selected'));
-    const activeBtn = document.querySelector(`.tool-btn.tool-${toolType}`);
-    if(activeBtn) activeBtn.classList.add('selected');
+    loadCurrentSentence();
 }
 
 
@@ -119,7 +115,7 @@ function generateSentenceBatch() {
     const userProds = window.shopData.products;
     const mixedInventory = [...userProds, ...dummyInventory];
 
-    for(let i=0; i<trainState.totalSentences; i++) {
+    for (let i = 0; i < trainState.totalSentences; i++) {
         const prod = mixedInventory[Math.floor(Math.random() * mixedInventory.length)];
         batch.push(createSentenceTemplate(prod));
     }
@@ -127,7 +123,7 @@ function generateSentenceBatch() {
 }
 
 function createSentenceTemplate(prod) {
-    const g = prod.gender; 
+    const g = prod.gender;
     const n = prod.number;
 
     const getIndefinite = () => {
@@ -141,8 +137,8 @@ function createSentenceTemplate(prod) {
     };
 
     const getSome = () => {
-         if (n === 'P') return g === 'F' ? "algunas" : "algunos";
-         return g === 'F' ? "alguna" : "algún";
+        if (n === 'P') return g === 'F' ? "algunas" : "algunos";
+        return g === 'F' ? "alguna" : "algún";
     }
 
     const getOther = () => {
@@ -150,35 +146,123 @@ function createSentenceTemplate(prod) {
         return g === 'F' ? "otra" : "otro";
     }
 
+    const getThis = () => {
+        if (n === 'P') return g === 'F' ? "estas" : "estos";
+        return g === 'F' ? "esta" : "este";
+    }
+
+    const getThat = () => {
+        if (n === 'P') return g === 'F' ? "esas" : "esos";
+        return g === 'F' ? "esa" : "ese";
+    }
+
     const un_una = getIndefinite();
     const el_la = getDefinite();
     const algun = getSome();
     const otro = getOther();
+    const este_esta = getThis();
+    const ese_esa = getThat();
 
     const templates = [
         {
             words: ["Quiero", un_una, prod.name, prod.feature],
-            keys:  ["verb", "det", "noun", "adj"]
+            keys: ["verb", "det", "noun", "adj"]
         },
         {
             words: ["Busco", el_la, prod.name, prod.feature, "hoy"],
-            keys:  ["verb", "det", "noun", "adj", "other"]
+            keys: ["verb", "det", "noun", "adj", "other"]
         },
         {
             words: ["¿", "Tenéis", algun, prod.name, "?"],
-            keys:  ["other", "verb", "det", "noun", "other"]
+            keys: ["other", "verb", "det", "noun", "other"]
         },
         {
-            words: [el_la.charAt(0).toUpperCase() + el_la.slice(1), prod.name, "es", "muy", prod.feature],
-            keys:  ["det", "noun", "verb", "other", "adj"]
+            words: [el_la, prod.name, "es", "muy", prod.feature],
+            keys: ["det", "noun", "verb", "other", "adj"]
         },
         {
-             words: ["Enséñame", otro, prod.name, "por favor"],
-             keys:  ["verb", "det", "noun", "other"]
+            words: ["Enséñame", otro, prod.name, "por favor"],
+            keys: ["verb", "det", "noun", "other"]
+        },
+        {
+            words: ["Compraré", el_la, prod.name, "ahora", "mismo"],
+            keys: ["verb", "det", "noun", "other", "other"]
+        },
+        {
+            words: ["¿", "Cuánto", "cuesta", este_esta, prod.name, "?"],
+            keys: ["other", "other", "verb", "det", "noun", "other"]
+        },
+        {
+            words: ["Me", "encanta", el_la, prod.name, prod.feature],
+            keys: ["other", "verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["Necesito", un_una, prod.name, "urgentemente"],
+            keys: ["verb", "det", "noun", "other"]
+        },
+        {
+            words: ["Ayer", "vi", ese_esa, prod.name, prod.feature],
+            keys: ["other", "verb", "det", "noun", "adj"]
         }
     ];
 
-    return templates[Math.floor(Math.random() * templates.length)];
+    const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
+
+    let capitalizeNext = true;
+    selectedTemplate.words = selectedTemplate.words.map(word => {
+        if (capitalizeNext && /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(word)) {
+            word = word.charAt(0).toUpperCase() + word.slice(1);
+            capitalizeNext = false;
+        }
+        if (word.endsWith('.')) {
+            capitalizeNext = true;
+        }
+        return word;
+    });
+
+    return selectedTemplate;
+}
+
+function showSpeechBubble(text, type = 'neutral') {
+    const bubble = document.getElementById('train-speech-bubble');
+    if (!bubble) return;
+    bubble.innerText = text;
+    
+    bubble.className = 'speech-bubble';
+    if(type === 'error') bubble.classList.add('error');
+    if(type === 'success') bubble.classList.add('success');
+
+    // Animar pulsando
+    bubble.animate([
+        { transform: 'scale(0.97)' },
+        { transform: 'scale(1)' }
+    ], { duration: 250, easing: 'ease-out' });
+}
+
+function resetSpeechBubble() {
+    const left = trainState.totalSentences - trainState.currentIndex;
+    
+    let text = "¡Hola! Ayúdame a identificar los tipos de palabras.";
+    if (trainState.currentIndex === 0) {
+        text = "¡Empezamos! Señala cada palabra con la herramienta correcta.";
+    } else if (left === 1) {
+        text = "¡Ya solo nos queda la última! Tú puedes con ella. Piénsalo bien.";
+    } else if (left === 2) {
+        text = "¡Muy bien! Ya casi terminamos el entrenamiento, solo quedan dos más.";
+    } else {
+        text = `¡Sigue así! Nos quedan ${left} oraciones por analizar.`;
+    }
+    
+    showSpeechBubble(text, "neutral");
+}
+
+window.selectTool = function(tool) {
+    trainState.currentTool = tool;
+    const buttons = document.querySelectorAll('.tool-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    const activeBtn = document.querySelector(`.tool-btn[data-tool="${tool}"]`);
+    if(activeBtn) activeBtn.classList.add('active');
 }
 
 function loadCurrentSentence() {
@@ -186,57 +270,63 @@ function loadCurrentSentence() {
 
     const data = trainState.sentences[trainState.currentIndex];
     const container = document.getElementById('sentence-container');
-    if(!container) return;
-    container.innerHTML = ""; 
+    if (!container) return;
+    container.innerHTML = "";
 
     document.getElementById('current-sentence-num').innerText = trainState.currentIndex + 1;
     const bar = document.getElementById('train-progress-fill');
-    if(bar) bar.style.width = `${(trainState.currentIndex / trainState.totalSentences) * 100}%`;
-    document.getElementById('feedback-msg').innerText = "";
+    if (bar) bar.style.width = `${(trainState.currentIndex / trainState.totalSentences) * 100}%`;
+    
+    resetSpeechBubble();
 
     data.words.forEach((word, index) => {
-        const span = document.createElement('span');
-        span.innerText = word;
-        span.className = 'interactive-word';
-        span.dataset.index = index;
-        span.dataset.currentTag = 'none'; 
-        
-        span.addEventListener('click', function() {
-            span.classList.remove('tagged-noun', 'tagged-adj', 'tagged-verb', 'tagged-det', 'tagged-other');
-            const newTag = trainState.currentTool;
-            span.classList.add(`tagged-${newTag}`);
-            span.dataset.currentTag = newTag;
+        const block = document.createElement('div');
+        block.className = 'word-analysis-block interactive-selectable';
+        block.dataset.index = index;
+        block.dataset.currentTag = 'none';
+        block.innerText = word;
+
+        block.addEventListener('click', function () {
+            if(!trainState.currentTool) {
+                showSpeechBubble("⚠️ ¡Selecciona primero una categoría de la barra!", 'error');
+                return;
+            }
+            // Toggle off if clicking the same tool
+            if (this.dataset.currentTag === trainState.currentTool) {
+                this.dataset.currentTag = 'none';
+                this.className = 'word-analysis-block interactive-selectable';
+            } else {
+                this.dataset.currentTag = trainState.currentTool;
+                this.className = `word-analysis-block interactive-selectable tagged-${trainState.currentTool}`;
+            }
         });
-        
-        container.appendChild(span);
+
+        container.appendChild(block);
     });
 }
 
-window.validateSentence = function() {
+window.validateSentence = function () {
     const currentSentence = trainState.sentences[trainState.currentIndex];
-    const spans = document.querySelectorAll('.interactive-word');
+    const blocks = document.querySelectorAll('.word-analysis-block');
     let errors = 0;
 
-    spans.forEach((span, i) => {
-        const userTag = span.dataset.currentTag;
+    blocks.forEach((block, i) => {
+        const userTag = block.dataset.currentTag;
         const correctTag = currentSentence.keys[i];
 
         if (userTag !== correctTag) {
             errors++;
-            span.style.border = "2px solid #e74c3c"; 
-            span.animate([
+            block.style.border = "2px solid #ef4444";
+            block.animate([
                 { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
             ], { duration: 300 });
         } else {
-            span.style.border = "2px solid #2ecc71"; 
+            block.style.border = "2px solid #22c55e";
         }
     });
 
-    const feedback = document.getElementById('feedback-msg');
-    
     if (errors === 0) {
-        feedback.innerText = "✨ ¡Perfecto! Análisis correcto.";
-        feedback.style.color = "#27ae60";
+        showSpeechBubble("✨ ¡Perfecto! El análisis de la oración es correcto. ¡Sigamos con la siguiente!", 'success');
         setTimeout(() => {
             trainState.currentIndex++;
             if (trainState.currentIndex >= trainState.totalSentences) {
@@ -244,15 +334,14 @@ window.validateSentence = function() {
             } else {
                 loadCurrentSentence();
             }
-        }, 1500);
+        }, 2000);
     } else {
-        feedback.innerText = `❌ Hay ${errors} errores.`;
-        feedback.style.color = "#c0392b";
+        showSpeechBubble(`❌ Vaya, he encontrado ${errors} error${errors > 1 ? 'es' : ''}. ¡Inténtalo de nuevo! Revisa que a una palabra no se le haya asignado el tipo que no le corresponde.`, 'error');
     }
 }
 
 function finishSession() {
-    if(window.shopData) {
+    if (window.shopData) {
         window.shopData.isTrained = true;
         saveData();
     }

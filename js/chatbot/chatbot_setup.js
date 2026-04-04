@@ -78,7 +78,7 @@ window.checkRequirements = function () {
 
     if (ready) {
         panel.className = 'status-box success';
-        panel.innerHTML = '<div><strong>Fase 1 Completa.</strong> Pasa a Entrenamiento.</div>';
+        panel.innerHTML = '<div><strong>Fase 1 completa.</strong> Pasa al entrenamiento.</div>';
     } else {
         panel.className = 'status-box';
         panel.innerHTML = `

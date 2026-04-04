@@ -55,11 +55,11 @@
                     <div class="form-group">
                         <label>Tipo de Tienda</label>
                         <select id="shop-type-select" onchange="updateShopVisual()">
-                            <option value="tech">Tecnología (Gadgets & Futuro)</option>
-                            <option value="bakery">Pastelería (Dulces & Pan)</option>
-                            <option value="sports">Deporte (Ropa & Equipo)</option>
-                            <option value="fashion">Moda (Estilo & Diseño)</option>
-                            <option value="magic">Alquimia (Pociones & Magia)</option>
+                            <option value="tech">Tecnología (gadgets y electrónica)</option>
+                            <option value="bakery">Pastelería (dulces y pan)</option>
+                            <option value="sports">Deporte (ropa y equipamiento)</option>
+                            <option value="fashion">Moda (ropa y diseño)</option>
+                            <option value="magic">Alquimia (pociones y magia)</option>
                         </select>
                     </div>
 
@@ -79,20 +79,22 @@
             <div class="divider"></div>
 
             <h2> Inventario y productos</h2>
-            <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros.</p>
+            <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros. Recuerda
+                poner los acentos necesarios y mayúscula solo en caso de nombres propios.</p>
 
             <div class="inventory-controls glass-subpanel">
-                <input type="text" id="prod-name" placeholder="Producto (Ej: Zapatillas)" class="flex-2">
+                <input type="text" id="prod-name" placeholder="Producto (Ej: zapatillas)" class="flex-2">
                 <input type="number" id="prod-price" placeholder="Precio (€)" class="flex-1">
-                <input type="text" id="prod-feature" placeholder="Atributo (Ej: Cómodas)" class="flex-2">
-                <button onclick="addProduct()" class="btn-primary">+ Añadir</button>
+                <input type="text" id="prod-feature" placeholder="Atributo (Ej: cómodas)" class="flex-2">
+                <button onclick="addProduct()" class="btn-primary">+</button>
             </div>
 
             <div id="products-list-ui" class="products-list"></div>
         </section>
 
         <section id="tab-train" class="tab-content glass-panel">
-            <img src="../images/chatbot_bot.webp" class="robot-side-avatar" alt="Robot Asistente">
+            <img src="../images/chatbot_bot.webp" id="train-side-avatar" class="robot-side-avatar"
+                alt="Robot Asistente">
 
             <div id="training-classification-ui" style="display: none;">
                 <h2>Paso 1: Clasificación</h2>
@@ -118,7 +120,7 @@
             </div>
 
             <div id="training-game-wrapper" style="display: none;">
-                <h2>Paso 2: Análisis Sintáctico</h2>
+                <h2>Paso 2: Análisis sintáctico</h2>
                 <p class="subtitle">Enséñale a la IA a identificar las partes de la oración.</p>
 
                 <div id="training-complete-msg" class="completion-msg glass-subpanel" style="display: none;">
@@ -130,40 +132,46 @@
                     </div>
                 </div>
 
-                <div id="training-game-ui">
-                    <div class="progress-wrapper">
-                        <p class="progress-text">ORACIÓN <span id="current-sentence-num">1</span> DE 5</p>
-                        <div class="progress-bar-container">
-                            <div id="train-progress-fill"></div>
+                <div id="training-game-ui" class="glass-subpanel train-layout">
+                    <div class="train-sidebar">
+                        <img src="../images/chatbot_bot.webp" class="robot-main-avatar" alt="Robot Asistente">
+                        <div class="speech-bubble" id="train-speech-bubble">
+                            ¡Hola! Ayúdame a identificar los tipos de palabras en esta oración.
                         </div>
                     </div>
 
-                    <div class="tools-grid glass-subpanel">
-                        <button class="tool-btn tool-noun selected" onclick="selectTool('noun')">Sustantivo</button>
-                        <button class="tool-btn tool-adj" onclick="selectTool('adj')">Adjetivo</button>
-                        <button class="tool-btn tool-verb" onclick="selectTool('verb')">Verbo</button>
-                        <button class="tool-btn tool-det" onclick="selectTool('det')">Deter.</button>
-                        <button class="tool-btn tool-other" onclick="selectTool('other')">Otros</button>
-                    </div>
+                    <div class="train-main-content">
+                        <div class="training-area">
+                            <p class="progress-text">ORACIÓN <span id="current-sentence-num">1</span> DE 5</p>
+                            <div class="progress-bar-container">
+                                <div id="train-progress-fill"></div>
+                            </div>
+                            <div class="tool-palette" id="tool-palette-ui">
+                                <button class="tool-btn active-tool-none" data-tool="noun"
+                                    onclick="selectTool('noun')">Sustantivo</button>
+                                <button class="tool-btn" data-tool="adj" onclick="selectTool('adj')">Adjetivo</button>
+                                <button class="tool-btn" data-tool="verb" onclick="selectTool('verb')">Verbo</button>
+                                <button class="tool-btn" data-tool="det"
+                                    onclick="selectTool('det')">Determinante</button>
+                                <button class="tool-btn" data-tool="other" onclick="selectTool('other')">Otros</button>
+                            </div>
 
-                    <div class="training-area glass-subpanel">
-                        <div id="sentence-container" class="sentence-display"></div>
-                        <div id="feedback-msg"></div>
-                    </div>
+                            <div id="sentence-container" class="sentence-display"></div>
+                        </div>
 
-                    <div class="center-action">
-                        <button class="btn-primary btn-large" onclick="validateSentence()">Comprobar Sintaxis</button>
+                        <div class="center-action">
+                            <button class=" btn-primary btn-large" onclick="validateSentence()">Comprobar
+                                sintaxis</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="tab-chat" class="tab-content glass-panel">
-            <img src="../images/chatbot_bot.webp" class="robot-side-avatar" alt="Robot Asistente">
-
             <div class="chat-section-header">
                 <h2 id="chat-shop-name-title">Tienda IA</h2>
-                <p id="chat-shop-type-subtitle" class="soft-subtitle">Asistente Virtual Activo</p>
+                <p id="chat-shop-type-subtitle" class="soft-subtitle">Asistencia al Cliente</p>
             </div>
 
             <div class="chat-container glass-subpanel">
@@ -219,14 +227,7 @@
 
             const subtitle = document.getElementById('chat-shop-type-subtitle');
             if (subtitle) {
-                const labels = {
-                    tech: 'Tecnología Avanzada',
-                    bakery: 'Pastelería Artesanal',
-                    sports: 'Ropa Deportiva',
-                    fashion: 'Boutique de Moda',
-                    magic: 'Bazar de Hechizos'
-                };
-                subtitle.innerText = labels[type];
+                subtitle.innerText = 'Asistencia al Cliente';
             }
         }
 
@@ -237,6 +238,11 @@
             if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
 
             if (tabId === 'tab-chat') {
+                const shopNameTitle = document.getElementById('chat-shop-name-title');
+                if (shopNameTitle && window.shopData && window.shopData.name) {
+                    shopNameTitle.innerText = window.shopData.name;
+                }
+                
                 setTimeout(() => {
                     if (typeof initChatGreeting === 'function') initChatGreeting();
                 }, 100);

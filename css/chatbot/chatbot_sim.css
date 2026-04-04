@@ -46,6 +46,61 @@
     display: none;
 }
 
+/* Nuevo layout de grupo (Mensajes con avatar) */
+.chat-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    animation: popIn 0.4s cubic-bezier(0.17, 0.5, 0.3, 1.2);
+}
+
+.wrapper-user {
+    align-items: flex-end;
+}
+
+.wrapper-bot {
+    align-items: flex-start;
+}
+
+.chat-avatar-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.avatar-bot-container {
+    flex-direction: row;
+}
+
+.avatar-user-container {
+    flex-direction: row;
+}
+
+.chat-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.chat-avatar.emoji-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: var(--cb-accent);
+    color: white;
+}
+
+.chat-name {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--cb-muted);
+}
+
 /* Burbujas */
 .chat-bubble {
     max-width: 80%;
@@ -54,7 +109,6 @@
     font-size: 0.95rem;
     line-height: 1.5;
     position: relative;
-    animation: popIn 0.4s cubic-bezier(0.17, 0.5, 0.3, 1.2);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
