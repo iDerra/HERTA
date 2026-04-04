@@ -2,7 +2,8 @@ let trainState = {
     currentIndex: 0,
     currentTool: 'noun',
     sentences: [],
-    totalSentences: 5
+    totalSentences: 5,
+    isTransitioning: false
 };
 
 const dummyInventory = [
@@ -163,45 +164,49 @@ function createSentenceTemplate(prod) {
     const este_esta = getThis();
     const ese_esa = getThat();
 
+    const es_son = n === 'P' ? "son" : "es";
+    const cuesta_cuestan = n === 'P' ? "cuestan" : "cuesta";
+    const encanta_encantan = n === 'P' ? "encantan" : "encanta";
+
     const templates = [
         {
-            words: ["Quiero", un_una, prod.name, prod.feature],
+            words: ["Quiero", un_una, prod.name, prod.feature + "."],
             keys: ["verb", "det", "noun", "adj"]
         },
         {
-            words: ["Busco", el_la, prod.name, prod.feature, "hoy"],
-            keys: ["verb", "det", "noun", "adj", "other"]
+            words: ["Busco", el_la, prod.name, "con", "descuento."],
+            keys: ["verb", "det", "noun", "prep", "noun"]
         },
         {
-            words: ["¿", "Tenéis", algun, prod.name, "?"],
-            keys: ["other", "verb", "det", "noun", "other"]
+            words: ["¿Tenéis", algun, prod.name, "en", "stock?"],
+            keys: ["verb", "det", "noun", "prep", "noun"]
         },
         {
-            words: [el_la, prod.name, "es", "muy", prod.feature],
+            words: [el_la, prod.name, es_son, "muy", prod.feature + "."],
             keys: ["det", "noun", "verb", "other", "adj"]
         },
         {
-            words: ["Enséñame", otro, prod.name, "por favor"],
-            keys: ["verb", "det", "noun", "other"]
+            words: ["Enséñame", otro, prod.name, "por", "favor."],
+            keys: ["verb", "det", "noun", "prep", "noun"]
         },
         {
-            words: ["Compraré", el_la, prod.name, "ahora", "mismo"],
-            keys: ["verb", "det", "noun", "other", "other"]
+            words: ["Compraré", el_la, prod.name, "de", "inmediato."],
+            keys: ["verb", "det", "noun", "prep", "other"]
         },
         {
-            words: ["¿", "Cuánto", "cuesta", este_esta, prod.name, "?"],
-            keys: ["other", "other", "verb", "det", "noun", "other"]
+            words: ["¿Cuánto", cuesta_cuestan, este_esta, prod.name + "?"],
+            keys: ["other", "verb", "det", "noun"]
         },
         {
-            words: ["Me", "encanta", el_la, prod.name, prod.feature],
+            words: ["Me", encanta_encantan, el_la, prod.name, prod.feature + "."],
             keys: ["other", "verb", "det", "noun", "adj"]
         },
         {
-            words: ["Necesito", un_una, prod.name, "urgentemente"],
-            keys: ["verb", "det", "noun", "other"]
+            words: ["Necesito", un_una, prod.name, "para", "hoy."],
+            keys: ["verb", "det", "noun", "prep", "other"]
         },
         {
-            words: ["Ayer", "vi", ese_esa, prod.name, prod.feature],
+            words: ["Ayer", "vi", ese_esa, prod.name, prod.feature + "."],
             keys: ["other", "verb", "det", "noun", "adj"]
         }
     ];
@@ -211,10 +216,14 @@ function createSentenceTemplate(prod) {
     let capitalizeNext = true;
     selectedTemplate.words = selectedTemplate.words.map(word => {
         if (capitalizeNext && /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(word)) {
-            word = word.charAt(0).toUpperCase() + word.slice(1);
+            const firstLetterMatch = word.match(/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/);
+            if (firstLetterMatch) {
+                const idx = word.indexOf(firstLetterMatch[0]);
+                word = word.substring(0, idx) + word.charAt(idx).toUpperCase() + word.substring(idx + 1);
+            }
             capitalizeNext = false;
         }
-        if (word.endsWith('.')) {
+        if (word.endsWith('.') || word.endsWith('?')) {
             capitalizeNext = true;
         }
         return word;
@@ -267,6 +276,8 @@ window.selectTool = function(tool) {
 
 function loadCurrentSentence() {
     if (!trainState.sentences || trainState.sentences.length === 0) return;
+    
+    trainState.isTransitioning = false;
 
     const data = trainState.sentences[trainState.currentIndex];
     const container = document.getElementById('sentence-container');
@@ -306,6 +317,8 @@ function loadCurrentSentence() {
 }
 
 window.validateSentence = function () {
+    if (trainState.isTransitioning) return;
+    
     const currentSentence = trainState.sentences[trainState.currentIndex];
     const blocks = document.querySelectorAll('.word-analysis-block');
     let errors = 0;
@@ -327,6 +340,7 @@ window.validateSentence = function () {
 
     if (errors === 0) {
         showSpeechBubble("✨ ¡Perfecto! El análisis de la oración es correcto. ¡Sigamos con la siguiente!", 'success');
+        trainState.isTransitioning = true;
         setTimeout(() => {
             trainState.currentIndex++;
             if (trainState.currentIndex >= trainState.totalSentences) {

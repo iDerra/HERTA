@@ -61,7 +61,7 @@ window.renderProductList = function () {
     window.shopData.products.forEach(p => {
         list.innerHTML += `
             <div class="product-item" style="background:#f8f9fa; padding:10px; margin-bottom:5px; border-left:4px solid var(--herta-main); display:flex; justify-content:space-between;">
-                <div><strong>${p.name}</strong> (${p.feature})</div>
+                <div><strong>${escapeHTML(p.name)}</strong> (${escapeHTML(p.feature)})</div>
                 <button onclick="removeProduct(${p.id})" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">🗑️</button>
             </div>`;
     });

@@ -342,30 +342,12 @@ td {
     color: var(--cb-text);
 }
 
-.tool-btn[data-tool="noun"].active {
-    background: #fce7f3;
-    color: #db2777;
-}
-
-.tool-btn[data-tool="adj"].active {
-    background: #fef9c3;
-    color: #ca8a04;
-}
-
-.tool-btn[data-tool="verb"].active {
-    background: #e0f2fe;
-    color: #0284c7;
-}
-
-.tool-btn[data-tool="det"].active {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-.tool-btn[data-tool="other"].active {
-    background: #f1f5f9;
-    color: #475569;
-}
+.tool-btn[data-tool="noun"].active { background: #fce7f3; color: #db2777; }
+.tool-btn[data-tool="adj"].active { background: #fef9c3; color: #ca8a04; }
+.tool-btn[data-tool="verb"].active { background: #e0f2fe; color: #0284c7; }
+.tool-btn[data-tool="det"].active { background: #dcfce7; color: #16a34a; }
+.tool-btn[data-tool="prep"].active { background: #f3e8ff; color: #9333ea; }
+.tool-btn[data-tool="other"].active { background: #f1f5f9; color: #475569; }
 
 /* PALABRAS INTERACTIVAS */
 .word-analysis-block.interactive-selectable {
@@ -413,6 +395,12 @@ td {
     background: #dcfce7;
     border-color: #bbf7d0;
     color: #16a34a;
+}
+
+.word-analysis-block.interactive-selectable.tagged-prep {
+    background: #f3e8ff;
+    border-color: #e9d5ff;
+    color: #9333ea;
 }
 
 .word-analysis-block.interactive-selectable.tagged-other {

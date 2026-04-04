@@ -239,7 +239,7 @@ function handleReturnDateLogic(dateText) {
 
 function getMainMenu() {
     return {
-        text: `¡Hola! Soy Herta, el asistente virtual de <b>${window.shopData.name || 'la tienda'}</b>.`,
+        text: `¡Hola! Soy Herta, el asistente virtual de <b>${escapeHTML(window.shopData.name) || 'la tienda'}</b>.`,
         commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "3. 🔄 Devolución", "4. ➕ Añadir a la cesta"]
     };
 }
@@ -248,7 +248,7 @@ function createMessageWrapper(type) {
     const wrapper = document.createElement('div');
     wrapper.className = `chat-message-wrapper wrapper-${type}`;
 
-    const botName = window.shopData && window.shopData.name ? window.shopData.name : 'Asistente IA';
+    const botName = window.shopData && window.shopData.name ? escapeHTML(window.shopData.name) : 'Asistente IA';
 
     let avatarHTML = '';
     if (type === 'bot') {
@@ -275,7 +275,11 @@ function addBubble(text, type) {
 
     const bubble = document.createElement('div');
     bubble.className = `chat-bubble bubble-${type}`;
-    bubble.innerHTML = text;
+    if (type === 'user') {
+        bubble.innerText = text;
+    } else {
+        bubble.innerHTML = text;
+    }
 
     wrapper.appendChild(bubble);
     container.appendChild(wrapper);
