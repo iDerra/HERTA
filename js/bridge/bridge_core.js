@@ -27,7 +27,7 @@ window.BridgeCore = {
 
         // Instanciar el motor de física de Matter.js
         this.engine = Matter.Engine.create();
-        this.engine.world.gravity.y = 1.0;
+        this.engine.world.gravity.y = 1.5; // Gravedad equilibrada (intermedia) para no aplastarlo en las rampas
 
         this.loadLevelSequence(this.currentSequenceIndex);
     },
@@ -341,6 +341,39 @@ window.BridgeCore = {
         document.querySelector('.btn-play').innerText = "⏹ REINICIAR";
 
         document.getElementById('level-grid').classList.add('hidden');
+        
+        // Mostrar pantalla de carga
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+
+        // Construir la escena física de inmediato (es inmediato y no consume asincronía)
+        this.buildPhysicsWorld();
+
+        const startSim = () => {
+             // Ocultar pantalla de carga
+             if (loadingOverlay) loadingOverlay.classList.add('hidden');
+
+             // Loop principal del motor físico
+             const fps = 60;
+             const timeStep = 1000 / fps;
+
+             this.physicsInterval = setInterval(() => {
+                 Matter.Engine.update(this.engine, timeStep);
+
+                 if (this.robotBody) {
+                     // Empuje de control ajustado (-25% velocidad)
+                     if (this.robotBody.velocity.x < 2.1) {
+                         Matter.Body.applyForce(this.robotBody, this.robotBody.position, { x: 0.01, y: 0 });
+                     }
+
+                     // Detector de caídas al abismo
+                     if (this.robotBody.position.y > this.levelMatrix.length * this.SCALE + 500) {
+                         this.failLevel("¡Te has caído al vacío!");
+                     }
+                 }
+             }, timeStep);
+        };
+
         const canvas3d = document.getElementById('sim-3d-canvas');
         if (canvas3d) {
             canvas3d.classList.remove('hidden');
@@ -348,33 +381,13 @@ window.BridgeCore = {
             if (zoomControls) zoomControls.classList.remove('hidden');
 
             window.dispatchEvent(new Event('resize'));
-            window.Bridge3D.buildScene(this.levelMatrix);
-            // El 3D Mesh del player se instanciará con coords del cuerpo de Matter, 
-            // no hace falta llamar a un update manual a priori.
+            
+            // Iniciar buildScene que cargará el coche. Cuando termine, lanzamos el bucle físico.
+            window.Bridge3D.buildScene(this.levelMatrix, startSim);
+        } else {
+            // Si no hubiera canvas 3D (modo 2d base), iniciar física del tirón
+            startSim();
         }
-
-        // Construir la escena física 2D que sustentará al render 3D
-        this.buildPhysicsWorld();
-
-        // Loop principal del motor físico
-        const fps = 60;
-        const timeStep = 1000 / fps;
-
-        this.physicsInterval = setInterval(() => {
-            Matter.Engine.update(this.engine, timeStep);
-
-            if (this.robotBody) {
-                // Empuje de control ajustado (-25% velocidad)
-                if (this.robotBody.velocity.x < 2.1) {
-                    Matter.Body.applyForce(this.robotBody, this.robotBody.position, { x: 0.01, y: 0 });
-                }
-
-                // Detector de caídas al abismo
-                if (this.robotBody.position.y > this.levelMatrix.length * this.SCALE + 500) {
-                    this.failLevel("¡Te has caído al vacío!");
-                }
-            }
-        }, timeStep);
     },
 
     buildPhysicsWorld: function () {
@@ -458,21 +471,23 @@ window.BridgeCore = {
         });
 
         // 3. Vehiculo
-        const carW = S * 1.5;
+        // carW aumentado a 0.8 para evitar que las curvas de sus bordes (chamfer) se solapen y se clave en las rampas
+        const carW = S * 0.8;
         const carH = S * 0.7;
         const carX = this.robotPos.c * S + S / 2;
-        // Posar el coche milimétricamente encima de su cuadrícula base para eliminar la caída libre visual.
+        // Posar el coche milimétricamente encima de su cuadrícula base
         const carY = this.robotPos.r * S + (S - carH / 2) - 0.5;
 
         this.robotBody = Matter.Bodies.rectangle(carX, carY, carW, carH, {
             mass: 2,
-            friction: 0.0,
+            friction: 0.0, // ESTO ERA CLAVE: Sin ruedas de verdad, una caja con fricción se "lija" contra la rampa y se frena.
             frictionAir: 0.001,
             restitution: 0.0, 
-            chamfer: { radius: carH * 0.4 }, // Esto es crucial para rampas, convierte bordes en curvas
+            chamfer: { radius: carH * 0.4 }, // Curvas mágicas para deslizarse suave
             label: "robot",
-            inertia: Infinity // ⬅️ IMPRESCINDIBLE: Congela la rotación de la caja para que sea un coche estable, imposible de voltear.
+            inertia: Infinity // Evitamos vueltas de campana
         });
+        
         bodies.push(this.robotBody);
 
         // Agregar todo al mundo

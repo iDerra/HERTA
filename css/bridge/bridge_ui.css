@@ -254,6 +254,7 @@
     transition: filter 0.15s, transform 0.1s;
     position: relative;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .btn-craft::before {

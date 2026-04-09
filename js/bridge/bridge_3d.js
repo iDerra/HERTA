@@ -135,7 +135,7 @@ window.Bridge3D = {
         window.addEventListener('touchend', handleUp);
     },
 
-    buildScene: function (levelMatrix) {
+    buildScene: function (levelMatrix, onLoaded) {
         // Limpiar escena anterior adecuadamente ignorando las luces que puedan estar dispersas en los hijos
         const objectsToRemove = this.scene.children.filter(child => child.type !== "AmbientLight" && child.type !== "DirectionalLight");
         objectsToRemove.forEach(obj => this.scene.remove(obj));
@@ -341,36 +341,67 @@ window.Bridge3D = {
         });
 
         // Crear el robot (un cochecito simple con dos bloques)
-        this.createRobot(cols, rows);
+        this.createRobot(cols, rows, onLoaded);
     },
 
-    createRobot: function (cols, rows) {
+    createRobot: function (cols, rows, onLoaded) {
         this.robotMesh = new THREE.Group(); // Agrupamos piezas del coche
 
-        // Cargar textura del coche y ajustar dimensiones dinámicamente
-        const loader = new THREE.TextureLoader();
+        const loader = new THREE.GLTFLoader();
 
-        loader.load('../images/bridge_3d_car.webp', (texture) => {
-            // Configuración "Pixel Perfect": evita el suavizado borroso
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        // Configuramos draco loader para soportar compresión
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.3/');
+        loader.setDRACOLoader(dracoLoader);
 
-            const img = texture.image;
-            // Calculamos la proporción real de la imagen (ancho / alto)
-            const aspect = img.width / img.height;
+        loader.load('../images/bridge_car_model.glb', (gltf) => {
+            const model = gltf.scene;
 
-            // Definimos el ancho deseado (ej. 1.4 bloques) y calculamos la altura automática
-            const width = this.blockSize * 2.0; // Aumentamos el tamaño (antes 1.4)
-            const height = width / aspect;
+            // Recorremos el modelo para activar sombras (opcional pero le da buen look)
+            model.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    // También definimos un fallback de color y material low-poly para que encaje
+                    if (child.material) {
+                        child.material.flatShading = true;
+                        child.material.needsUpdate = true;
+                    }
+                }
+            });
 
-            // Usamos Sprite: Siempre mira de frente a la cámara (sin deformación)
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const body = new THREE.Sprite(material);
+            // Escalar el objeto para que coincida con el tamaño físico en Matter.js (~1.5 bloques)
+            const box = new THREE.Box3().setFromObject(model);
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.z, size.y);
 
-            body.scale.set(width, height, 1);
-            body.center.set(0.5, 0); // Pivote en la base (ruedas)
+            const targetWidth = this.blockSize * 1.5;
+            const targetScale = targetWidth / maxDim;
+            model.scale.setScalar(targetScale);
 
-            this.robotMesh.add(body);
+            // Centrar el pivote: calculamos la caja escalada
+            const boxScaled = new THREE.Box3().setFromObject(model);
+            const center = boxScaled.getCenter(new THREE.Vector3());
+            const bottomY = boxScaled.min.y;
+
+            // Compensación visual clave (0.15 * blockSize):
+            // El terreno visual en Three.js se dibuja centrado y la física de Matter.js utiliza otro eje de referencia.
+            // Para que la rueda del coche de exactamente sobre el mapa visible, tenemos que empujar el visual model hacia arriba.
+            model.position.x = -center.x;
+            model.position.z = -center.z;
+            model.position.y = -bottomY + (0.15 * this.blockSize);
+
+            // Crear un contenedor intermedio
+            const wrapper = new THREE.Group();
+            wrapper.add(model);
+
+            // Los modelos en 3D suelen mirar hacia +Z. En este juego 2.5D se avanza hacia +X.
+            // Ponemos a 0 para que la ponga en el sentido opuesto al que estaba probocado por Math.PI
+            wrapper.rotation.y = 0;
+            wrapper.type = "GLTFCar";
+
+            this.robotMesh.add(wrapper);
+
+            if (onLoaded) onLoaded();
         });
 
         this.scene.add(this.robotMesh);
@@ -400,25 +431,25 @@ window.Bridge3D = {
                     const x3d = (body.position.x / S - cols / 2) * this.blockSize;
                     const y3d = (rows / 2 - body.position.y / S) * this.blockSize;
 
-                    // Rotación visual calculada leyendo la trayectoria en vez del bloque de Matter.
-                    // Evitar el cálculo de -90 grados (-PI/2) puro si cae verticalmente sin haberse movido mucho en X
+                    // Recuperar la excelente rotación calculada sobre la trayectoria visual
+                    // Evita por completo los trompos incontrolables y asegura un cabeceo perfecto.
                     const isMovingForward = body.velocity.x > 0.1;
                     if (isMovingForward) {
-                        // En Matter, +Y es abajo. En Three, -Y es abajo. 
+                        // Math.atan2 nos da la inclinación real del vector de movimiento
                         const tgtRot = Math.atan2(-body.velocity.y, body.velocity.x);
+
                         const diff = tgtRot - this.robotMesh.rotation.z;
                         const adDiff = Math.atan2(Math.sin(diff), Math.cos(diff));
-                        this.robotMesh.rotation.z += adDiff * 0.10; // interpolar suavidad
-                    } else if (body.velocity.y > 0.5 && body.velocity.x < 0.1) {
-                        // Si está cayendo libre puramente sin empuje frontal aún (esperando en aire), mantenlo plano
-                        // O restaura suavemente a 0.
+                        this.robotMesh.rotation.z += adDiff * 0.15; // Suavidad 
+                    } else if (Math.abs(body.velocity.y) > 0.5 && body.velocity.x < 0.1) {
+                        // Si cae rápido rectifica plano
                         const diff = 0 - this.robotMesh.rotation.z;
                         const adDiff = Math.atan2(Math.sin(diff), Math.cos(diff));
                         this.robotMesh.rotation.z += adDiff * 0.10;
                     }
 
-                    // Alinear ligeramente el sprite hacia arriba aportando un offset visual del 10%
-                    this.robotMesh.position.set(x3d, y3d + (0.10 * this.blockSize), 0.75 * this.blockSize);
+                    // Mantenemos la super compensación perfecta de las ruedas y ajustamos la profundidad (eje Z)
+                    this.robotMesh.position.set(x3d, y3d, -0.15 * this.blockSize);
 
                     if (this.robotMesh.children.length > 0 && this.robotMesh.children[0].type === "Sprite") {
                         this.robotMesh.children[0].material.rotation = this.robotMesh.rotation.z;
