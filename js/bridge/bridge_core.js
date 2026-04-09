@@ -149,38 +149,77 @@ window.BridgeCore = {
         let answer = 0;
         let unit = "";
 
-        const challengeType = Math.floor(Math.random() * 4);
+        const challengeType = Math.floor(Math.random() * 6);
 
         if (type === 'rect') {
-            if (challengeType === 0) {
-                question = `Calcula el <b>ÁREA</b> de este bloque (${b}m x ${h}m).`;
-                answer = b * h;
-                unit = "m²";
-            } else if (challengeType === 1) {
-                question = `Calcula el <b>PERÍMETRO</b> total del bloque (${b}m x ${h}m).`;
-                answer = (2 * b) + (2 * h);
-                unit = "m";
-            } else if (challengeType === 2) {
-                const price = 5;
-                question = `Bloque (${b}m x ${h}m). El material cuesta <b>${price}€/m²</b>. ¿Cuál es el coste total?`;
-                answer = (b * h) * price;
-                unit = "€";
-            } else {
-                const density = 2;
-                question = `Bloque (${b}m x ${h}m). La densidad es <b>${density}kg/m²</b>. ¿Cuánto pesa el bloque?`;
-                answer = (b * h) * density;
-                unit = "kg";
+            switch (challengeType) {
+                case 0:
+                    question = `Calcula el <b>área</b> de este bloque (${b}m x ${h}m).`;
+                    answer = b * h;
+                    unit = "m²";
+                    break;
+                case 1:
+                    question = `Calcula el <b>perímetro</b> total del bloque (${b}m x ${h}m).`;
+                    answer = (2 * b) + (2 * h);
+                    unit = "m";
+                    break;
+                case 2: {
+                    const price = 5;
+                    question = `El material de este bloque (${b * h}m²) cuesta <b>${price}€/m²</b>. ¿Cuál es el coste total?`;
+                    answer = (b * h) * price;
+                    unit = "€";
+                    break;
+                }
+                case 3:
+                    question = `Si decides cortar a la <b>mitad</b> el bloque (${b}m x ${h}m), ¿cuántos metros cuadrados tiene ahora?`;
+                    answer = (b * h) / 2;
+                    unit = "m²";
+                    break;
+                case 4:
+                    question = `El bloque de ${b * h}m² tiene un sobrecoste del <b>10%</b> sobre su área. ¿A cuánto equivale ese 10%?`;
+                    answer = (b * h) * 0.1;
+                    unit = "m²";
+                    break;
+                case 5: {
+                    const depth = Math.floor(Math.random() * 5);
+                    question = `Calcula el <b>volumen</b> total si esta pieza de ${b}m x ${h}m tiene una profundidad 3D de <b>${depth}m</b>.`;
+                    answer = b * h * depth;
+                    unit = "m³";
+                    break;
+                }
             }
         } else {
-            if (challengeType % 2 === 0) {
-                question = `Calcula el <b>ÁREA</b> de esta rampa triangular (Base ${b}, Altura ${h}).`;
-                answer = (b * h) / 2;
-                unit = "m²";
-            } else {
-                const price = 10;
-                question = `Rampa (Base ${b}, Altura ${h}). Este material reforzado cuesta <b>${price}€/m²</b>. ¿Coste total?`;
-                answer = ((b * h) / 2) * price;
-                unit = "€";
+            // Triangle logic
+            switch (challengeType) {
+                case 0:
+                    question = `Calcula el <b>área</b> de esta rampa triangular (Base ${b}m, Altura ${h}m). Formula: (base·altura)/2`;
+                    answer = (b * h) / 2;
+                    unit = "m²";
+                    break;
+                case 1: {
+                    const price = 10;
+                    question = `Este material en pendiente cuesta <b>${price}€/m²</b>. ¿Coste total de la rampa de ${b * h / 2}m²?`;
+                    answer = ((b * h) / 2) * price;
+                    unit = "€";
+                    break;
+                }
+                case 2: {
+                    const depthTri = Math.floor(Math.random() * 5);
+                    question = `Calcula el <b>volumen</b> de la rampa (${b}m x ${h}m) asumiendo una profundidad de <b>${depthTri}m</b>. (Fórmula: (base·altura)/2·profundidad)`;
+                    answer = ((b * h) / 2) * depthTri;
+                    unit = "m³";
+                    break;
+                }
+                case 3:
+                    question = `Van a pintar una línea que cubre <b>un cuarto (1/4)</b> del área visible de la rampa (${b * h / 2}m²). ¿Cuántos m² se pintan?`;
+                    answer = ((b * h) / 2) / 4;
+                    unit = "m²";
+                    break;
+                default:
+                    question = `Si reduces la altura de la rampa a la <b>mitad</b>, ¿cuál sería su nueva área? (Base ${b}m, Altura original ${h}m)`;
+                    answer = (b * (h / 2)) / 2;
+                    unit = "m²";
+                    break;
             }
         }
 
@@ -341,7 +380,7 @@ window.BridgeCore = {
         document.querySelector('.btn-play').innerText = "⏹ REINICIAR";
 
         document.getElementById('level-grid').classList.add('hidden');
-        
+
         // Mostrar pantalla de carga
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
@@ -350,28 +389,28 @@ window.BridgeCore = {
         this.buildPhysicsWorld();
 
         const startSim = () => {
-             // Ocultar pantalla de carga
-             if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            // Ocultar pantalla de carga
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
 
-             // Loop principal del motor físico
-             const fps = 60;
-             const timeStep = 1000 / fps;
+            // Loop principal del motor físico
+            const fps = 60;
+            const timeStep = 1000 / fps;
 
-             this.physicsInterval = setInterval(() => {
-                 Matter.Engine.update(this.engine, timeStep);
+            this.physicsInterval = setInterval(() => {
+                Matter.Engine.update(this.engine, timeStep);
 
-                 if (this.robotBody) {
-                     // Empuje de control ajustado (-25% velocidad)
-                     if (this.robotBody.velocity.x < 2.1) {
-                         Matter.Body.applyForce(this.robotBody, this.robotBody.position, { x: 0.01, y: 0 });
-                     }
+                if (this.robotBody) {
+                    // Empuje de control ajustado (-25% velocidad)
+                    if (this.robotBody.velocity.x < 2.1) {
+                        Matter.Body.applyForce(this.robotBody, this.robotBody.position, { x: 0.01, y: 0 });
+                    }
 
-                     // Detector de caídas al abismo
-                     if (this.robotBody.position.y > this.levelMatrix.length * this.SCALE + 500) {
-                         this.failLevel("¡Te has caído al vacío!");
-                     }
-                 }
-             }, timeStep);
+                    // Detector de caídas al abismo
+                    if (this.robotBody.position.y > this.levelMatrix.length * this.SCALE + 500) {
+                        this.failLevel("¡Te has caído al vacío!");
+                    }
+                }
+            }, timeStep);
         };
 
         const canvas3d = document.getElementById('sim-3d-canvas');
@@ -381,7 +420,7 @@ window.BridgeCore = {
             if (zoomControls) zoomControls.classList.remove('hidden');
 
             window.dispatchEvent(new Event('resize'));
-            
+
             // Iniciar buildScene que cargará el coche. Cuando termine, lanzamos el bucle físico.
             window.Bridge3D.buildScene(this.levelMatrix, startSim);
         } else {
@@ -482,12 +521,12 @@ window.BridgeCore = {
             mass: 2,
             friction: 0.0, // ESTO ERA CLAVE: Sin ruedas de verdad, una caja con fricción se "lija" contra la rampa y se frena.
             frictionAir: 0.001,
-            restitution: 0.0, 
+            restitution: 0.0,
             chamfer: { radius: carH * 0.4 }, // Curvas mágicas para deslizarse suave
             label: "robot",
             inertia: Infinity // Evitamos vueltas de campana
         });
-        
+
         bodies.push(this.robotBody);
 
         // Agregar todo al mundo
