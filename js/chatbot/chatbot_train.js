@@ -2,7 +2,7 @@ let trainState = {
     currentIndex: 0,
     currentTool: 'noun',
     sentences: [],
-    totalSentences: 5,
+    totalSentences: 8,
     isTransitioning: false,
     // Métricas de sesión
     totalErrors: 0,
@@ -49,6 +49,8 @@ window.initTrainingView = function () {
         const msgUI = document.getElementById('training-complete-msg');
 
         if (window.shopData.isTrained && trainState.currentIndex === 0 && trainState.sentences.length === 0) {
+            // Ya entrenado previamente: renderizar pantalla de resultados sin métricas de sesión
+            renderCompletionScreen(null);
             gameUI.style.display = 'none';
             msgUI.style.display = 'block';
         } else {
@@ -120,15 +122,23 @@ window.startTrainingRound = function () {
 
 
 function generateSentenceBatch() {
-    const batch = [];
     const userProds = window.shopData.products;
     const mixedInventory = [...userProds, ...dummyInventory];
+    const batch = [];
 
-    for (let i = 0; i < trainState.totalSentences; i++) {
+    // Garantizar al menos 3 frases con productos del usuario (barajados)
+    const shuffledUser = [...userProds].sort(() => Math.random() - 0.5);
+    const guaranteed = shuffledUser.slice(0, Math.min(3, shuffledUser.length));
+    guaranteed.forEach(prod => batch.push(createSentenceTemplate(prod)));
+
+    // Rellenar el resto con productos aleatorios del inventario mixto
+    while (batch.length < trainState.totalSentences) {
         const prod = mixedInventory[Math.floor(Math.random() * mixedInventory.length)];
         batch.push(createSentenceTemplate(prod));
     }
-    return batch;
+
+    // Barajar el lote completo para que los productos del usuario no salgan siempre primero
+    return batch.sort(() => Math.random() - 0.5);
 }
 
 function createSentenceTemplate(prod) {
@@ -177,6 +187,7 @@ function createSentenceTemplate(prod) {
     const encanta_encantan = n === 'P' ? "encantan" : "encanta";
 
     const templates = [
+        // ── Originales ─────────────────────────────────────────
         {
             words: ["Quiero", un_una, prod.name, prod.feature + "."],
             keys: ["verb", "det", "noun", "adj"]
@@ -216,6 +227,55 @@ function createSentenceTemplate(prod) {
         {
             words: ["Ayer", "vi", ese_esa, prod.name, prod.feature + "."],
             keys: ["other", "verb", "det", "noun", "adj"]
+        },
+        // ── Nuevas ─────────────────────────────────────────────
+        {
+            words: ["Dame", un_una, prod.name, prod.feature + "."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["¿Hay", algun, prod.name, prod.feature + "?"],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: [este_esta, prod.name, es_son, prod.feature + "."],
+            keys: ["det", "noun", "verb", "adj"]
+        },
+        {
+            words: ["Muéstrame", ese_esa, prod.name, prod.feature + "."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["Llevaré", este_esta, prod.name, prod.feature + "."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["¿Tienes", el_la, prod.name, prod.feature + "?"],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: [ese_esa, prod.name, cuesta_cuestan, "mucho."],
+            keys: ["det", "noun", "verb", "other"]
+        },
+        {
+            words: ["Devuelvo", el_la, prod.name, prod.feature + "."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["Busco", un_una, prod.name, "barato."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["¿Queda", algun, prod.name, "disponible?"],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["Reservo", el_la, prod.name, prod.feature + "."],
+            keys: ["verb", "det", "noun", "adj"]
+        },
+        {
+            words: ["Compro", el_la, prod.name, "sin", "duda."],
+            keys: ["verb", "det", "noun", "prep", "noun"]
         }
     ];
 
@@ -293,6 +353,8 @@ function loadCurrentSentence() {
     container.innerHTML = "";
 
     document.getElementById('current-sentence-num').innerText = trainState.currentIndex + 1;
+    const totalEl = document.getElementById('total-sentence-num');
+    if (totalEl) totalEl.innerText = trainState.totalSentences;
     const bar = document.getElementById('train-progress-fill');
     if (bar) bar.style.width = `${(trainState.currentIndex / trainState.totalSentences) * 100}%`;
     
@@ -365,6 +427,64 @@ window.validateSentence = function () {
     }
 }
 
+// Renderiza la pantalla de fin de entrenamiento.
+// stats: { accuracy, totalSentences, totalErrors, timeStr } o null si se carga desde persistencia.
+function renderCompletionScreen(stats) {
+    const resultEl = document.getElementById('training-complete-msg');
+    if (!resultEl) return;
+
+    if (stats) {
+        // Pantalla completa con métricas de la sesión recién completada
+        const trophy = stats.accuracy === 100 ? '🏆' : stats.accuracy >= 70 ? '🥇' : '🏅';
+        const msg = stats.accuracy === 100
+            ? '¡Sin ningún error! Análisis impecable. Eres un experto en PLN.'
+            : stats.accuracy >= 70
+            ? '¡Muy buen trabajo! Tu IA ha aprendido mucho.'
+            : 'Ha costado un poco, pero ¡el aprendizaje sigue!';
+
+        resultEl.innerHTML = `
+            <div class="results-screen">
+                <span class="results-trophy">${trophy}</span>
+                <h3>¡Entrenamiento Completado!</h3>
+                <p>${msg}</p>
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <span class="stat-value">${stats.accuracy}%</span>
+                        <span class="stat-label">Precisión</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">${stats.totalSentences}</span>
+                        <span class="stat-label">Oraciones</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">${stats.totalErrors}</span>
+                        <span class="stat-label">Errores</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">${stats.timeStr}</span>
+                        <span class="stat-label">Tiempo</span>
+                    </div>
+                </div>
+                <div class="action-group">
+                    <button class="btn-secondary" onclick="startTrainingRound()">Repasar de nuevo</button>
+                    <button class="btn-primary btn-large" onclick="switchTab('tab-chat')">Probar el Chatbot →</button>
+                </div>
+            </div>`;
+    } else {
+        // Pantalla simplificada al recargar con sesión ya guardada (sin métricas de sesión)
+        resultEl.innerHTML = `
+            <div class="results-screen">
+                <span class="results-trophy">🥇</span>
+                <h3>¡IA ya entrenada!</h3>
+                <p>Tu IA recuerda el entrenamiento anterior y está lista para el chat.</p>
+                <div class="action-group">
+                    <button class="btn-secondary" onclick="startTrainingRound()">Volver a entrenar</button>
+                    <button class="btn-primary btn-large" onclick="switchTab('tab-chat')">Ir al Chat →</button>
+                </div>
+            </div>`;
+    }
+}
+
 function finishSession() {
     if (window.shopData) {
         window.shopData.isTrained = true;
@@ -373,55 +493,23 @@ function finishSession() {
     checkTrainingStatus();
     document.getElementById('training-game-ui').style.display = 'none';
 
-    // Calcular métricas
+    // Calcular métricas de la sesión
     const elapsedMs = Date.now() - (trainState.sessionStartTime || Date.now());
     const elapsedSec = Math.round(elapsedMs / 1000);
     const minutes = Math.floor(elapsedSec / 60);
     const seconds = elapsedSec % 60;
-    const timeStr = minutes > 0
-        ? `${minutes}m ${seconds}s`
-        : `${seconds}s`;
+    const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 
     const accuracy = trainState.totalAttempts > 0
-        ? Math.round(((trainState.totalSentences) / trainState.totalAttempts) * 100)
+        ? Math.min(Math.round((trainState.totalSentences / trainState.totalAttempts) * 100), 100)
         : 100;
-    const accuracyCapped = Math.min(accuracy, 100);
 
-    const trophy = accuracyCapped === 100 ? '🏆' : accuracyCapped >= 70 ? '🥇' : '🏅';
-    const msg = accuracyCapped === 100
-        ? '¡Sin ningún error! Análisis impecable. Eres un experto en PLN.'
-        : accuracyCapped >= 70
-        ? '¡Muy buen trabajo! Tu IA ha aprendido mucho.'
-        : 'Ha costado un poco, pero ¡el aprendizaje sigue!';
+    renderCompletionScreen({
+        accuracy,
+        totalSentences: trainState.totalSentences,
+        totalErrors: trainState.totalErrors,
+        timeStr
+    });
 
-    const resultEl = document.getElementById('training-complete-msg');
-    resultEl.innerHTML = `
-        <div class="results-screen">
-            <span class="results-trophy">${trophy}</span>
-            <h3>¡Entrenamiento Completado!</h3>
-            <p>${msg}</p>
-            <div class="results-stats">
-                <div class="stat-card">
-                    <span class="stat-value">${accuracyCapped}%</span>
-                    <span class="stat-label">Precisión</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value">${trainState.totalSentences}</span>
-                    <span class="stat-label">Oraciones</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value">${trainState.totalErrors}</span>
-                    <span class="stat-label">Errores</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value">${timeStr}</span>
-                    <span class="stat-label">Tiempo</span>
-                </div>
-            </div>
-            <div class="action-group">
-                <button class="btn-secondary" onclick="startTrainingRound()">Repasar de nuevo</button>
-                <button class="btn-primary btn-large" onclick="switchTab('tab-chat')">Probar el Chatbot →</button>
-            </div>
-        </div>`;
-    resultEl.style.display = 'block';
+    document.getElementById('training-complete-msg').style.display = 'block';
 }

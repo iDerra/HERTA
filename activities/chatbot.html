@@ -39,28 +39,36 @@
                     <div class="info-card-icon">🧠</div>
                     <div>
                         <h3>Procesamiento del Lenguaje Natural (PLN)</h3>
-                        <p>El PLN es la rama de la IA que permite a los ordenadores <strong>leer y comprender</strong> el lenguaje humano. Cuando escribes un mensaje, el chatbot lo analiza palabra por palabra.</p>
+                        <p>El PLN es la rama de la IA que permite a los ordenadores <strong>leer y comprender</strong>
+                            el lenguaje humano. Cuando escribes un mensaje, el chatbot lo analiza palabra por palabra.
+                        </p>
                     </div>
                 </div>
                 <div class="info-card">
                     <div class="info-card-icon">🏷️</div>
                     <div>
                         <h3>¿Por qué analizar la sintaxis?</h3>
-                        <p>Identificar sustantivos, verbos y adjetivos ayuda al chatbot a saber <strong>qué busca el cliente</strong> (el sustantivo), <strong>cómo lo quiere</strong> (el adjetivo) y <strong>qué acción pide</strong> (el verbo).</p>
+                        <p>Identificar sustantivos, verbos y adjetivos ayuda al chatbot a saber <strong>qué busca el
+                                cliente</strong> (el sustantivo), <strong>cómo lo quiere</strong> (el adjetivo) y
+                            <strong>qué acción pide</strong> (el verbo).</p>
                     </div>
                 </div>
                 <div class="info-card">
                     <div class="info-card-icon">⚙️</div>
                     <div>
                         <h3>El flujo de trabajo real</h3>
-                        <p>En una IA real, este proceso se llama <em>tokenización</em> y <em>etiquetado POS</em> (Part-of-Speech). Es exactamente lo que estás haciendo tú en el entrenamiento: etiquetando oraciones para que la IA aprenda patrones.</p>
+                        <p>En una IA real, este proceso se llama <em>tokenización</em> y <em>etiquetado POS</em>
+                            (Part-of-Speech). Es exactamente lo que estás haciendo tú en el entrenamiento: etiquetando
+                            oraciones para que la IA aprenda patrones.</p>
                     </div>
                 </div>
                 <div class="info-card">
                     <div class="info-card-icon">🛒</div>
                     <div>
                         <h3>Del entrenamiento a la simulación</h3>
-                        <p>Una vez entrenado el modelo, el chatbot usa esos patrones para <strong>interpretar mensajes nuevos</strong> que nunca ha visto: busca productos, gestiona cesta y procesa devoluciones.</p>
+                        <p>Una vez entrenado el modelo, el chatbot usa esos patrones para <strong>interpretar mensajes
+                                nuevos</strong> que nunca ha visto: busca productos, gestiona cesta y procesa
+                            devoluciones.</p>
                     </div>
                 </div>
             </div>
@@ -95,7 +103,8 @@
                 <h1>Simulador Chatbot</h1>
             </div>
             <div class="header-controls">
-                <button class="btn-ctrl btn-info" id="btn-how-it-works" onclick="openInfoModal()">¿Cómo funciona?</button>
+                <button class="btn-ctrl btn-info" id="btn-how-it-works" onclick="openInfoModal()">¿Cómo
+                    funciona?</button>
                 <button class="btn-ctrl" onclick="location.href='../index.html'">Menú Principal</button>
                 <button class="btn-ctrl btn-danger" onclick="resetActivity()">Reiniciar</button>
             </div>
@@ -104,8 +113,7 @@
 
     <main>
         <nav class="tabs-nav">
-            <button class="tab-link active" data-target="tab-config"
-                onclick="switchTab('tab-config')">
+            <button class="tab-link active" data-target="tab-config" onclick="switchTab('tab-config')">
                 <span class="tab-step">①</span>
                 <span class="tab-label">Configuración</span>
                 <span class="tab-check" id="check-config" style="display:none;">✓</span>
@@ -160,7 +168,8 @@
 
             <div class="section-heading-group">
                 <h2>Inventario y productos</h2>
-                <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros. Recuerda
+                <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros.
+                    Recuerda
                     poner los acentos necesarios y mayúscula solo en caso de nombres propios.</p>
             </div>
 
@@ -175,8 +184,6 @@
         </section>
 
         <section id="tab-train" class="tab-content glass-panel">
-            <img src="../images/chatbot_bot.webp" id="train-side-avatar" class="robot-side-avatar"
-                alt="Robot Asistente">
 
             <div id="training-classification-ui" style="display: none;">
                 <h2>Paso 1: Clasificación</h2>
@@ -218,7 +225,8 @@
 
                     <div class="train-main-content">
                         <div class="training-area">
-                            <p class="progress-text">ORACIÓN <span id="current-sentence-num">1</span> DE 5</p>
+                            <p class="progress-text">ORACIÓN <span id="current-sentence-num">1</span> DE <span
+                                    id="total-sentence-num">8</span></p>
                             <div class="progress-bar-container">
                                 <div id="train-progress-fill"></div>
                             </div>
@@ -229,7 +237,8 @@
                                 <button class="tool-btn" data-tool="verb" onclick="selectTool('verb')">Verbo</button>
                                 <button class="tool-btn" data-tool="det"
                                     onclick="selectTool('det')">Determinante</button>
-                                <button class="tool-btn" data-tool="prep" onclick="selectTool('prep')">Preposición</button>
+                                <button class="tool-btn" data-tool="prep"
+                                    onclick="selectTool('prep')">Preposición</button>
                                 <button class="tool-btn" data-tool="other" onclick="selectTool('other')">Otros</button>
                             </div>
 
@@ -367,13 +376,13 @@
             const configDone = hasName && hasProducts;
 
             const checkConfig = document.getElementById('check-config');
-            const checkTrain  = document.getElementById('check-train');
-            const checkChat   = document.getElementById('check-chat');
+            const checkTrain = document.getElementById('check-train');
+            const checkChat = document.getElementById('check-chat');
 
             if (checkConfig) checkConfig.style.display = configDone ? 'inline' : 'none';
-            if (checkTrain)  checkTrain.style.display  = (window.shopData && window.shopData.isTrained) ? 'inline' : 'none';
+            if (checkTrain) checkTrain.style.display = (window.shopData && window.shopData.isTrained) ? 'inline' : 'none';
             // La simulación no tiene "completado" formal, pero se muestra al habilitarse
-            if (checkChat)   checkChat.style.display   = 'none';
+            if (checkChat) checkChat.style.display = 'none';
         }
 
         /* ── Override de switchTab con animación + indicadores ── */
