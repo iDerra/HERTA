@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
     <link rel="stylesheet" href="../css/style.css">
@@ -38,15 +38,18 @@
     <main>
         <nav class="tabs-nav">
             <button class="tab-link active" data-target="tab-config"
-                onclick="switchTab('tab-config')">Configuración</button>
+                onclick="switchTab('tab-config')">① Configuración</button>
             <button class="tab-link" id="btn-train" data-target="tab-train" onclick="switchTab('tab-train')"
-                disabled>Entrenamiento</button>
+                disabled>② Entrenamiento</button>
             <button class="tab-link" id="btn-chat" data-target="tab-chat" onclick="switchTab('tab-chat')"
-                disabled>Simulación</button>
+                disabled>③ Simulación</button>
         </nav>
 
         <section id="tab-config" class="tab-content active glass-panel">
-            <h2>Configura tu negocio</h2>
+            <div class="section-heading-group">
+                <h2>Configura tu negocio</h2>
+                <p class="subtitle">Elige el tipo de tienda y dale un nombre para comenzar tu aventura con la IA.</p>
+            </div>
 
             <div id="status-panel" class="status-box">Define el nombre y tipo de tu tienda para empezar.</div>
 
@@ -78,9 +81,11 @@
 
             <div class="divider"></div>
 
-            <h2> Inventario y productos</h2>
-            <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros. Recuerda
-                poner los acentos necesarios y mayúscula solo en caso de nombres propios.</p>
+            <div class="section-heading-group">
+                <h2>Inventario y productos</h2>
+                <p class="subtitle">Añade los artículos que venderá tu IA usando sustantivos y adjetivos claros. Recuerda
+                    poner los acentos necesarios y mayúscula solo en caso de nombres propios.</p>
+            </div>
 
             <div class="inventory-controls glass-subpanel">
                 <input type="text" id="prod-name" placeholder="Producto (Ej: zapatillas)" class="flex-2">
