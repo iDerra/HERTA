@@ -95,7 +95,8 @@ window.checkRequirements = function () {
     const btnTrain = document.getElementById('btn-train');
     if (btnTrain) {
         btnTrain.disabled = !ready;
-        btnTrain.innerText = ready ? "2. Entrenamiento" : "2. Entrenamiento 🔒";
+        const label = btnTrain.querySelector('.tab-label');
+        if (label) label.textContent = ready ? 'Entrenamiento' : 'Entrenamiento 🔒';
     }
 
     if (typeof checkTrainingStatus === 'function') checkTrainingStatus();

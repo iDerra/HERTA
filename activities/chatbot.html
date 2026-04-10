@@ -23,12 +23,79 @@
     <div id="cb-dynamic-bg" class="chatbot-bg-layer"></div>
     <div class="chatbot-bg-overlay"></div>
 
+    <!-- ══════════════════════════════════════════════
+         MODAL: ¿CÓMO FUNCIONA MI CHATBOT?
+    ══════════════════════════════════════════════ -->
+    <div id="info-modal-overlay" class="modal-overlay" onclick="closeInfoModal(event)">
+        <div class="modal-panel glass-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="modal-close-btn" onclick="closeInfoModal()" aria-label="Cerrar">✕</button>
+            <div class="modal-header">
+                <span class="modal-icon">🤖</span>
+                <h2 id="modal-title">¿Cómo funciona un Chatbot?</h2>
+                <p class="subtitle">Un vistazo rápido a la inteligencia artificial que estás creando</p>
+            </div>
+            <div class="modal-body">
+                <div class="info-card">
+                    <div class="info-card-icon">🧠</div>
+                    <div>
+                        <h3>Procesamiento del Lenguaje Natural (PLN)</h3>
+                        <p>El PLN es la rama de la IA que permite a los ordenadores <strong>leer y comprender</strong> el lenguaje humano. Cuando escribes un mensaje, el chatbot lo analiza palabra por palabra.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">🏷️</div>
+                    <div>
+                        <h3>¿Por qué analizar la sintaxis?</h3>
+                        <p>Identificar sustantivos, verbos y adjetivos ayuda al chatbot a saber <strong>qué busca el cliente</strong> (el sustantivo), <strong>cómo lo quiere</strong> (el adjetivo) y <strong>qué acción pide</strong> (el verbo).</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">⚙️</div>
+                    <div>
+                        <h3>El flujo de trabajo real</h3>
+                        <p>En una IA real, este proceso se llama <em>tokenización</em> y <em>etiquetado POS</em> (Part-of-Speech). Es exactamente lo que estás haciendo tú en el entrenamiento: etiquetando oraciones para que la IA aprenda patrones.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">🛒</div>
+                    <div>
+                        <h3>Del entrenamiento a la simulación</h3>
+                        <p>Una vez entrenado el modelo, el chatbot usa esos patrones para <strong>interpretar mensajes nuevos</strong> que nunca ha visto: busca productos, gestiona cesta y procesa devoluciones.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeInfoModal()">¡Entendido, vamos a ello!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         OVERLAY: CARGANDO IA
+    ══════════════════════════════════════════════ -->
+    <div id="ai-loading-overlay" class="ai-loading-overlay" style="display:none;">
+        <div class="ai-loading-panel">
+            <div class="ai-loading-rings">
+                <div class="ai-ring ai-ring-1"></div>
+                <div class="ai-ring ai-ring-2"></div>
+                <div class="ai-ring ai-ring-3"></div>
+                <div class="ai-loading-core">🤖</div>
+            </div>
+            <h3 class="ai-loading-title">Inicializando IA…</h3>
+            <p class="ai-loading-sub" id="ai-loading-msg">Cargando redes neuronales</p>
+            <div class="ai-loading-bar-wrap">
+                <div class="ai-loading-bar" id="ai-loading-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <header class="main-header glass-panel">
         <div class="header-top">
             <div class="header-title">
                 <h1>Simulador Chatbot</h1>
             </div>
             <div class="header-controls">
+                <button class="btn-ctrl btn-info" id="btn-how-it-works" onclick="openInfoModal()">¿Cómo funciona?</button>
                 <button class="btn-ctrl" onclick="location.href='../index.html'">Menú Principal</button>
                 <button class="btn-ctrl btn-danger" onclick="resetActivity()">Reiniciar</button>
             </div>
@@ -38,11 +105,21 @@
     <main>
         <nav class="tabs-nav">
             <button class="tab-link active" data-target="tab-config"
-                onclick="switchTab('tab-config')">① Configuración</button>
-            <button class="tab-link" id="btn-train" data-target="tab-train" onclick="switchTab('tab-train')"
-                disabled>② Entrenamiento</button>
-            <button class="tab-link" id="btn-chat" data-target="tab-chat" onclick="switchTab('tab-chat')"
-                disabled>③ Simulación</button>
+                onclick="switchTab('tab-config')">
+                <span class="tab-step">①</span>
+                <span class="tab-label">Configuración</span>
+                <span class="tab-check" id="check-config" style="display:none;">✓</span>
+            </button>
+            <button class="tab-link" id="btn-train" data-target="tab-train" onclick="switchTab('tab-train')" disabled>
+                <span class="tab-step">②</span>
+                <span class="tab-label">Entrenamiento</span>
+                <span class="tab-check" id="check-train" style="display:none;">✓</span>
+            </button>
+            <button class="tab-link" id="btn-chat" data-target="tab-chat" onclick="switchTab('tab-chat')" disabled>
+                <span class="tab-step">③</span>
+                <span class="tab-label">Simulación</span>
+                <span class="tab-check" id="check-chat" style="display:none;">✓</span>
+            </button>
         </nav>
 
         <section id="tab-config" class="tab-content active glass-panel">
@@ -128,14 +205,8 @@
                 <h2>Paso 2: Análisis sintáctico</h2>
                 <p class="subtitle">Enséñale a la IA a identificar las partes de la oración.</p>
 
-                <div id="training-complete-msg" class="completion-msg glass-subpanel" style="display: none;">
-                    <h3>¡Entrenamiento Completado!</h3>
-                    <p>Tu IA está lista para interactuar con los clientes.</p>
-                    <div class="action-group">
-                        <button class="btn-secondary" onclick="startTrainingRound()">Repasar</button>
-                        <button class="btn-primary" onclick="switchTab('tab-chat')">Probar Chatbot</button>
-                    </div>
-                </div>
+                <!-- Pantalla de resultados (nueva) -->
+                <div id="training-complete-msg" class="completion-msg glass-subpanel" style="display: none;"></div>
 
                 <div id="training-game-ui" class="glass-subpanel train-layout">
                     <div class="train-sidebar">
@@ -166,7 +237,7 @@
                         </div>
 
                         <div class="center-action">
-                            <button class=" btn-primary btn-large" onclick="validateSentence()">Comprobar
+                            <button class="btn-primary btn-large" onclick="validateSentence()">Comprobar
                                 sintaxis</button>
                         </div>
                     </div>
@@ -215,6 +286,7 @@
     <script src="../js/chatbot/chatbot_train.js"></script>
 
     <script>
+        /* ── Fondo dinámico ── */
         function updateShopVisual() {
             const select = document.getElementById('shop-type-select');
             const visual = document.getElementById('shop-visual-container');
@@ -224,23 +296,106 @@
             const type = select.value;
             const imgPath = `../images/shop_${type}_bg.webp`;
 
-            if (bgLayer) {
-                bgLayer.style.backgroundImage = `url("${imgPath}")`;
-            }
-
+            if (bgLayer) bgLayer.style.backgroundImage = `url("${imgPath}")`;
             visual.style.backgroundImage = `url("${imgPath}")`;
             visual.innerHTML = "";
 
             const subtitle = document.getElementById('chat-shop-type-subtitle');
-            if (subtitle) {
-                subtitle.innerText = 'Asistencia al Cliente';
-            }
+            if (subtitle) subtitle.innerText = 'Asistencia al Cliente';
         }
 
         updateShopVisual();
 
+        /* ── Modal informativo ── */
+        function openInfoModal() {
+            document.getElementById('info-modal-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal(event) {
+            if (event && event.target !== document.getElementById('info-modal-overlay') && event.type === 'click') return;
+            document.getElementById('info-modal-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeInfoModal();
+        });
+
+        /* ── Overlay de carga de IA ── */
+        const aiMessages = [
+            "Cargando redes neuronales",
+            "Aplicando análisis sintáctico",
+            "Indexando inventario",
+            "Calibrando respuestas",
+            "¡IA lista para el chat!"
+        ];
+
+        function showAILoading(callback) {
+            const overlay = document.getElementById('ai-loading-overlay');
+            const msgEl = document.getElementById('ai-loading-msg');
+            const barEl = document.getElementById('ai-loading-bar');
+
+            overlay.style.display = 'flex';
+            let step = 0;
+            const totalSteps = aiMessages.length;
+
+            function tick() {
+                if (step >= totalSteps) {
+                    overlay.classList.add('fade-out');
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        overlay.classList.remove('fade-out');
+                        if (typeof callback === 'function') callback();
+                    }, 400);
+                    return;
+                }
+                msgEl.textContent = aiMessages[step];
+                const pct = Math.round(((step + 1) / totalSteps) * 100);
+                barEl.style.width = pct + '%';
+                step++;
+                setTimeout(tick, 480);
+            }
+            tick();
+        }
+
+        /* ── Indicadores de progreso en tabs ── */
+        function updateTabProgress() {
+            // Fase 1 completa: nombre + ≥3 productos
+            const hasName = window.shopData && window.shopData.name && window.shopData.name.trim().length > 0;
+            const hasProducts = window.shopData && window.shopData.products && window.shopData.products.length >= 3;
+            const configDone = hasName && hasProducts;
+
+            const checkConfig = document.getElementById('check-config');
+            const checkTrain  = document.getElementById('check-train');
+            const checkChat   = document.getElementById('check-chat');
+
+            if (checkConfig) checkConfig.style.display = configDone ? 'inline' : 'none';
+            if (checkTrain)  checkTrain.style.display  = (window.shopData && window.shopData.isTrained) ? 'inline' : 'none';
+            // La simulación no tiene "completado" formal, pero se muestra al habilitarse
+            if (checkChat)   checkChat.style.display   = 'none';
+        }
+
+        /* ── Override de switchTab con animación + indicadores ── */
         const originalSwitchTab = window.switchTab;
         window.switchTab = function (tabId) {
+            if (tabId === 'tab-chat' && !(window.shopData && window.shopData._chatFirstVisited)) {
+                // Mostrar loading antes del primer acceso al chat
+                showAILoading(() => {
+                    if (window.shopData) window.shopData._chatFirstVisited = true;
+                    if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
+
+                    const shopNameTitle = document.getElementById('chat-shop-name-title');
+                    if (shopNameTitle && window.shopData && window.shopData.name) {
+                        shopNameTitle.innerText = window.shopData.name;
+                    }
+                    setTimeout(() => {
+                        if (typeof initChatGreeting === 'function') initChatGreeting();
+                    }, 100);
+                });
+                return;
+            }
+
             if (typeof originalSwitchTab === 'function') originalSwitchTab(tabId);
 
             if (tabId === 'tab-chat') {
@@ -248,12 +403,22 @@
                 if (shopNameTitle && window.shopData && window.shopData.name) {
                     shopNameTitle.innerText = window.shopData.name;
                 }
-                
                 setTimeout(() => {
                     if (typeof initChatGreeting === 'function') initChatGreeting();
                 }, 100);
             }
-        }
+
+            updateTabProgress();
+        };
+
+        // Actualizar indicadores al cargar y cuando cambian datos
+        document.addEventListener('DOMContentLoaded', () => updateTabProgress());
+        // Piggybacking sobre saveData para actualizar los checks automáticamente
+        const _origSaveData = window.saveData;
+        window.saveData = function () {
+            if (typeof _origSaveData === 'function') _origSaveData();
+            updateTabProgress();
+        };
     </script>
 </body>
 

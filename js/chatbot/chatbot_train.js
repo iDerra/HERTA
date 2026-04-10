@@ -3,7 +3,11 @@ let trainState = {
     currentTool: 'noun',
     sentences: [],
     totalSentences: 5,
-    isTransitioning: false
+    isTransitioning: false,
+    // Métricas de sesión
+    totalErrors: 0,
+    totalAttempts: 0,
+    sessionStartTime: null
 };
 
 const dummyInventory = [
@@ -19,7 +23,8 @@ window.checkTrainingStatus = function () {
     if (btnChat) {
         const isTrained = window.shopData && window.shopData.isTrained;
         btnChat.disabled = !isTrained;
-        btnChat.innerText = isTrained ? "3. Simulación" : "3. Simulación 🔒";
+        const label = btnChat.querySelector('.tab-label');
+        if (label) label.textContent = isTrained ? 'Simulación' : 'Simulación 🔒';
     }
 }
 
@@ -103,6 +108,9 @@ window.saveClassificationAndStart = function () {
 window.startTrainingRound = function () {
     trainState.currentIndex = 0;
     trainState.sentences = generateSentenceBatch();
+    trainState.totalErrors = 0;
+    trainState.totalAttempts = 0;
+    trainState.sessionStartTime = Date.now();
 
     document.getElementById('training-game-ui').style.display = 'block';
     document.getElementById('training-complete-msg').style.display = 'none';
@@ -341,6 +349,7 @@ window.validateSentence = function () {
     if (errors === 0) {
         showSpeechBubble("✨ ¡Perfecto! El análisis de la oración es correcto. ¡Sigamos con la siguiente!", 'success');
         trainState.isTransitioning = true;
+        trainState.totalAttempts++;
         setTimeout(() => {
             trainState.currentIndex++;
             if (trainState.currentIndex >= trainState.totalSentences) {
@@ -350,6 +359,8 @@ window.validateSentence = function () {
             }
         }, 2000);
     } else {
+        trainState.totalErrors += errors;
+        trainState.totalAttempts++;
         showSpeechBubble(`❌ Vaya, he encontrado ${errors} error${errors > 1 ? 'es' : ''}. ¡Inténtalo de nuevo! Revisa que a una palabra no se le haya asignado el tipo que no le corresponde.`, 'error');
     }
 }
@@ -361,5 +372,56 @@ function finishSession() {
     }
     checkTrainingStatus();
     document.getElementById('training-game-ui').style.display = 'none';
-    document.getElementById('training-complete-msg').style.display = 'block';
+
+    // Calcular métricas
+    const elapsedMs = Date.now() - (trainState.sessionStartTime || Date.now());
+    const elapsedSec = Math.round(elapsedMs / 1000);
+    const minutes = Math.floor(elapsedSec / 60);
+    const seconds = elapsedSec % 60;
+    const timeStr = minutes > 0
+        ? `${minutes}m ${seconds}s`
+        : `${seconds}s`;
+
+    const accuracy = trainState.totalAttempts > 0
+        ? Math.round(((trainState.totalSentences) / trainState.totalAttempts) * 100)
+        : 100;
+    const accuracyCapped = Math.min(accuracy, 100);
+
+    const trophy = accuracyCapped === 100 ? '🏆' : accuracyCapped >= 70 ? '🥇' : '🏅';
+    const msg = accuracyCapped === 100
+        ? '¡Sin ningún error! Análisis impecable. Eres un experto en PLN.'
+        : accuracyCapped >= 70
+        ? '¡Muy buen trabajo! Tu IA ha aprendido mucho.'
+        : 'Ha costado un poco, pero ¡el aprendizaje sigue!';
+
+    const resultEl = document.getElementById('training-complete-msg');
+    resultEl.innerHTML = `
+        <div class="results-screen">
+            <span class="results-trophy">${trophy}</span>
+            <h3>¡Entrenamiento Completado!</h3>
+            <p>${msg}</p>
+            <div class="results-stats">
+                <div class="stat-card">
+                    <span class="stat-value">${accuracyCapped}%</span>
+                    <span class="stat-label">Precisión</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${trainState.totalSentences}</span>
+                    <span class="stat-label">Oraciones</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${trainState.totalErrors}</span>
+                    <span class="stat-label">Errores</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${timeStr}</span>
+                    <span class="stat-label">Tiempo</span>
+                </div>
+            </div>
+            <div class="action-group">
+                <button class="btn-secondary" onclick="startTrainingRound()">Repasar de nuevo</button>
+                <button class="btn-primary btn-large" onclick="switchTab('tab-chat')">Probar el Chatbot →</button>
+            </div>
+        </div>`;
+    resultEl.style.display = 'block';
 }
