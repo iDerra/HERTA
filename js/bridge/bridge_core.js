@@ -177,7 +177,7 @@ window.BridgeCore = {
                     break;
                 }
                 case 3:
-                    question = `Si decides cortar a la <b>mitad</b> el bloque (${b}m x ${h}m), ¿cuántos metros cuadrados tiene ahora?`;
+                    question = `Si decides cortar a la <b>mitad</b> el bloque (${b}m x ${h}m), ¿cuál es el nuevo área?`;
                     answer = (b * h) / 2;
                     unit = "m²";
                     break;
@@ -188,7 +188,7 @@ window.BridgeCore = {
                     break;
                 case 5: {
                     const depth = Math.floor(Math.random() * 5);
-                    question = `Calcula el <b>volumen</b> total si esta pieza de ${b}m x ${h}m tiene una profundidad 3D de <b>${depth}m</b>.`;
+                    question = `Calcula el <b>volumen</b> total si esta pieza de ${b}m x ${h}m tiene una profundidad de <b>${depth}m</b>.`;
                     answer = b * h * depth;
                     unit = "m³";
                     break;
@@ -198,7 +198,7 @@ window.BridgeCore = {
             // Triangle logic
             switch (challengeType) {
                 case 0:
-                    question = `Calcula el <b>área</b> de esta rampa triangular (Base ${b}m, Altura ${h}m). Formula: (base·altura)/2`;
+                    question = `Calcula el <b>área</b> de esta rampa triangular (Base ${b}m, Altura ${h}m).`;
                     answer = (b * h) / 2;
                     unit = "m²";
                     break;
@@ -211,13 +211,13 @@ window.BridgeCore = {
                 }
                 case 2: {
                     const depthTri = Math.floor(Math.random() * 5);
-                    question = `Calcula el <b>volumen</b> de la rampa (${b}m x ${h}m) asumiendo una profundidad de <b>${depthTri}m</b>. (Fórmula: (base·altura)/2·profundidad)`;
+                    question = `Calcula el <b>volumen</b> de la rampa (${b}m x ${h}m) asumiendo una profundidad de <b>${depthTri}m</b>.`;
                     answer = ((b * h) / 2) * depthTri;
                     unit = "m³";
                     break;
                 }
                 case 3:
-                    question = `Van a pintar una línea que cubre <b>un cuarto (1/4)</b> del área visible de la rampa (${b * h / 2}m²). ¿Cuántos m² se pintan?`;
+                    question = `Van a pintar una línea que cubre <b>un cuarto (1/4)</b> del área visible de la rampa. ¿Cuántos m² se pintan?`;
                     answer = ((b * h) / 2) / 4;
                     unit = "m²";
                     break;

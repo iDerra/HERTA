@@ -604,16 +604,21 @@
 .formulas-grid {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
 
 .formula-item {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
     gap: 6px;
     font-size: 0.78rem;
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.4;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .formula-name {
@@ -624,8 +629,29 @@
 }
 
 .formula-expr {
-    color: rgba(255, 255, 255, 0.6);
-    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-style: normal;
+    display: inline-flex;
+    align-items: center;
+}
+
+.formula-fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1.1;
+    margin: 0 4px;
+}
+
+.formula-fraction .numerator {
+    border-bottom: 1.5px solid currentColor;
+    padding: 0 4px;
+}
+
+.formula-fraction .denominator {
+    padding: 0 4px;
 }
 
 
