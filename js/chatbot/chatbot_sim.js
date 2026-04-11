@@ -55,17 +55,24 @@ window.handleUserMessage = function () {
 
 function generateBotResponse(cleanText) {
 
-    if (cleanText.includes("cesta") || cleanText.includes("carrito") || cleanText.includes("ver compra")) return showCart();
-    if (cleanText.includes("pagar") || cleanText.includes("finalizar") || cleanText.includes("comprar todo")) return processCheckout();
+    // Arrays de sinónimos para detectar intenciones
+    const intCesta = ["cesta", "carrito", "compra", "mis cosas", "pedidos", "bolsa"];
+    if (intCesta.some(w => cleanText.includes(w))) return showCart();
 
-    if (cleanText.includes("catalogo") || cleanText.includes("articulos") || cleanText.includes("1")) {
+    const intCheckout = ["pagar", "finalizar", "cobrar", "caja", "tarjeta", "factura", "terminar", "abonar"];
+    if (intCheckout.some(w => cleanText.includes(w))) return processCheckout();
+
+    const intCatalog = ["catalogo", "articulos", "1", "productos", "inventario", "ver", "mostrar", "teneis", "vendeis", "lista", "ofreceis"];
+    if (intCatalog.some(w => cleanText.includes(w))) {
         const list = window.shopData.products.map(p => `- ${p.name} (${p.price}€)`).join("<br>");
         return `📦 <b>Artículos disponibles:</b><br>${list}`;
     }
 
-    if (cleanText.includes("envio") || cleanText.includes("gastos") || cleanText.includes("2")) return "🚚 <b>Política de Envíos:</b><br>Coste fijo: 5€.<br><b>¡GRATIS</b> si la cesta supera los 50€!";
+    const intEnvio = ["envio", "gastos", "2", "mandar", "entrega", "domicilio", "transporte", "portes", "mandais"];
+    if (intEnvio.some(w => cleanText.includes(w))) return "🚚 <b>Política de Envíos:</b><br>Coste fijo: 5€.<br><b>¡GRATIS</b> si la cesta supera los 50€!";
 
-    if (cleanText.includes("devolver") || cleanText.includes("devolucion") || cleanText.includes("3")) {
+    const intDevolucion = ["devolver", "devolucion", "3", "retornar", "cambiar", "reembolso", "roto", "mal estado", "defectuoso"];
+    if (intDevolucion.some(w => cleanText.includes(w))) {
         chatState.conversationStage = 'WAITING_RETURN_PRODUCT';
         return "🔄 <b>Solicitud de Devolución.</b><br>Por favor, indícame: <b>¿Qué artículo quieres devolver?</b>";
     }
@@ -78,11 +85,9 @@ function generateBotResponse(cleanText) {
     
     inventory.forEach(p => {
         const pNameClean = normalizeText(p.name);
-        // Coincidencia exacta o contiene el nombre
         if (cleanText.includes(pNameClean)) {
             foundProduct = p;
         } else {
-            // Verifica si las palabras clave del producto están en el input
             const pWords = pNameClean.split(" ");
             const hasAllWords = pWords.every(pw => userWords.some(uw => uw.includes(pw) || pw.includes(uw)));
             if(pWords.length > 0 && hasAllWords) {
@@ -95,7 +100,8 @@ function generateBotResponse(cleanText) {
         return processAddToCart(cleanText, foundProduct);
     }
 
-    if (cleanText.includes("anadir") || cleanText.includes("comprar") || cleanText.includes("4")) {
+    const intAnadir = ["anadir", "comprar", "4", "adquirir", "llevar", "quiero", "dame", "poner", "agregar", "vender"];
+    if (intAnadir.some(w => cleanText.includes(w))) {
         if (inventory.length === 0) return "El catálogo está vacío.";
         const productCommands = inventory.map(p => `➕ Añadir ${p.name} ${p.feature}`);
         return {
@@ -104,8 +110,11 @@ function generateBotResponse(cleanText) {
         };
     }
 
-    if (cleanText.includes("hola") || cleanText.includes("buenos") || cleanText.includes("buenas") || cleanText.includes("empezar")) return getMainMenu();
-    if (cleanText.includes("gracias") || cleanText.includes("merci")) return "¡De nada! ¿En qué más puedo ayudarte?";
+    const intSaludos = ["hola", "buenos", "buenas", "empezar", "saludos", "que tal", "ey", "hey"];
+    if (intSaludos.some(w => cleanText.includes(w))) return getMainMenu();
+
+    const intGracias = ["gracias", "merci", "agradecido", "genial", "guay", "estupendo", "perfecto", "ok", "vale"];
+    if (intGracias.some(w => cleanText.includes(w))) return "¡De nada! ¿En qué más puedo ayudarte?";
 
     // Fallback: No se entendió el mensaje
     const fallbacks = [
