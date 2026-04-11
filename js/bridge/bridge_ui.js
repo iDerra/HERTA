@@ -44,6 +44,7 @@ window.BridgeUI = {
                 if ((r + 1) % 5 === 0) cell.classList.add('grid-mark-y');
                 
                 cell.onclick = () => window.BridgeCore.placeBlock(r, c);
+                cell.onmouseenter = () => window.BridgeUI.updateGhost(r, c);
 
                 container.appendChild(cell);
             }
@@ -56,6 +57,97 @@ window.BridgeUI = {
         robot.style.height = cs + 'px';
         robot.innerHTML = `<div class="robot-body"></div><div class="robot-wheel w1"></div><div class="robot-wheel w2"></div>`;
         container.appendChild(robot);
+
+        // CREATE GHOST
+        const ghost = document.createElement('div');
+        ghost.id = 'placement-ghost';
+        ghost.style.position = 'absolute';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.display = 'none';
+        ghost.style.zIndex = '50';
+        ghost.style.opacity = '0.9';
+        ghost.style.transition = 'none';
+        container.appendChild(ghost);
+
+        container.onmouseleave = () => {
+            if(ghost) ghost.style.display = 'none';
+        };
+    },
+
+    updateGhost: function(r, c) {
+        const ghost = document.getElementById('placement-ghost');
+        if (!ghost) return;
+
+        const core = window.BridgeCore;
+        if (core.isSimulating || core.eraserMode || core.selectedItemIdx === null) {
+            ghost.style.display = 'none';
+            return;
+        }
+
+        const item = core.inventory[core.selectedItemIdx];
+        const cs = core.CELL_SIZE;
+        const matrix = core.levelMatrix;
+
+        const startR = r - item.h + 1;
+        const startC = c;
+
+        let valid = true;
+        let mirrored = false;
+
+        if (startR < 0 || startR + item.h > matrix.length || startC + item.w > matrix[0].length) {
+            valid = false;
+        } else {
+            for (let j = 0; j < item.w; j++) {
+                let colHeight = item.h;
+                if (item.type === 'tri') {
+                    colHeight = Math.ceil(((j + 1) / item.w) * item.h);
+                }
+                for (let k = 0; k < colHeight; k++) {
+                    const targetR = (startR + item.h - 1) - k;
+                    const targetC = startC + j;
+                    if (targetR < 0 || targetR >= matrix.length || targetC >= matrix[0].length) {
+                        valid = false;
+                    } else if (matrix[targetR][targetC] !== '.' && matrix[targetR][targetC] !== 'w') {
+                        valid = false;
+                    }
+                }
+            }
+            if (item.type === 'tri') {
+                const leftC = startC - 1;
+                if (leftC >= 0) {
+                    for (let row = startR; row <= startR + item.h - 1; row++) {
+                        if (row >= 0 && row < matrix.length && matrix[row][leftC] === 'x') {
+                            mirrored = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        ghost.style.display = 'block';
+        ghost.style.left = (startC * cs) + 'px';
+        ghost.style.top = (startR * cs) + 'px';
+        ghost.style.width = (item.w * cs) + 'px';
+        ghost.style.height = (item.h * cs) + 'px';
+
+        const colorMode = valid ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 79, 109, 0.65)';
+        
+        if (item.type === 'rect') {
+            ghost.style.clipPath = 'none';
+            ghost.style.background = `repeating-linear-gradient(45deg, ${colorMode}, ${colorMode} 10px, transparent 10px, transparent 20px)`;
+            ghost.style.border = valid ? '2px solid rgba(255,255,255,0.8)' : '2px solid rgba(255,79,109,0.8)';
+        } else {
+            if (mirrored) {
+                ghost.style.clipPath = 'polygon(0% 100%, 100% 100%, 0% 0%)';
+            } else {
+                ghost.style.clipPath = 'polygon(0% 100%, 100% 100%, 100% 0%)';
+            }
+            ghost.style.background = `repeating-linear-gradient(45deg, ${colorMode}, ${colorMode} 10px, transparent 10px, transparent 20px)`;
+            ghost.style.border = 'none';
+        }
+
+        ghost.style.boxShadow = valid ? '0 0 16px rgba(255, 255, 255, 0.3)' : '0 0 16px rgba(255, 79, 109, 0.5)';
     },
 
     renderPlacedItems: function(items) {
@@ -130,5 +222,40 @@ window.BridgeUI = {
         document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
         if(type==='rect') document.querySelector('.shape-btn:nth-child(1)').classList.add('active');
         if(type==='tri') document.querySelector('.shape-btn:nth-child(2)').classList.add('active');
+    },
+
+    renderFormulas: function() {
+        const grid = document.getElementById('formulas-grid');
+        if (!grid) return;
+        
+        const formulas = [
+            { name: "Área Bloque (Rectángulo)", expr: "Base × Altura" },
+            { name: "Área Rampa (Triángulo)", expr: "(Base × Altura) / 2" },
+            { name: "Perímetro (Rectángulo)", expr: "2×Base + 2×Altura" },
+            { name: "Volumen", expr: "Área × Profundidad" },
+            { name: "Coste Total", expr: "Área × Precio (m²)" }
+        ];
+
+        grid.innerHTML = formulas.map(f => `
+            <div class="formula-item">
+                <span class="formula-name">${f.name}:</span>
+                <span class="formula-expr">${f.expr}</span>
+            </div>
+        `).join('');
+    },
+    
+    initUI: function() {
+        this.renderFormulas();
     }
 };
+
+window.BridgeHelp = {
+    open: function() {
+        document.getElementById('help-overlay').classList.remove('hidden');
+    },
+    close: function() {
+        document.getElementById('help-overlay').classList.add('hidden');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => { window.BridgeUI.initUI(); });

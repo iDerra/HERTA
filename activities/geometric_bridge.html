@@ -26,6 +26,8 @@
                 title="Volver a hacer el tutorial">📖 Tutorial</button>
             <button onclick="window.BridgeCore.skipLevel()" class="btn-back hidden" id="btn-skip"
                 title="Saltar nivel actual">⏭️ Saltar</button>
+            <button onclick="window.BridgeHelp.open()" class="btn-back" id="btn-help" title="Cómo se juega">❓
+                Ayuda</button>
             <button onclick="window.BridgeCore.toggleSimulation()" class="btn-play">▶ SIMULAR</button>
             <button onclick="location.href='../index.html'" class="btn-back">Salir</button>
         </div>
@@ -51,7 +53,11 @@
         <div class="builder-ui">
 
             <div class="panel-section inventory-section">
-                <h3>Inventario</h3>
+                <div class="inventory-header">
+                    <h3>Inventario</h3>
+                    <button id="btn-eraser" class="btn-eraser" onclick="window.BridgeCore.toggleEraser()"
+                        title="Eliminar figura colocada">Borrar</button>
+                </div>
                 <div id="inventory-grid" class="inventory-grid">
                     <div class="empty-msg">Fabrica piezas primero</div>
                 </div>
@@ -79,7 +85,7 @@
                             </div>
                         </div>
 
-                        <button onclick="window.BridgeCore.initCrafting()" class="btn-craft">⚙️ CALCULAR Y
+                        <button onclick="window.BridgeCore.initCrafting()" class="btn-craft">CALCULAR Y
                             FABRICAR</button>
                     </div>
 
@@ -97,6 +103,12 @@
                             <button onclick="window.BridgeCore.cancelCrafting()" class="btn-cancel">❌</button>
                         </div>
                         <p id="challenge-error" class="error-msg"></p>
+
+                        <!-- Formulario de referencia -->
+                        <div class="formulas-ref" id="formulas-ref">
+                            <div class="formulas-title">📐 Fórmulas de referencia</div>
+                            <div class="formulas-grid" id="formulas-grid"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,11 +124,97 @@
         </div>
     </div>
 
+    <!-- Modal de Ayuda -->
+    <div id="help-overlay" class="overlay hidden" onclick="if(event.target===this) window.BridgeHelp.close()">
+        <div class="help-modal">
+            <div class="help-header">
+                <h2>❓ ¿Cómo se juega?</h2>
+                <button class="help-close" onclick="window.BridgeHelp.close()">✕</button>
+            </div>
+            <div class="help-body">
+                <div class="help-steps">
+                    <div class="help-step">
+                        <div class="help-step-num">1</div>
+                        <div class="help-step-content">
+                            <strong>Fabrica piezas</strong>
+                            <p>Elige el tipo de pieza (Bloque o Rampa) e introduce las dimensiones en metros. La vista
+                                previa 2D te muestra cómo quedará la pieza.</p>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-num">2</div>
+                        <div class="help-step-content">
+                            <strong>Resuelve el cálculo</strong>
+                            <p>Antes de fabricar la pieza debes resolver un ejercicio de geometría: área, perímetro,
+                                volumen o coste. ¡Usa las fórmulas de referencia si las necesitas!</p>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-num">3</div>
+                        <div class="help-step-content">
+                            <strong>Coloca las piezas</strong>
+                            <p>Selecciona una pieza del inventario y haz clic en la cuadrícula para colocarla. Las
+                                <b>rampas</b> junto a un bloque sólido se colocan automáticamente de bajada (espejo).
+                            </p>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-num">4</div>
+                        <div class="help-step-content">
+                            <strong>Elimina piezas</strong>
+                            <p>¿Te has equivocado? Activa el modo <b>Borrar</b> y haz clic sobre cualquier pieza
+                                colocada para recuperarla en tu inventario.</p>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <div class="help-step-num">5</div>
+                        <div class="help-step-content">
+                            <strong>¡Simula!</strong>
+                            <p>Pulsa <b>▶ SIMULAR</b> para lanzar el coche. El objetivo es llegar a la meta 🏁 sin caer
+                                al agua 🌊. Si fallas, puedes reiniciar y recolocar las piezas.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="help-legend">
+                    <div class="help-legend-title">Simbología del mapa</div>
+                    <div class="help-legend-grid">
+                        <span class="leg-cell leg-solid"></span><span>Tierra sólida (bloques naturales)</span>
+                        <span class="leg-cell leg-water"></span><span>Agua ☠️</span>
+                        <span class="leg-cell leg-goal"></span><span>Meta 🏁</span>
+                        <span class="leg-cell leg-ramp"></span><span>Tu rampa colocada</span>
+                        <span class="leg-cell leg-block"></span><span>Tu bloque colocado</span>
+                    </div>
+                </div>
+            </div>
+            <div class="help-footer">
+                <button class="btn-help-close" onclick="window.BridgeHelp.close()">¡Entendido, a jugar! 🚗</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla de carga 3D -->
-    <div id="loading-overlay" class="overlay hidden" style="z-index: 1000; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <div id="loading-overlay" class="overlay hidden"
+        style="z-index: 1000; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; flex-direction: column;">
         <style>
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .spinner {
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-top: 4px solid #fff;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+            }
         </style>
         <div class="spinner"></div>
         <h2 style="color: white; font-family: 'Poppins', sans-serif;">Cargando modelo...</h2>

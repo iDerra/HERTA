@@ -11,6 +11,7 @@ window.BridgeCore = {
     levelMatrix: [],
     placedItems: [],
     robotPos: { r: 0, c: 0 },
+    eraserMode: false,
 
     // Matter.js
     engine: null,
@@ -129,6 +130,11 @@ window.BridgeCore = {
 
         this.renderAll();
         document.querySelector('.btn-play').innerText = "▶ SIMULAR";
+        this.eraserMode = false;
+        const btnEraser = document.getElementById('btn-eraser');
+        if (btnEraser) btnEraser.classList.remove('active');
+        const grid = document.getElementById('level-grid');
+        if (grid) grid.style.cursor = '';
     },
 
     pendingBlock: null,
@@ -267,6 +273,12 @@ window.BridgeCore = {
     },
 
     placeBlock: function (clickR, clickC) {
+        // Si el modo borrador está activo, borrar en lugar de colocar
+        if (this.eraserMode) {
+            this.eraseBlock(clickR, clickC);
+            return;
+        }
+
         if (this.selectedItemIdx === null || this.isSimulating) return;
 
         const item = this.inventory[this.selectedItemIdx];
@@ -341,6 +353,66 @@ window.BridgeCore = {
 
         this.inventory.splice(this.selectedItemIdx, 1);
         this.selectedItemIdx = null;
+        this.renderAll();
+    },
+
+    toggleEraser: function () {
+        if (this.isSimulating) return;
+        this.eraserMode = !this.eraserMode;
+        this.selectedItemIdx = null; // Deseleccionar inventario al entrar en modo borrado
+        const btn = document.getElementById('btn-eraser');
+        if (btn) btn.classList.toggle('active', this.eraserMode);
+        // Cambiar cursor del grid
+        const grid = document.getElementById('level-grid');
+        if (grid) grid.style.cursor = this.eraserMode ? 'cell' : '';
+        this.renderAll();
+    },
+
+    eraseBlock: function (clickR, clickC) {
+        // Buscar qué placed item cubre la celda (clickR, clickC)
+        const idx = this.placedItems.findIndex(item => {
+            const endR = item.r + item.h - 1;
+            const endC = item.c + item.w - 1;
+            return clickR >= item.r && clickR <= endR && clickC >= item.c && clickC <= endC;
+        });
+
+        if (idx === -1) return; // No hay pieza aquí
+
+        const item = this.placedItems[idx];
+
+        // Devolver al inventario
+        this.inventory.push({
+            type: item.type,
+            w: item.w,
+            h: item.h,
+            id: Date.now(),
+            char: item.type === 'rect' ? 'r' : 't'
+        });
+
+        // Limpiar celdas del levelMatrix
+        for (let j = 0; j < item.w; j++) {
+            let colHeight = item.h;
+            if (item.type === 'tri') {
+                if (item.mirrored) {
+                    colHeight = Math.ceil(((item.w - j) / item.w) * item.h);
+                } else {
+                    colHeight = Math.ceil(((j + 1) / item.w) * item.h);
+                }
+            }
+            for (let k = 0; k < colHeight; k++) {
+                const targetR = (item.r + item.h - 1) - k;
+                const targetC = item.c + j;
+                if (targetR >= 0 && targetR < this.levelMatrix.length &&
+                    targetC >= 0 && targetC < this.levelMatrix[0].length) {
+                    const cell = this.levelMatrix[targetR][targetC];
+                    if (cell === 'r' || cell === 't') {
+                        this.levelMatrix[targetR][targetC] = '.';
+                    }
+                }
+            }
+        }
+
+        this.placedItems.splice(idx, 1);
         this.renderAll();
     },
 
