@@ -578,8 +578,15 @@
 }
 
 @keyframes pulse-eraser {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(255, 79, 109, 0.4); }
-    50%       { box-shadow: 0 0 0 6px rgba(255, 79, 109, 0.15); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 3px rgba(255, 79, 109, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(255, 79, 109, 0.15);
+    }
 }
 
 
@@ -605,7 +612,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 140px;
+    max-height: 185px;
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -801,18 +808,41 @@
     height: 22px;
     border-radius: 4px;
     display: inline-block;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.leg-solid  { background: #5b7e6a; }
-.leg-water  { background: #1e6eb0; }
-.leg-goal   { background: #ffd23f; animation: goalPulse 1.2s ease-in-out infinite; }
-.leg-ramp   { background: linear-gradient(135deg, #ff8090, #e85566); clip-path: polygon(0% 100%, 100% 100%, 100% 0%); }
-.leg-block  { background: var(--b-block, #d9823a); }
+.leg-solid {
+    background: #5b7e6a;
+}
+
+.leg-water {
+    background: #1e6eb0;
+}
+
+.leg-goal {
+    background: #ffd23f;
+    animation: goalPulse 1.2s ease-in-out infinite;
+}
+
+.leg-ramp {
+    background: linear-gradient(135deg, #ff8090, #e85566);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
+}
+
+.leg-block {
+    background: var(--b-block, #d9823a);
+}
 
 @keyframes goalPulse {
-    0%, 100% { box-shadow: 0 0 4px rgba(255, 210, 63, 0.6); }
-    50%       { box-shadow: 0 0 10px rgba(255, 210, 63, 1); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 4px rgba(255, 210, 63, 0.6);
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(255, 210, 63, 1);
+    }
 }
 
 .help-footer {
