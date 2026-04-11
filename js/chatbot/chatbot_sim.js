@@ -4,8 +4,8 @@ let chatState = {
     pendingProduct: null
 };
 
-function removeAccents(str) {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function normalizeText(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/gi, '').toLowerCase();
 }
 
 window.handleUserMessage = function () {
@@ -20,14 +20,24 @@ window.handleUserMessage = function () {
     setTimeout(() => {
         let response;
 
-        if (chatState.conversationStage === 'WAITING_RETURN_PRODUCT') {
-            response = handleReturnProductInput(text);
-        } else if (chatState.conversationStage === 'WAITING_DATE') {
-            response = handleReturnDateLogic(text);
-        } else if (chatState.conversationStage === 'WAITING_SPECIFICATION') {
-            response = handleSpecificationLogic(text);
+        const cleanText = normalizeText(text);
+        
+        // Comandos globales de escape
+        const abortWords = ["cancelar", "menu", "inicio", "salir", "reiniciar", "volver"];
+        if (abortWords.some(w => cleanText === w || cleanText.startsWith(w + " "))) {
+            chatState.conversationStage = 'IDLE';
+            chatState.pendingProduct = null;
+            response = getMainMenu();
         } else {
-            response = generateBotResponse(text);
+            if (chatState.conversationStage === 'WAITING_RETURN_PRODUCT') {
+                response = handleReturnProductInput(cleanText);
+            } else if (chatState.conversationStage === 'WAITING_DATE') {
+                response = handleReturnDateLogic(cleanText);
+            } else if (chatState.conversationStage === 'WAITING_SPECIFICATION') {
+                response = handleSpecificationLogic(cleanText);
+            } else {
+                response = generateBotResponse(cleanText);
+            }
         }
 
         showTyping(false);
@@ -43,8 +53,7 @@ window.handleUserMessage = function () {
     }, 800);
 }
 
-function generateBotResponse(userText) {
-    const cleanText = removeAccents(userText.toLowerCase());
+function generateBotResponse(cleanText) {
 
     if (cleanText.includes("cesta") || cleanText.includes("carrito") || cleanText.includes("ver compra")) return showCart();
     if (cleanText.includes("pagar") || cleanText.includes("finalizar") || cleanText.includes("comprar todo")) return processCheckout();
@@ -62,9 +71,31 @@ function generateBotResponse(userText) {
     }
 
     const inventory = window.shopData.products;
-    const mentionsProduct = inventory.some(p => cleanText.includes(removeAccents(p.name.toLowerCase())));
+    
+    // Función de búsqueda flexible (palabras parciales o desordenadas)
+    let foundProduct = null;
+    const userWords = cleanText.split(" ");
+    
+    inventory.forEach(p => {
+        const pNameClean = normalizeText(p.name);
+        // Coincidencia exacta o contiene el nombre
+        if (cleanText.includes(pNameClean)) {
+            foundProduct = p;
+        } else {
+            // Verifica si las palabras clave del producto están en el input
+            const pWords = pNameClean.split(" ");
+            const hasAllWords = pWords.every(pw => userWords.some(uw => uw.includes(pw) || pw.includes(uw)));
+            if(pWords.length > 0 && hasAllWords) {
+                foundProduct = p;
+            }
+        }
+    });
 
-    if (!mentionsProduct && (cleanText.includes("anadir") || cleanText.includes("comprar") || cleanText.includes("4"))) {
+    if (foundProduct) {
+        return processAddToCart(cleanText, foundProduct);
+    }
+
+    if (cleanText.includes("anadir") || cleanText.includes("comprar") || cleanText.includes("4")) {
         if (inventory.length === 0) return "El catálogo está vacío.";
         const productCommands = inventory.map(p => `➕ Añadir ${p.name} ${p.feature}`);
         return {
@@ -73,29 +104,24 @@ function generateBotResponse(userText) {
         };
     }
 
-    if (cleanText.includes("menu") || cleanText.includes("ayuda") || cleanText.includes("hola") || cleanText.includes("empezar")) return getMainMenu();
+    if (cleanText.includes("hola") || cleanText.includes("buenos") || cleanText.includes("buenas") || cleanText.includes("empezar")) return getMainMenu();
+    if (cleanText.includes("gracias") || cleanText.includes("merci")) return "¡De nada! ¿En qué más puedo ayudarte?";
 
-    return processAddToCart(cleanText);
+    // Fallback: No se entendió el mensaje
+    const fallbacks = [
+        "😕 Hmm, no estoy seguro de entender eso. ¿Quizás querías ver el catálogo?",
+        "No he captado bien lo que buscas. ¿Podrías escribirlo de otra forma o elegir una opción rápida?",
+        "¡Vaya! Esa frase no está en mi base de datos actual. ¿Qué tal si empezamos desde el menú?"
+    ];
+    
+    return {
+        text: fallbacks[Math.floor(Math.random() * fallbacks.length)],
+        commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "4. ➕ Añadir a la cesta"]
+    };
 }
 
-function processAddToCart(cleanText) {
-    const inventory = window.shopData.products;
-    let foundProduct = null;
-
-    inventory.forEach(prod => {
-        if (cleanText.includes(removeAccents(prod.name.toLowerCase()))) {
-            foundProduct = prod;
-        }
-    });
-
-    if (!foundProduct) {
-        return {
-            text: "😕 No te he entendido. ¿Quizás querías decir alguna de estas cosas?",
-            commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "4. ➕ Añadir a la cesta"]
-        };
-    }
-
-    const featureKey = removeAccents(foundProduct.feature.toLowerCase());
+function processAddToCart(cleanText, foundProduct) {
+    const featureKey = normalizeText(foundProduct.feature);
 
     if (cleanText.includes(featureKey)) {
         return addToCart(foundProduct);
@@ -109,8 +135,7 @@ function processAddToCart(cleanText) {
     }
 }
 
-function handleSpecificationLogic(userText) {
-    const cleanText = removeAccents(userText.toLowerCase());
+function handleSpecificationLogic(cleanText) {
     const pending = chatState.pendingProduct;
 
     chatState.conversationStage = 'IDLE';
@@ -118,9 +143,9 @@ function handleSpecificationLogic(userText) {
 
     if (!pending) return getMainMenu();
 
-    const affirmations = ["si", "ese", "claro", "vale", "correcto", "perfecto", "ok", "confirmar"];
+    const affirmations = ["si", "sii", "ese", "claro", "vale", "correcto", "perfecto", "ok", "confirmar", "eso"];
     const isAffirmative = affirmations.some(word => cleanText.includes(word));
-    const mentionsFeature = cleanText.includes(removeAccents(pending.feature.toLowerCase()));
+    const mentionsFeature = cleanText.includes(normalizeText(pending.feature));
 
     if (isAffirmative || mentionsFeature) {
         return addToCart(pending);
@@ -189,13 +214,16 @@ function updateCartUI() {
     if (countEl) countEl.innerText = chatState.cart.length;
 }
 
-function handleReturnProductInput(text) {
-    const cleanText = removeAccents(text.toLowerCase());
+function handleReturnProductInput(cleanText) {
     const inventory = window.shopData.products;
 
-    const foundProduct = inventory.find(p =>
-        cleanText.includes(removeAccents(p.name.toLowerCase()))
-    );
+    const userWords = cleanText.split(" ");
+    const foundProduct = inventory.find(p => {
+        const pClean = normalizeText(p.name);
+        if (cleanText.includes(pClean)) return true;
+        const pWords = pClean.split(" ");
+        return pWords.length > 0 && pWords.every(pw => userWords.some(uw => uw.includes(pw) || pw.includes(uw)));
+    });
 
     if (foundProduct) {
         chatState.conversationStage = 'WAITING_DATE';
@@ -211,15 +239,17 @@ function handleReturnProductInput(text) {
     }
 }
 
-function handleReturnDateLogic(dateText) {
-    const parts = dateText.split('/');
-    if (parts.length !== 3) {
-        return "❌ Formato incorrecto. Por favor usa DD/MM/AAAA (ej: 15/01/2026).";
+function handleReturnDateLogic(cleanText) {
+    // Buscar un patrón de fecha, incluso si el texto tiene palabras adicionales
+    const match = cleanText.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+    
+    if (!match) {
+        return "❌ Formato incorrecto. Por favor dime la fecha con el formato DD/MM/AAAA (ej: 15/01/2026).";
     }
 
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const year = parseInt(match[3], 10);
     const purchaseDate = new Date(year, month, day);
     const today = new Date();
 
