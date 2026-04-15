@@ -23,9 +23,6 @@
     <div id="cb-dynamic-bg" class="chatbot-bg-layer"></div>
     <div class="chatbot-bg-overlay"></div>
 
-    <!-- ══════════════════════════════════════════════
-         MODAL: ¿CÓMO FUNCIONA MI CHATBOT?
-    ══════════════════════════════════════════════ -->
     <div id="info-modal-overlay" class="modal-overlay" onclick="closeInfoModal(event)">
         <div class="modal-panel glass-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <button class="modal-close-btn" onclick="closeInfoModal()" aria-label="Cerrar">✕</button>
@@ -50,7 +47,8 @@
                         <h3>¿Por qué analizar la sintaxis?</h3>
                         <p>Identificar sustantivos, verbos y adjetivos ayuda al chatbot a saber <strong>qué busca el
                                 cliente</strong> (el sustantivo), <strong>cómo lo quiere</strong> (el adjetivo) y
-                            <strong>qué acción pide</strong> (el verbo).</p>
+                            <strong>qué acción pide</strong> (el verbo).
+                        </p>
                     </div>
                 </div>
                 <div class="info-card">
@@ -78,9 +76,7 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════
-         OVERLAY: CARGANDO IA
-    ══════════════════════════════════════════════ -->
+
     <div id="ai-loading-overlay" class="ai-loading-overlay" style="display:none;">
         <div class="ai-loading-panel">
             <div class="ai-loading-rings">
@@ -94,6 +90,49 @@
             <div class="ai-loading-bar-wrap">
                 <div class="ai-loading-bar" id="ai-loading-bar"></div>
             </div>
+        </div>
+    </div>
+
+
+    <div id="congrats-modal-overlay" class="modal-overlay">
+        <div class="modal-panel glass-panel" style="text-align: center;">
+            <div class="modal-header">
+                <span class="modal-icon">🎉</span>
+                <h2>¡Actividad Completada!</h2>
+                <p class="subtitle">Has cumplido todas las misiones del Chatbot Educativo.</p>
+            </div>
+            <div class="modal-body" style="align-items: center;">
+                <p style="font-size: 1.1rem; color: var(--cb-text); line-height: 1.6;">
+                    Tu asistente inteligente está <strong>configurado</strong>, <strong>entrenado</strong> y ha sido
+                    capaz de <strong>generar ventas</strong> de forma autónoma.
+                    <br><br>¡Excelente trabajo, tu IA es todo un éxito!
+                </p>
+            </div>
+            <div class="action-group" style="margin-top: 20px;">
+                <button class="btn-secondary"
+                    onclick="document.getElementById('congrats-modal-overlay').classList.remove('active'); document.body.style.overflow='';">Continuar</button>
+                <button class="btn-primary btn-large" onclick="location.href='../index.html'">Salir al Menú</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="quest-log-panel" class="quest-log glass-panel">
+        <div class="quest-log-header" onclick="toggleQuestLog()">
+            <h3>Misiones</h3>
+            <span id="quest-toggle-icon">▼</span>
+        </div>
+        <div class="quest-log-body" id="quest-log-body">
+            <ul class="quest-list">
+                <li id="quest-1" class="quest-item"><span class="q-check">🔲</span> <span><b>Montar negocio:</b> Da un
+                        nombre a tu tienda.</span></li>
+                <li id="quest-2" class="quest-item"><span class="q-check">🔲</span> <span><b>Inventario:</b> Añade al
+                        menos 3 productos.</span></li>
+                <li id="quest-3" class="quest-item"><span class="q-check">🔲</span> <span><b>Entrenamiento:</b> Logra
+                        >70% de precisión.</span></li>
+                <li id="quest-4" class="quest-item"><span class="q-check">🔲</span> <span><b>Apertura:</b> Consigue 2
+                        ventas en simulación.</span></li>
+            </ul>
         </div>
     </div>
 
@@ -255,9 +294,15 @@
         </section>
 
         <section id="tab-chat" class="tab-content glass-panel">
-            <div class="chat-section-header">
-                <h2 id="chat-shop-name-title">Tienda IA</h2>
-                <p id="chat-shop-type-subtitle" class="soft-subtitle">Asistencia al Cliente</p>
+            <div class="chat-section-header chat-header-flex">
+                <div class="chat-header-titles">
+                    <h2 id="chat-shop-name-title">Tienda IA</h2>
+                    <p id="chat-shop-type-subtitle" class="soft-subtitle">Asistencia al Cliente</p>
+                </div>
+                <div class="cash-register glass-subpanel">
+                    <div class="cash-label">Caja Registradora</div>
+                    <div class="cash-amount" id="cash-amount-anim"><span id="total-cash">0</span> €</div>
+                </div>
             </div>
 
             <div class="chat-container glass-subpanel">
@@ -427,7 +472,30 @@
         window.saveData = function () {
             if (typeof _origSaveData === 'function') _origSaveData();
             updateTabProgress();
+            if (window.checkQuests) window.checkQuests();
         };
+
+        /* ── Toggle Quest Log ── */
+        function toggleQuestLog() {
+            const body = document.getElementById('quest-log-body');
+            const icon = document.getElementById('quest-toggle-icon');
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.innerText = '▼';
+            } else {
+                body.style.display = 'none';
+                icon.innerText = '▲';
+            }
+        }
+
+        /* ── Congratulation final ── */
+        window.showFinalCongratulations = function () {
+            const overlay = document.getElementById('congrats-modal-overlay');
+            if (overlay) {
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
     </script>
 </body>
 

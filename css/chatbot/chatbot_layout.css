@@ -1030,3 +1030,111 @@ input::placeholder {
     letter-spacing: 0.08em;
     color: var(--cb-muted);
 }
+
+/* ══════════════════════════════════════════════
+   QUEST LOG (CUADERNO DE MISIONES)
+══════════════════════════════════════════════ */
+.quest-log {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 300px;
+    z-index: 900;
+    border-radius: var(--cb-radius-md);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--cb-shadow-accent);
+}
+
+.quest-log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: var(--cb-grad);
+    color: #fff;
+    cursor: pointer;
+}
+
+.quest-log-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.quest-log-body {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 14px 18px;
+    border-top: 1px solid var(--cb-border-soft);
+}
+
+.quest-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quest-item {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: var(--cb-text);
+    transition: all 0.3s ease;
+}
+
+.quest-item:last-child {
+    margin-bottom: 0;
+}
+
+.quest-item.completed {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+.quest-item.completed .q-check {
+    filter: hue-rotate(80deg) saturate(2);
+}
+
+/* ══════════════════════════════════════════════
+   CAJA REGISTRADORA
+══════════════════════════════════════════════ */
+.chat-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cash-register {
+    padding: 12px 24px;
+    text-align: center;
+    border: 1px solid var(--cb-border-accent);
+    background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(22,163,74,0.1));
+}
+
+.cash-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #166534;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.cash-amount {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #15803d;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+@keyframes pop-cash {
+    0% { transform: scale(1); color: #15803d; }
+    50% { transform: scale(1.3); color: #22c55e; }
+    100% { transform: scale(1); color: #15803d; }
+}
+.cash-pop {
+    animation: pop-cash 0.5s ease;
+}

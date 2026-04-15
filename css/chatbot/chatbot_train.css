@@ -521,3 +521,22 @@ tr:hover td {
         font-size: 0.78rem;
     }
 }
+
+/* ── PUNTOS FLOTANTES (GAMIFICACIÓN) ── */
+.floating-points {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 4px 10px rgba(255, 215, 0, 0.4), 0 1px 3px rgba(0,0,0,0.5);
+    pointer-events: none;
+    z-index: 1000;
+    animation: float-up-fade 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes float-up-fade {
+    0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+    20% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+    80% { opacity: 1; transform: translateY(-40px) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+}

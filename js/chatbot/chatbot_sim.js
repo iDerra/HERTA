@@ -21,7 +21,7 @@ window.handleUserMessage = function () {
         let response;
 
         const cleanText = normalizeText(text);
-        
+
         // Comandos globales de escape
         const abortWords = ["cancelar", "menu", "inicio", "salir", "reiniciar", "volver"];
         if (abortWords.some(w => cleanText === w || cleanText.startsWith(w + " "))) {
@@ -56,7 +56,7 @@ window.handleUserMessage = function () {
 function generateBotResponse(cleanText) {
 
     // Arrays de sinónimos para detectar intenciones
-    const intCesta = ["cesta", "carrito", "compra", "mis cosas", "pedidos", "bolsa"];
+    const intCesta = ["cesta", "carrito", "mis cosas", "pedidos", "bolsa"];
     if (intCesta.some(w => cleanText.includes(w))) return showCart();
 
     const intCheckout = ["pagar", "finalizar", "cobrar", "caja", "tarjeta", "factura", "terminar", "abonar"];
@@ -78,21 +78,17 @@ function generateBotResponse(cleanText) {
     }
 
     const inventory = window.shopData.products;
-    
+
     // Función de búsqueda flexible (palabras parciales o desordenadas)
-    let foundProduct = null;
-    const userWords = cleanText.split(" ");
+    const userWords = cleanText.split(/\s+/).filter(w => w.trim().length > 0);
     
-    inventory.forEach(p => {
-        const pNameClean = normalizeText(p.name);
+    const foundProduct = inventory.find(p => {
+        const pNameClean = normalizeText(p.name).trim();
         if (cleanText.includes(pNameClean)) {
-            foundProduct = p;
+            return true;
         } else {
-            const pWords = pNameClean.split(" ");
-            const hasAllWords = pWords.every(pw => userWords.some(uw => uw.includes(pw) || pw.includes(uw)));
-            if(pWords.length > 0 && hasAllWords) {
-                foundProduct = p;
-            }
+            const pWords = pNameClean.split(/\s+/).filter(w => w.trim().length > 0);
+            return pWords.length > 0 && pWords.every(pw => userWords.some(uw => uw.length > 1 && (uw.includes(pw) || pw.includes(uw))));
         }
     });
 
@@ -122,7 +118,7 @@ function generateBotResponse(cleanText) {
         "No he captado bien lo que buscas. ¿Podrías escribirlo de otra forma o elegir una opción rápida?",
         "¡Vaya! Esa frase no está en mi base de datos actual. ¿Qué tal si empezamos desde el menú?"
     ];
-    
+
     return {
         text: fallbacks[Math.floor(Math.random() * fallbacks.length)],
         commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "4. ➕ Añadir a la cesta"]
@@ -212,10 +208,32 @@ function processCheckout() {
     receipt += `</div>`;
 
     chatState.cart = [];
+
+    // --- GAMIFICACIÓN: Sumar ventas ---
+    playCashRegisterAnimation(subtotal);
+
     return {
         text: receipt,
         commands: ["1. 📦 Volver al catálogo", "3. 🔄 Gestionar devolución"]
     };
+}
+
+function playCashRegisterAnimation(amount) {
+    if (window.shopData) {
+        window.shopData.salesTotal = (window.shopData.salesTotal || 0) + amount;
+        window.shopData.salesCount = (window.shopData.salesCount || 0) + 1;
+        saveData(); // Llama a checkQuests() indirectamente
+    }
+
+    const cashEl = document.getElementById('total-cash');
+    const animContainer = document.getElementById('cash-amount-anim');
+    if (cashEl && animContainer) {
+        cashEl.innerText = window.shopData.salesTotal.toFixed(2);
+
+        animContainer.classList.remove('cash-pop');
+        void animContainer.offsetWidth;
+        animContainer.classList.add('cash-pop');
+    }
 }
 
 function updateCartUI() {
@@ -226,12 +244,12 @@ function updateCartUI() {
 function handleReturnProductInput(cleanText) {
     const inventory = window.shopData.products;
 
-    const userWords = cleanText.split(" ");
+    const userWords = cleanText.split(/\s+/).filter(w => w.trim().length > 0);
     const foundProduct = inventory.find(p => {
-        const pClean = normalizeText(p.name);
+        const pClean = normalizeText(p.name).trim();
         if (cleanText.includes(pClean)) return true;
-        const pWords = pClean.split(" ");
-        return pWords.length > 0 && pWords.every(pw => userWords.some(uw => uw.includes(pw) || pw.includes(uw)));
+        const pWords = pClean.split(/\s+/).filter(w => w.trim().length > 0);
+        return pWords.length > 0 && pWords.every(pw => userWords.some(uw => uw.length > 1 && (uw.includes(pw) || pw.includes(uw))));
     });
 
     if (foundProduct) {
@@ -251,7 +269,7 @@ function handleReturnProductInput(cleanText) {
 function handleReturnDateLogic(cleanText) {
     // Buscar un patrón de fecha, incluso si el texto tiene palabras adicionales
     const match = cleanText.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
-    
+
     if (!match) {
         return "❌ Formato incorrecto. Por favor dime la fecha con el formato DD/MM/AAAA (ej: 15/01/2026).";
     }
@@ -380,4 +398,10 @@ window.initChatGreeting = function () {
         addBubbleWithCommands(menu.text, menu.commands);
     }
     updateCartUI();
+
+    // Actualizar visual de la caja registradora
+    const cashEl = document.getElementById('total-cash');
+    if (cashEl && window.shopData) {
+        cashEl.innerText = (window.shopData.salesTotal || 0).toFixed(2);
+    }
 }

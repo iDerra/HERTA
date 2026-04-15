@@ -7,7 +7,9 @@ let trainState = {
     // Métricas de sesión
     totalErrors: 0,
     totalAttempts: 0,
-    sessionStartTime: null
+    sessionStartTime: null,
+    combo: 0,
+    score: 0
 };
 
 const dummyInventory = [
@@ -112,6 +114,8 @@ window.startTrainingRound = function () {
     trainState.sentences = generateSentenceBatch();
     trainState.totalErrors = 0;
     trainState.totalAttempts = 0;
+    trainState.combo = 0;
+    trainState.score = 0;
     trainState.sessionStartTime = Date.now();
 
     document.getElementById('training-game-ui').style.display = 'block';
@@ -316,6 +320,30 @@ function showSpeechBubble(text, type = 'neutral') {
     ], { duration: 250, easing: 'ease-out' });
 }
 
+window.showFloatingPoints = function(points, combo) {
+    const gameArea = document.querySelector('.training-area');
+    if (!gameArea) return;
+
+    const floater = document.createElement('div');
+    floater.className = 'floating-points';
+    let text = `+${points}`;
+    if(combo > 1) text += ` (Combo x${combo}!)`;
+    floater.innerText = text;
+    
+    // Posición algo aleatoria central
+    const x = 40 + Math.random() * 20;
+    const y = 30 + Math.random() * 20;
+
+    floater.style.left = `${x}%`;
+    floater.style.top = `${y}%`;
+
+    gameArea.appendChild(floater);
+
+    setTimeout(() => {
+        if(floater.parentNode) floater.parentNode.removeChild(floater);
+    }, 1200);
+}
+
 function resetSpeechBubble() {
     const left = trainState.totalSentences - trainState.currentIndex;
     
@@ -409,6 +437,12 @@ window.validateSentence = function () {
     });
 
     if (errors === 0) {
+        trainState.combo++;
+        const points = 100 * trainState.combo;
+        trainState.score += points;
+
+        showFloatingPoints(points, trainState.combo);
+
         showSpeechBubble("✨ ¡Perfecto! El análisis de la oración es correcto. ¡Sigamos con la siguiente!", 'success');
         trainState.isTransitioning = true;
         trainState.totalAttempts++;
@@ -421,6 +455,7 @@ window.validateSentence = function () {
             }
         }, 2000);
     } else {
+        trainState.combo = 0; // Rompemos el combo
         trainState.totalErrors += errors;
         trainState.totalAttempts++;
         showSpeechBubble(`❌ Vaya, he encontrado ${errors} error${errors > 1 ? 'es' : ''}. ¡Inténtalo de nuevo! Revisa que a una palabra no se le haya asignado el tipo que no le corresponde.`, 'error');
@@ -486,8 +521,15 @@ function renderCompletionScreen(stats) {
 }
 
 function finishSession() {
+    const accuracy = trainState.totalAttempts > 0
+        ? Math.min(Math.round((trainState.totalSentences / trainState.totalAttempts) * 100), 100)
+        : 100;
+
     if (window.shopData) {
         window.shopData.isTrained = true;
+        if(accuracy > (window.shopData.bestAccuracy || 0)) {
+            window.shopData.bestAccuracy = accuracy;
+        }
         saveData();
     }
     checkTrainingStatus();
@@ -500,15 +542,12 @@ function finishSession() {
     const seconds = elapsedSec % 60;
     const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 
-    const accuracy = trainState.totalAttempts > 0
-        ? Math.min(Math.round((trainState.totalSentences / trainState.totalAttempts) * 100), 100)
-        : 100;
-
     renderCompletionScreen({
         accuracy,
         totalSentences: trainState.totalSentences,
         totalErrors: trainState.totalErrors,
-        timeStr
+        timeStr,
+        score: trainState.score
     });
 
     document.getElementById('training-complete-msg').style.display = 'block';
