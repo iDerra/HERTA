@@ -134,6 +134,7 @@
     flex-direction: column;
     gap: 12px;
     flex: 1;
+    min-height: 0;
 }
 
 /* Selector de forma */
@@ -334,6 +335,14 @@
     flex-direction: column;
     gap: 12px;
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.math-challenge::-webkit-scrollbar {
+    display: none;
 }
 
 .challenge-header {
@@ -612,14 +621,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 185px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.formulas-grid::-webkit-scrollbar {
-    display: none;
 }
 
 .formula-item {

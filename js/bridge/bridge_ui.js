@@ -1,5 +1,23 @@
 window.BridgeUI = {
     currentShape: 'rect',
+    zoomFactor2D: 1.0,
+
+    zoomIn2D: function() {
+        this.zoomFactor2D = Math.min(this.zoomFactor2D + 0.1, 2.0);
+        this.applyZoom2D();
+    },
+
+    zoomOut2D: function() {
+        this.zoomFactor2D = Math.max(this.zoomFactor2D - 0.1, 0.3);
+        this.applyZoom2D();
+    },
+
+    applyZoom2D: function() {
+        const grid = document.getElementById('level-grid');
+        if (grid) {
+            grid.style.transform = `translate(-50%, -50%) scale(${this.zoomFactor2D})`;
+        }
+    },
 
     renderGrid: function (matrix) {
         const container = document.getElementById('level-grid');

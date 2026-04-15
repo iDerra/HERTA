@@ -104,6 +104,13 @@ window.BridgeCore = {
 
         const zoomControls = document.getElementById('zoom-controls');
         if (zoomControls) zoomControls.classList.add('hidden');
+        const zoomControls2D = document.getElementById('zoom-controls-2d');
+        if (zoomControls2D) zoomControls2D.classList.remove('hidden');
+
+        if (window.BridgeUI) {
+            window.BridgeUI.zoomFactor2D = 1.0;
+            window.BridgeUI.applyZoom2D();
+        }
 
         this.isSimulating = false;
         this.inventory = [];
@@ -443,6 +450,8 @@ window.BridgeCore = {
 
             const zoomControls = document.getElementById('zoom-controls');
             if (zoomControls) zoomControls.classList.add('hidden');
+            const zoomControls2D = document.getElementById('zoom-controls-2d');
+            if (zoomControls2D) zoomControls2D.classList.remove('hidden');
 
             this.loadLevelSequence(this.currentSequenceIndex);
             return;
@@ -490,6 +499,8 @@ window.BridgeCore = {
             canvas3d.classList.remove('hidden');
             const zoomControls = document.getElementById('zoom-controls');
             if (zoomControls) zoomControls.classList.remove('hidden');
+            const zoomControls2D = document.getElementById('zoom-controls-2d');
+            if (zoomControls2D) zoomControls2D.classList.add('hidden');
 
             window.dispatchEvent(new Event('resize'));
 
