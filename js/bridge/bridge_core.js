@@ -189,7 +189,7 @@ window.BridgeCore = {
                     unit = "m²";
                     break;
                 case 4:
-                    question = `El bloque de ${b * h}m² tiene un sobrecoste del <b>10%</b> sobre su área. ¿A cuánto equivale ese 10%?`;
+                    question = `Al bloque de ${b * h}m² se le tiene que aumentar el área en un <b>10%</b>. ¿A cuántos m² equivale ese 10%?`;
                     answer = (b * h) * 0.1;
                     unit = "m²";
                     break;
