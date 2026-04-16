@@ -10,7 +10,7 @@ window.BridgeLevels = [
             "....................",
             "....................",
             "....................",
-            "xxxx......nxxxxxxxxx",
+            "xxxx......xxxxxxxxxx",
             "xxxx......xxxxxxxxxx",
             "xxxxwwwwwwxxxxxxxxxx"
         ],
@@ -22,7 +22,7 @@ window.BridgeLevels = [
             "....................",
             "....................",
             "o.................m.",
-            "xxxx......nxxxxxxxxx",
+            "xxxx......xxxxxxxxxx",
             "xxxx......xxxxxxxxxx",
             "xxxxwwwwwwxxxxxxxxxx"
         ],
@@ -34,7 +34,7 @@ window.BridgeLevels = [
             "....................",
             "....................",
             "..............nxx...",
-            "xxxx......nxxxxxxxxx",
+            "xxxx......xxxxxxxxxx",
             "xxxx......xxxxxxxxxx",
             "xxxxwwwwwwxxxxxxxxxx"
         ]
