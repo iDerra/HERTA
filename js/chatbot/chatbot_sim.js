@@ -62,16 +62,16 @@ function generateBotResponse(cleanText) {
     const intCheckout = ["pagar", "finalizar", "cobrar", "caja", "tarjeta", "factura", "terminar", "abonar"];
     if (intCheckout.some(w => cleanText.includes(w))) return processCheckout();
 
-    const intCatalog = ["catalogo", "articulos", "1", "productos", "inventario", "ver", "mostrar", "teneis", "vendeis", "lista", "ofreceis"];
+    const intCatalog = ["catalogo", "articulos", "productos", "inventario", "ver", "mostrar", "teneis", "vendeis", "lista", "ofreceis"];
     if (intCatalog.some(w => cleanText.includes(w))) {
         const list = window.shopData.products.map(p => `- ${p.name} (${p.price}€)`).join("<br>");
         return `📦 <b>Artículos disponibles:</b><br>${list}`;
     }
 
-    const intEnvio = ["envio", "gastos", "2", "mandar", "entrega", "domicilio", "transporte", "portes", "mandais"];
+    const intEnvio = ["envio", "gastos", "mandar", "entrega", "domicilio", "transporte", "portes", "mandais"];
     if (intEnvio.some(w => cleanText.includes(w))) return "🚚 <b>Política de Envíos:</b><br>Coste fijo: 5€.<br><b>¡GRATIS</b> si la cesta supera los 50€!";
 
-    const intDevolucion = ["devolver", "devolucion", "3", "retornar", "cambiar", "reembolso", "roto", "mal estado", "defectuoso"];
+    const intDevolucion = ["devolver", "devolucion", "retornar", "cambiar", "reembolso", "roto", "mal estado", "defectuoso"];
     if (intDevolucion.some(w => cleanText.includes(w))) {
         chatState.conversationStage = 'WAITING_RETURN_PRODUCT';
         return "🔄 <b>Solicitud de Devolución.</b><br>Por favor, indícame: <b>¿Qué artículo quieres devolver?</b>";
@@ -96,7 +96,7 @@ function generateBotResponse(cleanText) {
         return processAddToCart(cleanText, foundProduct);
     }
 
-    const intAnadir = ["anadir", "comprar", "4", "adquirir", "llevar", "quiero", "dame", "poner", "agregar", "vender"];
+    const intAnadir = ["anadir", "comprar", "adquirir", "llevar", "quiero", "dame", "poner", "agregar", "vender"];
     if (intAnadir.some(w => cleanText.includes(w))) {
         if (inventory.length === 0) return "El catálogo está vacío.";
         const productCommands = inventory.map(p => `➕ Añadir ${p.name} ${p.feature}`);
@@ -121,7 +121,7 @@ function generateBotResponse(cleanText) {
 
     return {
         text: fallbacks[Math.floor(Math.random() * fallbacks.length)],
-        commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "4. ➕ Añadir a la cesta"]
+        commands: ["📦 Consultar catálogo", "🚚 Gastos de envío", "➕ Añadir a la cesta"]
     };
 }
 
@@ -157,7 +157,7 @@ function handleSpecificationLogic(cleanText) {
     } else {
         return {
             text: "Entendido, operación cancelada. ¿Qué quieres hacer ahora?",
-            commands: ["1. 📦 Ver catálogo", "4. ➕ Comprar otra cosa"]
+            commands: ["📦 Ver catálogo", "➕ Comprar otra cosa"]
         };
     }
 }
@@ -166,7 +166,7 @@ function addToCart(prod) {
     chatState.cart.push(prod);
     return {
         text: `✅ He añadido <b>${prod.name} ${prod.feature}</b> (${prod.price}€) a tu cesta.<br>Llevas ${chatState.cart.length} artículos.`,
-        commands: ["🛒 Ver cesta", "💳 Finalizar compra", "4. ➕ Añadir otro"]
+        commands: ["🛒 Ver cesta", "💳 Finalizar compra", "➕ Añadir otro"]
     };
 }
 
@@ -184,7 +184,7 @@ function showCart() {
     html += `<br><b>Subtotal: ${subtotal}€</b>`;
     return {
         text: html,
-        commands: ["💳 Finalizar compra", "4. ➕ Añadir más productos"]
+        commands: ["💳 Finalizar compra", "➕ Añadir más productos"]
     };
 }
 
@@ -214,7 +214,7 @@ function processCheckout() {
 
     return {
         text: receipt,
-        commands: ["1. 📦 Volver al catálogo", "3. 🔄 Gestionar devolución"]
+        commands: ["📦 Volver al catálogo", "🔄 Gestionar devolución"]
     };
 }
 
@@ -297,7 +297,7 @@ function handleReturnDateLogic(cleanText) {
 function getMainMenu() {
     return {
         text: `¡Hola! Soy Herta, el asistente virtual de <b>${escapeHTML(window.shopData.name) || 'la tienda'}</b>.`,
-        commands: ["1. 📦 Consultar catálogo", "2. 🚚 Gastos de envío", "3. 🔄 Devolución", "4. ➕ Añadir a la cesta"]
+        commands: ["📦 Consultar catálogo", "🚚 Gastos de envío", "🔄 Devolución", "➕ Añadir a la cesta"]
     };
 }
 
@@ -352,18 +352,17 @@ function addBubbleWithCommands(text, commands) {
 
     let html = text + `<div class="command-list">`;
     commands.forEach(cmd => {
-        let cleanCmd = cmd.replace(/^[0-9.]+\s/, '').replace(/^[^\w\s]/, '').trim();
-        let valToSend = cmd;
+        let valToSend = cmd.replace(/^[^\w\sáéíóúÁÉÍÓÚñÑ]+/, '').trim();
 
         if (cmd.includes("Cesta")) valToSend = "ver cesta";
-        if (cmd.includes("Finalizar")) valToSend = "finalizar";
-        if (cmd.includes("Añadir")) valToSend = cmd;
-        if (cmd.includes("Consultar")) valToSend = "1";
-        if (cmd.includes("Gastos")) valToSend = "2";
-        if (cmd.includes("Devolución")) valToSend = "3";
-        if (cmd.includes("Sí,")) valToSend = "si";
-        if (cmd.includes("No,")) valToSend = "no";
-        if (cmd.includes("4.")) valToSend = "4";
+        else if (cmd.includes("Finalizar")) valToSend = "finalizar compra";
+        else if (cmd.includes("Consultar") || cmd.includes("Ver catálogo") || cmd.includes("Volver al")) valToSend = "consultar catalogo";
+        else if (cmd.includes("Gastos")) valToSend = "gastos de envio";
+        else if (cmd.includes("Devolución") || cmd.includes("Gestionar")) valToSend = "devolucion";
+        else if (cmd.includes("Sí,")) valToSend = "si";
+        else if (cmd.includes("No,")) valToSend = "no";
+        else if (cmd.includes("Añadir a la cesta") || cmd.includes("Añadir otro") || cmd.includes("Añadir más") || cmd.includes("Comprar otra")) valToSend = "añadir";
+        else if (cmd.startsWith("➕ Añadir ")) valToSend = cmd.replace("➕ Añadir ", "");
 
         html += `<div class="command-item" onclick="simulateUserClick('${valToSend}')">${cmd}</div>`;
     });
