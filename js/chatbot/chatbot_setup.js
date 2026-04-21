@@ -15,11 +15,30 @@ window.addProduct = function () {
     const featureInput = document.getElementById('prod-feature');
 
     const name = nameInput.value.trim();
-    const price = priceInput.value;
+    const price = priceInput.value.trim();
     const feature = featureInput.value.trim();
 
     if (name === "" || price === "") {
         alert("Rellena nombre y precio.");
+        return;
+    }
+
+    if (/\s/.test(name)) {
+        alert("⚠️ El nombre del producto debe ser una sola palabra (sin espacios).");
+        nameInput.focus();
+        return;
+    }
+
+    if (/\s/.test(feature)) {
+        alert("⚠️ El atributo debe ser una sola palabra (sin espacios).");
+        featureInput.focus();
+        return;
+    }
+
+    const priceNum = parseFloat(price.replace(',', '.'));
+    if (price === "" || isNaN(priceNum) || priceNum <= 0) {
+        alert("⚠️ El precio debe ser un número válido mayor que 0.");
+        priceInput.focus();
         return;
     }
 

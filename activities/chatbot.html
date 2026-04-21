@@ -213,9 +213,15 @@
             </div>
 
             <div class="inventory-controls glass-subpanel">
-                <input type="text" id="prod-name" placeholder="Producto (Ej: zapatillas)" class="flex-2">
-                <input type="number" id="prod-price" placeholder="Precio (€)" class="flex-1">
-                <input type="text" id="prod-feature" placeholder="Atributo (Ej: cómodas)" class="flex-2">
+                <input type="text" id="prod-name" placeholder="Producto (Ej: zapatillas)" class="flex-2"
+                    title="Solo se permite una palabra (sin espacios)"
+                    oninput="this.value=this.value.replace(/\s/g,'')">
+                <input type="text" id="prod-price" placeholder="Precio (€)" class="flex-1"
+                    title="Solo se permiten números, coma y punto"
+                    oninput="this.value=this.value.replace(/[^0-9.,]/g,'')">
+                <input type="text" id="prod-feature" placeholder="Atributo (Ej: cómodas)" class="flex-2"
+                    title="Solo se permite una palabra (sin espacios)"
+                    oninput="this.value=this.value.replace(/\s/g,'')">
                 <button onclick="addProduct()" class="btn-primary">+</button>
             </div>
 
