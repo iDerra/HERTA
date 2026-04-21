@@ -32,7 +32,7 @@ window.handleUserMessage = function () {
             if (chatState.conversationStage === 'WAITING_RETURN_PRODUCT') {
                 response = handleReturnProductInput(cleanText);
             } else if (chatState.conversationStage === 'WAITING_DATE') {
-                response = handleReturnDateLogic(cleanText);
+                response = handleReturnDateLogic(text);
             } else if (chatState.conversationStage === 'WAITING_SPECIFICATION') {
                 response = handleSpecificationLogic(cleanText);
             } else {
