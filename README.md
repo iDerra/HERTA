@@ -10,12 +10,12 @@ Puedes acceder a la versión desplegada en:
 [https://herta.pro](https://herta.pro)
 
 ## Estructura técnica
-El software está desarrollado bajo un paradigma de desarrollo nativo, minimizando dependencias externas y optimizando el rendimiento para dispositivos con recursos limitados (tabletas/Chromebooks escolares).
+El software está desarrollado bajo un paradigma de desarrollo nativo, minimizando dependencias externas y optimizando el rendimiento para dispositivos con recursos limitados.
 - **Core:** Vanilla JavaScript, HTML5, CSS3.
 - **Físicas:** Integración de Matter.js para simulaciones dinámicas.
 
 ## Licencia
-Este proyecto se distribuye bajo [insertar nombre de licencia si la tienes, ej: MIT].
+Este proyecto se distribuye bajo MIT.
 
 ---
 *Autor: Víctor Dosantos Luis*
