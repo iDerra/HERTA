@@ -1,5 +1,5 @@
 /* ============================================================
-   CHATBOT — SIMULACIÓN (MENSAJERÍA PREMIUM)
+    CHATBOT — SIMULATION
    ============================================================ */
 
 .chat-container {
@@ -38,7 +38,6 @@
     opacity: 0.85;
 }
 
-/* ── HISTÓRICO DE CHAT ── */
 .chat-history {
     flex: 1;
     padding: 28px 28px 16px;
@@ -59,7 +58,6 @@
     border-radius: 4px;
 }
 
-/* ── MENSAJES ── */
 .chat-message-wrapper {
     display: flex;
     flex-direction: column;
@@ -117,7 +115,6 @@
     letter-spacing: 0.02em;
 }
 
-/* ── BURBUJAS ── */
 .chat-bubble {
     max-width: 78%;
     padding: 13px 18px;
@@ -145,7 +142,6 @@
     box-shadow: 0 6px 22px rgba(91, 63, 248, 0.28);
 }
 
-/* ── COMANDOS INTERACTIVOS ── */
 .command-list {
     margin-top: 14px;
     display: flex;
@@ -175,7 +171,6 @@
     box-shadow: var(--cb-shadow-accent);
 }
 
-/* ── ÁREA DE ENTRADA ── */
 .chat-input-area {
     padding: 16px 20px;
     background: rgba(255, 255, 255, 0.90);
@@ -211,7 +206,6 @@
     color: var(--cb-muted-light);
 }
 
-/* ── BOTÓN ENVIAR ── */
 .btn-send {
     background: var(--cb-grad) !important;
     border-radius: 50% !important;
@@ -244,7 +238,6 @@
     transform: scale(0.95);
 }
 
-/* ── INDICADOR DE CESTA ── */
 .cart-indicator {
     position: absolute;
     top: 18px;
@@ -281,7 +274,6 @@
     text-align: center;
 }
 
-/* ── RECIBO ── */
 .receipt-box {
     background: rgba(248, 246, 255, 0.9);
     border: 1px dashed rgba(91, 63, 248, 0.25);
@@ -312,7 +304,6 @@
     background-clip: text;
 }
 
-/* ── INDICADOR DE ESCRITURA ── */
 .typing-indicator {
     padding: 8px 28px 4px;
     font-size: 0.82rem;

@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'herta_chatbot_data';
 
+// Define the default state structure for the shop and chatbot data
 window.shopData = {
     name: "",
     products: [],
@@ -9,6 +10,7 @@ window.shopData = {
     salesCount: 0
 };
 
+// Sanitize strings to prevent Cross-Site Scripting (XSS)
 window.escapeHTML = function (str) {
     if (typeof str !== 'string') return '';
     return str.replace(/[&<>'"]/g,
@@ -22,10 +24,12 @@ window.escapeHTML = function (str) {
     );
 };
 
+// Persist current shop state to LocalStorage
 window.saveData = function () {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(window.shopData));
 }
 
+// Restore shop state from LocalStorage and trigger UI updates
 window.loadData = function () {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -37,6 +41,7 @@ window.loadData = function () {
     }
 }
 
+// Clear all saved progress and reload the application
 window.resetActivity = function () {
     if (confirm("¿Borrar todo y empezar de cero?")) {
         localStorage.removeItem(STORAGE_KEY);
@@ -44,6 +49,7 @@ window.resetActivity = function () {
     }
 }
 
+// Evaluate quest conditions and update the gamification UI
 window.checkQuests = function () {
     const q1 = window.shopData.name && window.shopData.name.trim().length > 0;
     const q2 = window.shopData.products && window.shopData.products.length >= 3;
@@ -83,6 +89,7 @@ window.checkQuests = function () {
     }
 }
 
+// Handle tab navigation and initialize view-specific logic
 window.switchTab = function (tabId) {
     const btn = document.querySelector(`button[data-target="${tabId}"]`);
     if (btn && btn.disabled) return;
@@ -99,6 +106,7 @@ window.switchTab = function (tabId) {
     }
 }
 
+// Initialize application state and validate quests on page load
 document.addEventListener('DOMContentLoaded', () => {
     switchTab('tab-config');
 

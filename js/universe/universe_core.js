@@ -15,6 +15,7 @@ window.Core = {
         const avatars = ['us_avatar1.webp', 'us_avatar2.webp', 'us_avatar3.webp'];
         const preloadList = avatars.map(a => `../images/universe/${a}`);
         
+        // Preload avatar assets before showing the selection screen
         window.UniverseUI.showLoading();
         window.UniverseUI.preloadImages(preloadList, () => {
             window.UniverseUI.hideLoading();
@@ -40,7 +41,10 @@ window.Core = {
 
     generateMap: function() {
         this.map = [];
+        // Initialize map with a starting node
         this.map.push([{ id: 'start', type: 'start', x: 0.5, connections: [], status: 'visited', data: window.UniverseData.generateProblem() }]);
+
+        // Generate intermediate layers with random normal or semiboss encounters
         for (let i = 1; i < MAP_CONFIG.layers - 1; i++) {
             const layerNodes = [];
             const count = Math.random() > 0.6 ? 3 : 2; 
@@ -70,8 +74,11 @@ window.Core = {
             }
             this.map.push(layerNodes);
         }
+
+        // Append the final boss node
         this.map.push([{ id: 'boss', type: 'boss', x: 0.5, connections: [], status: 'locked', bossQuestions: window.UniverseData.generateBossGauntlet() }]);
 
+        // Link current layer nodes to the closest nodes in the next layer
         for (let i = 0; i < this.map.length - 1; i++) {
             const current = this.map[i];
             const next = this.map[i+1];
@@ -85,6 +92,7 @@ window.Core = {
     },
 
     updateSelectables: function(layer, index) {
+        // Unlock connected nodes in the upcoming layer
         const currentNode = this.map[layer][index];
         const nextLayerIdx = layer + 1;
         if (nextLayerIdx < this.map.length) {
@@ -113,11 +121,10 @@ window.Core = {
 
     loadRoom: function(node) {
         const assets = [];
-        // Player assets
         assets.push(`../images/universe/${this.avatar}`);
         assets.push(`../images/universe/${this.avatar.replace(/(\.[^.]+)$/, '_base$1')}`);
 
-        // Enemy assets
+        // Gather all required enemy visual assets based on node data
         const collectAssets = (data) => {
             if (data.visual && data.visual.img) {
                 assets.push(`../images/universe/${data.visual.img}`);
@@ -131,9 +138,12 @@ window.Core = {
 
         const uniqueAssets = [...new Set(assets)];
 
+        // Preload room-specific assets before rendering the combat scene
         window.UniverseUI.showLoading();
         window.UniverseUI.preloadImages(uniqueAssets, () => {
             window.UniverseUI.hideLoading();
+
+            // Set up combat state depending on the encounter type
             if (node.type === 'boss') {
                 this.combatType = 'boss';
                 this.bossStage = 0;
@@ -153,17 +163,20 @@ window.Core = {
 
     solveProblem: function(isCorrect) {
         if (isCorrect) {
+            // Handle multi-stage encounters (boss or semiboss)
             if (this.combatType === 'boss' || this.combatType === 'semiboss') {
                 const totalStages = this.combatType === 'boss' ? 3 : 2;
                 this.bossStage++;
                 window.UniverseUI.animateBossHit(totalStages - this.bossStage, totalStages); 
                 
+                // Check if all stages are completed
                 if (this.bossStage >= totalStages) {
                     setTimeout(() => {
                         window.UniverseUI.animateSuccess(() => {
                             if (this.combatType === 'boss') {
                                 window.UniverseUI.showModal("¡VICTORIA!", "Has derrotado al Boss y completado el Universo Simulado.", "Salir", () => location.href = '../index.html');
                             } else {
+                                // Reward player with energy upon defeating a semiboss
                                 this.energy = Math.min(100, this.energy + 50);
                                 this.updateHUD();
                                 this.updateSelectables(this.currentLayer, this.currentNode);
@@ -173,12 +186,14 @@ window.Core = {
                         });
                     }, 1000);
                 } else {
+                    // Load the next stage of the fight
                     setTimeout(() => {
                         window.UniverseUI.renderScene(this.combatData[this.bossStage], this.combatType, totalStages - this.bossStage);
                     }, 1000);
                 }
 
             } else {
+                // Standard node clearance
                 window.UniverseUI.animateSuccess(() => {
                     this.updateSelectables(this.currentLayer, this.currentNode);
                     window.UniverseUI.renderMap(this.map);
@@ -186,10 +201,13 @@ window.Core = {
                 });
             }
         } else {
+            // Apply penalty damage based on enemy difficulty
             const damage = this.combatType === 'boss' ? 30 : (this.combatType === 'semiboss' ? 25 : 20);
             this.energy -= damage;
             this.updateHUD();
             window.UniverseUI.animateFail();
+
+            // Trigger game over if energy is depleted
             if(this.energy <= 0) {
                 window.UniverseUI.showModal("DESCONEXIÓN", "Energía crítica. Herta te desconecta de la simulación.", "Reiniciar", () => location.reload());
             }
@@ -205,6 +223,7 @@ window.Core = {
             roomEl.innerText = (this.currentLayer + 1);
         }
 
+        // Update health bar UI based on current energy levels
         const playerHpBar = document.querySelector('.hp-player .hp-bar-fill');
         if(playerHpBar) {
             playerHpBar.style.width = this.energy + '%';

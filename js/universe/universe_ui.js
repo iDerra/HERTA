@@ -24,6 +24,7 @@ window.UniverseUI = {
         if (overlay) overlay.classList.add('hidden');
     },
 
+    // Preload required image assets and execute callback when all are loaded
     preloadImages: function(urls, callback) {
         let loaded = 0;
         const total = urls.length;
@@ -37,9 +38,10 @@ window.UniverseUI = {
         });
     },
 
+    // Dynamically generate the avatar selection screen
     showAvatarSelection: function(avatars, callback) {
         const overlay = document.createElement('div');
-        // Le asignamos una clase para controlarlo desde el CSS
+        // We assign a class to it so we can style it using CSS
         overlay.className = 'avatar-select-overlay';
         
         let html = `<h2>ELIGE TU AVATAR</h2><div class='avatar-container'>`;
@@ -61,6 +63,7 @@ window.UniverseUI = {
         });
     },
 
+    // Reusable modal for game alerts and state transitions
     showModal: function(title, text, btnText, callback) {
         const overlay = document.getElementById('msg-overlay');
         document.getElementById('msg-title').innerText = title;
@@ -95,6 +98,7 @@ window.UniverseUI = {
         this.mapContent.style.transform = `scale(${this.zoomLevel})`;
     },
 
+    // Render the structural map and place nodes based on their status
     renderMap: function(mapData) {
         this.mapOverlay.onclick = (e) => {
             if (e.target.closest('button')) return;
@@ -131,6 +135,7 @@ window.UniverseUI = {
                 }
                 this.mapNodesContainer.appendChild(el);
 
+                // Draw SVG lines to connect current node with available next nodes
                 node.connections.forEach(targetIdx => {
                     const next = mapData[lIdx + 1];
                     if (next && next[targetIdx].status !== 'locked') {
@@ -147,6 +152,7 @@ window.UniverseUI = {
         });
     },
 
+    // Render the 3D-like combat scene including player, enemy, and UI panels
     renderScene: function(data, combatType, enemyHealth = 0) {
         const bgNum = Math.floor(Math.random() * 3) + 1;
         const viewport = document.getElementById('viewport-3d');
@@ -172,6 +178,7 @@ window.UniverseUI = {
         const isBoss = combatType === 'boss';
         const isSemiBoss = combatType === 'semiboss';
 
+        // Calculate and set enemy HP bar based on encounter type (normal, semiboss, boss)
         const maxHp = isBoss ? 3 : (isSemiBoss ? 2 : 1);
         const currentHp = (isBoss || isSemiBoss) ? enemyHealth : 1;
         const hpPercent = (currentHp / maxHp) * 100;
@@ -210,6 +217,8 @@ window.UniverseUI = {
 
         const grid = document.getElementById('panel-options');
         grid.innerHTML = '';
+
+        // Generate multiple-choice buttons and bind the answer validation
         data.options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
@@ -219,6 +228,7 @@ window.UniverseUI = {
         });
     },
 
+    // Apply visual feedback and update HP bar for multi-stage enemies
     animateBossHit: function(remainingLives, totalLives) {
         const sprite = document.getElementById('enemy-sprite');
         sprite.style.filter = "brightness(5) sepia(1) hue-rotate(-50deg) saturate(5)"; 
@@ -233,6 +243,7 @@ window.UniverseUI = {
         hpFill.style.width = `${pct}%`;
     },
 
+    // Trigger enemy defeat animation before proceeding to the map
     animateSuccess: function(callback) {
         const sprite = document.getElementById('enemy-sprite');
         const hpBox = document.getElementById('enemy-hp-box');
@@ -250,6 +261,7 @@ window.UniverseUI = {
         setTimeout(callback, 1000);
     },
 
+    // Apply screen shake and red flash effect when the player answers incorrectly
     animateFail: function() {
         const overlay = document.getElementById('fx-overlay');
         overlay.classList.add('fx-hit');

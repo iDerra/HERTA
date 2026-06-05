@@ -1,42 +1,31 @@
 /* ============================================================
-   HERTA — Style Principal
-   Estética: Honkai Star Rail × Low-Poly × Dark Academia
+   HERTA — Main Menu Stylesheet
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
 
 /* ── TOKENS ── */
 :root {
-    /* Paleta Herta */
     --h-bg: #0d0d1a;
-    /* Negro-violeta profundo */
     --h-surface: #13132b;
-    /* Superficie de cards */
     --h-border: rgba(180, 155, 255, 0.15);
     --h-purple: #7c5cbf;
-    /* Púrpura Herta */
     --h-lavender: #b49bff;
-    /* Lavanda suave */
     --h-gold: #f0c060;
-    /* Dorado marioneta */
     --h-gold-dark: #c49030;
     --h-star: #e8ddff;
-    /* Blanco estrellado */
     --h-muted: rgba(200, 185, 255, 0.45);
 
-    /* Tags */
     --tag-lang: #3b4fc8;
     --tag-math: #b83060;
     --tag-tech: #6a3cbf;
     --tag-physics: #c87820;
     --tag-bio: #2a8050;
 
-    /* Tipografías */
     --font-body: 'Nunito', 'Segoe UI', sans-serif;
     --font-head: 'Space Grotesk', 'Nunito', sans-serif;
 }
 
-/* ── RESET ── */
 *,
 *::before,
 *::after {
@@ -45,7 +34,6 @@
     padding: 0;
 }
 
-/* ── FONDO ── */
 html,
 body {
     width: 100%;
@@ -56,7 +44,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Canvas de estrellas — capa inferior */
 #star-canvas {
     position: fixed;
     inset: 0;
@@ -64,7 +51,6 @@ body {
     pointer-events: none;
 }
 
-/* Imagen de fondo opcional — colócala en images/herta_bg.webp */
 .bg-layer {
     position: fixed;
     inset: 0;
@@ -74,11 +60,9 @@ body {
     background-position: center 20%;
     background-repeat: no-repeat;
     opacity: 0.18;
-    /* Sutil: la imagen se ve bajo el contenido sin saturarlo */
     pointer-events: none;
 }
 
-/* Neblina inferior para que las tarjetas se lean bien */
 .bg-layer::after {
     content: '';
     position: absolute;
@@ -90,7 +74,6 @@ body {
             var(--h-bg) 100%);
 }
 
-/* Contenedor principal (encima del canvas) */
 .page-wrapper {
     position: relative;
     z-index: 2;
@@ -100,7 +83,6 @@ body {
 }
 
 
-/* ── HEADER ── */
 .site-header {
     padding: 1.8rem 2.5rem 1.4rem;
     border-bottom: 1px solid var(--h-border);
@@ -116,7 +98,6 @@ body {
     justify-content: space-between;
 }
 
-/* Bloque logo */
 .logo-block {
     display: flex;
     align-items: center;
@@ -140,7 +121,6 @@ body {
     position: relative;
 }
 
-/* Brillo superior del logo */
 .logo-mark::before {
     content: '';
     position: absolute;
@@ -160,7 +140,6 @@ body {
     color: white;
     letter-spacing: 0.12em;
     line-height: 1.1;
-    /* Degradado texto dorado-lavanda */
     background: linear-gradient(90deg, var(--h-gold) 0%, var(--h-lavender) 60%, white 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -176,7 +155,6 @@ body {
     font-weight: 400;
 }
 
-/* Decoración header — anillos concéntricos */
 .header-deco {
     position: relative;
     width: 70px;
@@ -242,7 +220,6 @@ body {
 }
 
 
-/* ── SECCIÓN INTRO ── */
 .menu-section {
     flex: 1;
     display: flex;
@@ -266,7 +243,6 @@ body {
 }
 
 
-/* ── GRID DE TARJETAS ── */
 .menu-container {
     display: flex;
     flex-wrap: wrap;
@@ -277,7 +253,6 @@ body {
 }
 
 
-/* ── TARJETA ── */
 .card {
     position: relative;
     width: 290px;
@@ -300,7 +275,6 @@ body {
     overflow: hidden;
 }
 
-/* Brillo de hover (glow que sube desde abajo) */
 .card-glow {
     position: absolute;
     bottom: -60px;
@@ -330,7 +304,6 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Línea superior de acento */
 .card::before {
     content: '';
     position: absolute;
@@ -350,7 +323,6 @@ body {
     opacity: 1;
 }
 
-/* Tarjeta destacada (puentes) — borde dorado */
 .card-featured {
     border-color: rgba(240, 192, 96, 0.25);
 }
@@ -364,7 +336,6 @@ body {
     opacity: 0.6;
 }
 
-/* Icono grande */
 .card-icon {
     font-size: 2.4rem;
     line-height: 1;
@@ -373,7 +344,6 @@ body {
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
-/* Cuerpo de texto */
 .card-body {
     position: relative;
     z-index: 1;
@@ -395,7 +365,6 @@ body {
     line-height: 1.55;
 }
 
-/* Footer de la tarjeta — tags */
 .card-footer {
     position: relative;
     z-index: 1;
@@ -404,7 +373,6 @@ body {
     gap: 6px;
 }
 
-/* Flecha de navegación */
 .card-arrow {
     position: absolute;
     top: 1.4rem;
@@ -423,7 +391,6 @@ body {
 }
 
 
-/* ── TAGS ── */
 .tag {
     display: inline-block;
     padding: 3px 10px;
@@ -466,7 +433,6 @@ body {
 }
 
 
-/* ── FOOTER ── */
 .site-footer {
     text-align: center;
     padding: 1.2rem;
@@ -481,7 +447,6 @@ body {
 }
 
 
-/* ── RESPONSIVE ── */
 @media (max-width: 680px) {
     .site-header {
         padding: 1.2rem 1.2rem 1rem;
@@ -510,14 +475,12 @@ body {
 }
 
 
-/* ── UTILIDADES heredadas por actividades ── */
 .card.locked {
     opacity: 0.45;
     cursor: not-allowed;
     pointer-events: none;
 }
 
-/* Estilos globales de botón usados por las actividades */
 button {
     font-family: var(--font-body);
     cursor: pointer;

@@ -1,8 +1,7 @@
 /* ============================================================
-   CHATBOT — ENTRENAMIENTO (ESTILO PREMIUM)
+   CHATBOT — TRAIN
    ============================================================ */
 
-/* ── TABLA DE CLASIFICACIÓN ── */
 .table-container {
     overflow: hidden;
     margin-bottom: 28px;
@@ -41,7 +40,6 @@ tr:hover td {
     background: rgba(91, 63, 248, 0.03);
 }
 
-/* ── BARRA DE PROGRESO ── */
 .progress-text {
     text-align: center;
     font-family: 'Space Grotesk', sans-serif;
@@ -71,7 +69,6 @@ tr:hover td {
     box-shadow: 0 0 10px rgba(91, 63, 248, 0.4);
 }
 
-/* ── ÁREA DE ENTRENAMIENTO ── */
 .training-area {
     padding: 16px 8px;
     text-align: center;
@@ -95,7 +92,6 @@ tr:hover td {
     margin-bottom: 6px;
 }
 
-/* ── BLOQUES DE ANÁLISIS CLÁSICO ── */
 .word-analysis-block {
     display: flex;
     flex-direction: column;
@@ -113,7 +109,6 @@ tr:hover td {
     box-shadow: 0 10px 24px rgba(91, 63, 248, 0.12);
 }
 
-/* Selector tipo Header */
 .word-tag-select {
     background: #f5f3ff;
     border: none;
@@ -146,7 +141,6 @@ tr:hover td {
     text-align: center;
 }
 
-/* ── COLORES POR CATEGORÍA ── */
 .word-analysis-block.tagged-noun {
     background: #fce7f3;
     border-color: #fbcfe8;
@@ -202,14 +196,12 @@ tr:hover td {
     border-color: #cbd5e1;
 }
 
-/* ── FEEDBACK ── */
 #feedback-msg {
     font-size: 1.05rem;
     margin-top: 24px;
     font-weight: 800;
 }
 
-/* ── MENSAJE DE COMPLETADO ── */
 .completion-msg {
     text-align: center;
     padding: 56px 24px;
@@ -253,7 +245,6 @@ tr:hover td {
     margin-top: 32px;
 }
 
-/* ── LAYOUT DE ENTRENAMIENTO (DOS COLUMNAS) ── */
 .train-layout {
     display: flex;
     gap: 28px;
@@ -294,7 +285,6 @@ tr:hover td {
     transform: scale(1.06) rotate(4deg) translateY(-4px);
 }
 
-/* ── GLOBO DE DIÁLOGO ── */
 .speech-bubble {
     position: relative;
     background: var(--cb-surface);
@@ -347,7 +337,6 @@ tr:hover td {
     border-color: transparent rgba(254, 226, 226, 0.92) transparent transparent;
 }
 
-/* ── TOOL PALETTE ── */
 .tool-palette {
     display: inline-flex;
     justify-content: center;
@@ -380,7 +369,6 @@ tr:hover td {
     color: var(--cb-accent);
 }
 
-/* Colores activos por categoría */
 .tool-btn[data-tool="noun"].active {
     background: #fce7f3;
     color: #db2777;
@@ -417,7 +405,6 @@ tr:hover td {
     box-shadow: 0 4px 12px rgba(71, 85, 105, 0.12);
 }
 
-/* ── PALABRAS INTERACTIVAS (SELECCIONABLES) ── */
 .word-analysis-block.interactive-selectable {
     padding: 13px 26px;
     font-size: 1.2rem;
@@ -444,7 +431,6 @@ tr:hover td {
     box-shadow: 0 14px 28px rgba(91, 63, 248, 0.15);
 }
 
-/* Colores categorizados */
 .word-analysis-block.interactive-selectable.tagged-noun {
     background: #fce7f3;
     border-color: #fbcfe8;
@@ -486,7 +472,6 @@ tr:hover td {
     color: #475569;
 }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 800px) {
     .train-layout {
         flex-direction: column;
@@ -522,7 +507,6 @@ tr:hover td {
     }
 }
 
-/* ── PUNTOS FLOTANTES (GAMIFICACIÓN) ── */
 .floating-points {
     position: absolute;
     font-size: 1.5rem;

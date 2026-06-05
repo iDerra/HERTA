@@ -1,10 +1,10 @@
+// Define the state for the NLP training minigame and a fallback inventory
 let trainState = {
     currentIndex: 0,
     currentTool: 'noun',
     sentences: [],
     totalSentences: 8,
     isTransitioning: false,
-    // Métricas de sesión
     totalErrors: 0,
     totalAttempts: 0,
     sessionStartTime: null,
@@ -19,7 +19,7 @@ const dummyInventory = [
     { name: "botas", feature: "gravitatorias", gender: 'F', number: 'P' }
 ];
 
-
+// Enable or disable the Chat simulation tab based on the user's training progress
 window.checkTrainingStatus = function () {
     const btnChat = document.getElementById('btn-chat');
     if (btnChat) {
@@ -30,6 +30,7 @@ window.checkTrainingStatus = function () {
     }
 }
 
+// Route to either the pre-training classification table or the actual minigame
 window.initTrainingView = function () {
     const unclassified = window.shopData.products.filter(p => !p.gender || !p.number);
 
@@ -51,7 +52,6 @@ window.initTrainingView = function () {
         const msgUI = document.getElementById('training-complete-msg');
 
         if (window.shopData.isTrained && trainState.currentIndex === 0 && trainState.sentences.length === 0) {
-            // Ya entrenado previamente: renderizar pantalla de resultados sin métricas de sesión
             renderCompletionScreen(null);
             gameUI.style.display = 'none';
             msgUI.style.display = 'block';
@@ -61,6 +61,7 @@ window.initTrainingView = function () {
     }
 }
 
+// Generate the UI table to define the gender and number of the user's products
 function renderClassificationTable() {
     const tbody = document.getElementById('classification-list');
     tbody.innerHTML = '';
@@ -93,6 +94,7 @@ function renderClassificationTable() {
     });
 }
 
+// Save the linguistic attributes for the products and proceed to the training game
 window.saveClassificationAndStart = function () {
     window.shopData.products.forEach(p => {
         const gSelect = document.getElementById(`gender-${p.id}`);
@@ -108,7 +110,7 @@ window.saveClassificationAndStart = function () {
     initTrainingView();
 }
 
-
+// Reset game metrics and generate a new batch of sentences to tag
 window.startTrainingRound = function () {
     trainState.currentIndex = 0;
     trainState.sentences = generateSentenceBatch();
@@ -124,27 +126,25 @@ window.startTrainingRound = function () {
     loadCurrentSentence();
 }
 
-
+// Mix user products with dummy items and prepare a randomized list of sentences
 function generateSentenceBatch() {
     const userProds = window.shopData.products;
     const mixedInventory = [...userProds, ...dummyInventory];
     const batch = [];
 
-    // Garantizar al menos 3 frases con productos del usuario (barajados)
     const shuffledUser = [...userProds].sort(() => Math.random() - 0.5);
     const guaranteed = shuffledUser.slice(0, Math.min(3, shuffledUser.length));
     guaranteed.forEach(prod => batch.push(createSentenceTemplate(prod)));
 
-    // Rellenar el resto con productos aleatorios del inventario mixto
     while (batch.length < trainState.totalSentences) {
         const prod = mixedInventory[Math.floor(Math.random() * mixedInventory.length)];
         batch.push(createSentenceTemplate(prod));
     }
 
-    // Barajar el lote completo para que los productos del usuario no salgan siempre primero
     return batch.sort(() => Math.random() - 0.5);
 }
 
+// Dynamically build a sentence applying proper Spanish grammatical agreement (gender/number)
 function createSentenceTemplate(prod) {
     const g = prod.gender;
     const n = prod.number;
@@ -191,7 +191,6 @@ function createSentenceTemplate(prod) {
     const encanta_encantan = n === 'P' ? "encantan" : "encanta";
 
     const templates = [
-        // ── Originales ─────────────────────────────────────────
         {
             words: ["Quiero", un_una, prod.name, prod.feature + "."],
             keys: ["verb", "det", "noun", "adj"]
@@ -232,7 +231,6 @@ function createSentenceTemplate(prod) {
             words: ["Ayer", "vi", ese_esa, prod.name, prod.feature + "."],
             keys: ["other", "verb", "det", "noun", "adj"]
         },
-        // ── Nuevas ─────────────────────────────────────────────
         {
             words: ["Dame", un_una, prod.name, prod.feature + "."],
             keys: ["verb", "det", "noun", "adj"]
@@ -304,6 +302,7 @@ function createSentenceTemplate(prod) {
     return selectedTemplate;
 }
 
+// Animate the avatar's speech bubble to provide dynamic visual feedback
 function showSpeechBubble(text, type = 'neutral') {
     const bubble = document.getElementById('train-speech-bubble');
     if (!bubble) return;
@@ -313,13 +312,13 @@ function showSpeechBubble(text, type = 'neutral') {
     if(type === 'error') bubble.classList.add('error');
     if(type === 'success') bubble.classList.add('success');
 
-    // Animar pulsando
     bubble.animate([
         { transform: 'scale(0.97)' },
         { transform: 'scale(1)' }
     ], { duration: 250, easing: 'ease-out' });
 }
 
+// Render gamified floating score animations when the user gets a correct answer
 window.showFloatingPoints = function(points, combo) {
     const gameArea = document.querySelector('.training-area');
     if (!gameArea) return;
@@ -330,7 +329,6 @@ window.showFloatingPoints = function(points, combo) {
     if(combo > 1) text += ` (Combo x${combo}!)`;
     floater.innerText = text;
     
-    // Posición algo aleatoria central
     const x = 40 + Math.random() * 20;
     const y = 30 + Math.random() * 20;
 
@@ -344,6 +342,7 @@ window.showFloatingPoints = function(points, combo) {
     }, 1200);
 }
 
+// Update the dialogue text based on how many sentences are left to analyze
 function resetSpeechBubble() {
     const left = trainState.totalSentences - trainState.currentIndex;
     
@@ -361,6 +360,7 @@ function resetSpeechBubble() {
     showSpeechBubble(text, "neutral");
 }
 
+// Set the active tagging tool (e.g., noun, verb) for the user to apply to words
 window.selectTool = function(tool) {
     trainState.currentTool = tool;
     const buttons = document.querySelectorAll('.tool-btn');
@@ -370,6 +370,7 @@ window.selectTool = function(tool) {
     if(activeBtn) activeBtn.classList.add('active');
 }
 
+// Render the current sentence as interactive blocks for the user to click and tag
 function loadCurrentSentence() {
     if (!trainState.sentences || trainState.sentences.length === 0) return;
     
@@ -400,7 +401,6 @@ function loadCurrentSentence() {
                 showSpeechBubble("⚠️ ¡Selecciona primero una categoría de la barra!", 'error');
                 return;
             }
-            // Toggle off if clicking the same tool
             if (this.dataset.currentTag === trainState.currentTool) {
                 this.dataset.currentTag = 'none';
                 this.className = 'word-analysis-block interactive-selectable';
@@ -414,6 +414,7 @@ function loadCurrentSentence() {
     });
 }
 
+// Verify user tags against correct answers, handle combo points, or display errors
 window.validateSentence = function () {
     if (trainState.isTransitioning) return;
     
@@ -455,21 +456,19 @@ window.validateSentence = function () {
             }
         }, 2000);
     } else {
-        trainState.combo = 0; // Rompemos el combo
+        trainState.combo = 0; 
         trainState.totalErrors += errors;
         trainState.totalAttempts++;
         showSpeechBubble(`❌ Vaya, he encontrado ${errors} error${errors > 1 ? 'es' : ''}. ¡Inténtalo de nuevo! Revisa que a una palabra no se le haya asignado el tipo que no le corresponde.`, 'error');
     }
 }
 
-// Renderiza la pantalla de fin de entrenamiento.
-// stats: { accuracy, totalSentences, totalErrors, timeStr } o null si se carga desde persistencia.
+// Generate the final results UI based on the user's minigame performance stats
 function renderCompletionScreen(stats) {
     const resultEl = document.getElementById('training-complete-msg');
     if (!resultEl) return;
 
     if (stats) {
-        // Pantalla completa con métricas de la sesión recién completada
         const trophy = stats.accuracy === 100 ? '🏆' : stats.accuracy >= 70 ? '🥇' : '🏅';
         const msg = stats.accuracy === 100
             ? '¡Sin ningún error! Análisis impecable. Eres un experto en PLN.'
@@ -506,7 +505,6 @@ function renderCompletionScreen(stats) {
                 </div>
             </div>`;
     } else {
-        // Pantalla simplificada al recargar con sesión ya guardada (sin métricas de sesión)
         resultEl.innerHTML = `
             <div class="results-screen">
                 <span class="results-trophy">🥇</span>
@@ -520,6 +518,7 @@ function renderCompletionScreen(stats) {
     }
 }
 
+// Calculate final accuracy, update global shop data, and end the training session
 function finishSession() {
     const accuracy = trainState.totalAttempts > 0
         ? Math.min(Math.round((trainState.totalSentences / trainState.totalAttempts) * 100), 100)
@@ -535,7 +534,6 @@ function finishSession() {
     checkTrainingStatus();
     document.getElementById('training-game-ui').style.display = 'none';
 
-    // Calcular métricas de la sesión
     const elapsedMs = Date.now() - (trainState.sessionStartTime || Date.now());
     const elapsedSec = Math.round(elapsedMs / 1000);
     const minutes = Math.floor(elapsedSec / 60);

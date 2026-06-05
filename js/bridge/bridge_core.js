@@ -1,11 +1,9 @@
 window.BridgeCore = {
-    // Estado del juego
     currentLevelIdx: 0,
     activeLevelSequence: [],
     currentSequenceIndex: 0,
     tutorialCompleted: false,
 
-    // Crafteo
     inventory: [],
     selectedItemIdx: null,
     levelMatrix: [],
@@ -13,26 +11,26 @@ window.BridgeCore = {
     robotPos: { r: 0, c: 0 },
     eraserMode: false,
 
-    // Matter.js
     engine: null,
     robotBody: null,
     physicsInterval: null,
     isSimulating: false,
-    SCALE: 50, // Factor para escalar bloques de la grilla 1x1 a dimensiones estables del motor físico
-    CELL_SIZE: 50, // Alias necesario para que bridge_ui.js y css antiguo funcionen sin problemas
+    SCALE: 50,
+    CELL_SIZE: 50,
 
+    // Initialize the game engine, load physics settings, and start the level sequence
     init: function () {
         this.tutorialCompleted = localStorage.getItem('herta_bridge_tutorial_completed') === 'true';
         this.generateSequence();
         this.currentSequenceIndex = 0;
 
-        // Instanciar el motor de física de Matter.js
         this.engine = Matter.Engine.create();
-        this.engine.world.gravity.y = 1.5; // Gravedad equilibrada (intermedia) para no aplastarlo en las rampas
+        this.engine.world.gravity.y = 1.5;
 
         this.loadLevelSequence(this.currentSequenceIndex);
     },
 
+    // Create a randomized playlist of levels, optionally prepending tutorial stages
     generateSequence: function (forceTutorial = false) {
         let playTutorial = forceTutorial || !this.tutorialCompleted;
         let randomLevels = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -94,6 +92,7 @@ window.BridgeCore = {
         document.getElementById('level-val').innerText = (seqIdx + 1) + " / " + this.activeLevelSequence.length;
     },
 
+    // Load and reset level state, converting the text-based matrix into a playable grid
     loadLevel: function (idx) {
         const levelData = window.BridgeLevels[idx];
         if (!levelData) return;
@@ -117,7 +116,6 @@ window.BridgeCore = {
         this.placedItems = [];
         clearInterval(this.physicsInterval);
 
-        // IMPRESCINDIBLE: Limpiar todos los objetos del motor físico del nivel anterior
         if (this.engine) {
             Matter.Events.off(this.engine, 'collisionStart');
             Matter.World.clear(this.engine.world, false);
@@ -130,7 +128,7 @@ window.BridgeCore = {
             for (let c = 0; c < this.levelMatrix[r].length; c++) {
                 if (this.levelMatrix[r][c] === 'o') {
                     this.robotPos = { r: r, c: c };
-                    this.levelMatrix[r][c] = '.'; // Retiramos al jugador visualmente de la celda matrix general
+                    this.levelMatrix[r][c] = '.';
                 }
             }
         }
@@ -146,6 +144,7 @@ window.BridgeCore = {
 
     pendingBlock: null,
 
+    // Generate a random math/geometry question based on the selected block dimensions
     initCrafting: function () {
         const b = parseInt(document.getElementById('inp-base').value);
         const h = parseInt(document.getElementById('inp-height').value);
@@ -202,7 +201,6 @@ window.BridgeCore = {
                 }
             }
         } else {
-            // Triangle logic
             switch (challengeType) {
                 case 0:
                     question = `Calcula el <b>área</b> de esta rampa triangular (Base ${b}m, Altura ${h}m).`;
@@ -247,6 +245,7 @@ window.BridgeCore = {
         document.getElementById('challenge-unit').innerText = unit;
     },
 
+    // Validate user's answer to the math challenge and add the block to their inventory
     verifyAndCraft: function () {
         if (!this.pendingBlock) return;
 
@@ -279,8 +278,8 @@ window.BridgeCore = {
         window.BridgeUI.highlightInventory(this.selectedItemIdx);
     },
 
+    // Insert the selected block into the grid matrix if space is available and valid
     placeBlock: function (clickR, clickC) {
-        // Si el modo borrador está activo, borrar en lugar de colocar
         if (this.eraserMode) {
             this.eraseBlock(clickR, clickC);
             return;
@@ -290,7 +289,6 @@ window.BridgeCore = {
 
         const item = this.inventory[this.selectedItemIdx];
 
-        // Validar inclinación máxima de rampas: si h > w la pendiente supera 45° y el vehículo no puede subirla
         if (item.type === 'tri' && item.h > item.w) {
             return alert("⚠️ Rampa demasiado empinada. La inclinación máxima es 1:1 (45°). Usa una base ≥ altura.");
         }
@@ -316,12 +314,10 @@ window.BridgeCore = {
             }
         }
 
-        // Detectar si hay un bloque sólido 'x' a la izquierda de la rampa (solo para triángulos)
         let mirrored = false;
         if (item.type === 'tri') {
             const leftC = startC - 1;
             if (leftC >= 0) {
-                // Comprobar si alguna fila de la rampa tiene un 'x' a la izquierda
                 for (let r = startR; r <= startR + item.h - 1; r++) {
                     if (r >= 0 && r < this.levelMatrix.length && this.levelMatrix[r][leftC] === 'x') {
                         mirrored = true;
@@ -335,7 +331,6 @@ window.BridgeCore = {
             let colHeight = item.h;
             if (item.type === 'tri') {
                 if (mirrored) {
-                    // Rampa reflejada: la altura crece de derecha a izquierda
                     colHeight = Math.ceil(((item.w - j) / item.w) * item.h);
                 } else {
                     colHeight = Math.ceil(((j + 1) / item.w) * item.h);
@@ -366,28 +361,26 @@ window.BridgeCore = {
     toggleEraser: function () {
         if (this.isSimulating) return;
         this.eraserMode = !this.eraserMode;
-        this.selectedItemIdx = null; // Deseleccionar inventario al entrar en modo borrado
+        this.selectedItemIdx = null;
         const btn = document.getElementById('btn-eraser');
         if (btn) btn.classList.toggle('active', this.eraserMode);
-        // Cambiar cursor del grid
         const grid = document.getElementById('level-grid');
         if (grid) grid.style.cursor = this.eraserMode ? 'cell' : '';
         this.renderAll();
     },
 
+    // Remove a placed block from the grid and return it to the user's inventory
     eraseBlock: function (clickR, clickC) {
-        // Buscar qué placed item cubre la celda (clickR, clickC)
         const idx = this.placedItems.findIndex(item => {
             const endR = item.r + item.h - 1;
             const endC = item.c + item.w - 1;
             return clickR >= item.r && clickR <= endR && clickC >= item.c && clickC <= endC;
         });
 
-        if (idx === -1) return; // No hay pieza aquí
+        if (idx === -1) return;
 
         const item = this.placedItems[idx];
 
-        // Devolver al inventario
         this.inventory.push({
             type: item.type,
             w: item.w,
@@ -396,7 +389,6 @@ window.BridgeCore = {
             char: item.type === 'rect' ? 'r' : 't'
         });
 
-        // Limpiar celdas del levelMatrix
         for (let j = 0; j < item.w; j++) {
             let colHeight = item.h;
             if (item.type === 'tri') {
@@ -428,7 +420,6 @@ window.BridgeCore = {
         window.BridgeUI.renderPlacedItems(this.placedItems);
         window.BridgeUI.renderInventory();
 
-        // Simplemente ponemos el robot CSS visual estático en base
         const robot = document.getElementById('robot');
         if (robot && !this.isSimulating) {
             robot.style.top = (this.robotPos.r * this.SCALE) + 'px';
@@ -437,11 +428,12 @@ window.BridgeCore = {
         }
     },
 
+    // Sync the 2D grid logic with the Matter.js physics engine and toggle UI views
     toggleSimulation: function () {
         if (this.isSimulating) {
             clearInterval(this.physicsInterval);
             Matter.Events.off(this.engine, 'collisionStart');
-            Matter.World.clear(this.engine.world, false); // No deep, solo limpiar objetos
+            Matter.World.clear(this.engine.world, false);
             this.robotBody = null;
 
             const canvas3d = document.getElementById('sim-3d-canvas');
@@ -459,21 +451,16 @@ window.BridgeCore = {
 
         this.isSimulating = true;
         document.querySelector('.btn-play').innerText = "⏹ REINICIAR";
-
         document.getElementById('level-grid').classList.add('hidden');
 
-        // Mostrar pantalla de carga
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-        // Construir la escena física de inmediato (es inmediato y no consume asincronía)
         this.buildPhysicsWorld();
 
         const startSim = () => {
-            // Ocultar pantalla de carga
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
 
-            // Loop principal del motor físico
             const fps = 60;
             const timeStep = 1000 / fps;
 
@@ -481,12 +468,10 @@ window.BridgeCore = {
                 Matter.Engine.update(this.engine, timeStep);
 
                 if (this.robotBody) {
-                    // Empuje de control ajustado (-25% velocidad)
                     if (this.robotBody.velocity.x < 2.1) {
                         Matter.Body.applyForce(this.robotBody, this.robotBody.position, { x: 0.01, y: 0 });
                     }
 
-                    // Detector de caídas al abismo
                     if (this.robotBody.position.y > this.levelMatrix.length * this.SCALE + 500) {
                         this.failLevel("¡Te has caído al vacío!");
                     }
@@ -504,14 +489,13 @@ window.BridgeCore = {
 
             window.dispatchEvent(new Event('resize'));
 
-            // Iniciar buildScene que cargará el coche. Cuando termine, lanzamos el bucle físico.
             window.Bridge3D.buildScene(this.levelMatrix, startSim);
         } else {
-            // Si no hubiera canvas 3D (modo 2d base), iniciar física del tirón
             startSim();
         }
     },
 
+    // Map grid characters ('x' for ground, 'w' for water) to physical Matter.js bodies
     buildPhysicsWorld: function () {
         const S = this.SCALE;
         const rows = this.levelMatrix.length;
@@ -519,23 +503,20 @@ window.BridgeCore = {
 
         const bodies = [];
 
-        // 1. Matriz de bloques fijos (Tierra, Agua, Meta)
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const cell = this.levelMatrix[r][c];
                 if (cell === 'x') {
-                    // Cuerpo estático tierra
                     bodies.push(Matter.Bodies.rectangle(c * S + S / 2, r * S + S / 2, S, S, {
                         isStatic: true,
-                        friction: 0.1, // Baja fricción para facilitar deslizar
-                        restitution: 0.0 // No rebotar
+                        friction: 0.1,
+                        restitution: 0.0
                     }));
                 } else if (cell === 'n') {
-                    // Cuerpo estático rampa de tierra (Sube hacia la derecha)
                     const vertices = [
-                        { x: -S / 2, y: S / 2 },  // Esquina inferior izquierda
-                        { x: S / 2, y: S / 2 },   // Esquina inferior derecha
-                        { x: S / 2, y: -S / 2 }   // Esquina superior derecha
+                        { x: -S / 2, y: S / 2 },
+                        { x: S / 2, y: S / 2 },
+                        { x: S / 2, y: -S / 2 }
                     ];
                     bodies.push(Matter.Bodies.fromVertices(c * S + S / 2, r * S + S / 2, [vertices], {
                         isStatic: true,
@@ -543,12 +524,10 @@ window.BridgeCore = {
                         restitution: 0.0
                     }, true));
                 } else if (cell === 'w') {
-                    // Detector agua (Sensor)
                     bodies.push(Matter.Bodies.rectangle(c * S + S / 2, r * S + S / 2, S, S, {
                         isStatic: true, isSensor: true, label: "agua"
                     }));
                 } else if (cell === 'm') {
-                    // Detector meta (Sensor)
                     bodies.push(Matter.Bodies.rectangle(c * S + S / 2, r * S + S / 2, S, S, {
                         isStatic: true, isSensor: true, label: "meta"
                     }));
@@ -556,7 +535,6 @@ window.BridgeCore = {
             }
         }
 
-        // 2. Placed Items (Rectángulos y Triángulos que puso el jugador)
         this.placedItems.forEach(item => {
             if (item.type === 'rect') {
                 const w = item.w * S;
@@ -571,17 +549,12 @@ window.BridgeCore = {
                 const h = item.h * S;
                 let verts;
                 if (item.mirrored) {
-                    // Rampa reflejada: cuña que sube de derecha a izquierda (baja hacia la derecha)
-                    // Esquina inferior izq(0,h), esquina inferior der(w,h), esquina superior izq(0,0)
                     verts = [{ x: 0, y: h }, { x: w, y: h }, { x: 0, y: 0 }];
                 } else {
-                    // Rampa normal: cuña que sube hacia la derecha
-                    // Esquina inferior izq(0,h), esquina inferior der(w,h), esquina superior der(w,0)
                     verts = [{ x: 0, y: h }, { x: w, y: h }, { x: w, y: 0 }];
                 }
                 const vBody = Matter.Bodies.fromVertices(0, 0, [verts], { isStatic: true, friction: 0.1 });
 
-                // Alinearlo a sus límites
                 const targetMinX = item.c * S;
                 const targetMaxY = (item.r + item.h) * S;
                 Matter.Body.setPosition(vBody, {
@@ -592,30 +565,25 @@ window.BridgeCore = {
             }
         });
 
-        // 3. Vehiculo
-        // carW aumentado a 0.8 para evitar que las curvas de sus bordes (chamfer) se solapen y se clave en las rampas
         const carW = S * 0.8;
         const carH = S * 0.7;
         const carX = this.robotPos.c * S + S / 2;
-        // Posar el coche milimétricamente encima de su cuadrícula base
         const carY = this.robotPos.r * S + (S - carH / 2) - 0.5;
 
         this.robotBody = Matter.Bodies.rectangle(carX, carY, carW, carH, {
             mass: 2,
-            friction: 0.0, // ESTO ERA CLAVE: Sin ruedas de verdad, una caja con fricción se "lija" contra la rampa y se frena.
+            friction: 0.0,
             frictionAir: 0.001,
             restitution: 0.0,
-            chamfer: { radius: carH * 0.4 }, // Curvas mágicas para deslizarse suave
+            chamfer: { radius: carH * 0.4 },
             label: "robot",
-            inertia: Infinity // Evitamos vueltas de campana
+            inertia: Infinity
         });
 
         bodies.push(this.robotBody);
 
-        // Agregar todo al mundo
         Matter.World.add(this.engine.world, bodies);
 
-        // 4. Configurar Triggers (Ganar o perder)
         Matter.Events.on(this.engine, 'collisionStart', (event) => {
             const pairs = event.pairs;
             for (let i = 0; i < pairs.length; i++) {
@@ -635,6 +603,7 @@ window.BridgeCore = {
         });
     },
 
+    // Handle game over state, stop physics, and prompt user to retry the level
     failLevel: function (msg) {
         clearInterval(this.physicsInterval);
         Matter.Events.off(this.engine, 'collisionStart');
@@ -647,12 +616,13 @@ window.BridgeCore = {
         btn.innerText = "Reintentar";
         btn.onclick = () => {
             overlay.classList.add('hidden');
-            this.toggleSimulation(); // Apaga la sim actual
+            this.toggleSimulation();
         };
 
         overlay.classList.remove('hidden');
     },
 
+    // Handle victory state, save tutorial progress, and load the next level or menu
     winLevel: function (forcedEnd = false) {
         clearInterval(this.physicsInterval);
         Matter.Events.off(this.engine, 'collisionStart');

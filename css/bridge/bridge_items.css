@@ -1,8 +1,7 @@
 /* ============================================================
-   BRIDGE — ITEMS (celdas de mundo + robot)
+   BRIDGE — ITEMS
    ============================================================ */
 
-/* ── BLOQUES COLOCADOS POR EL JUGADOR ── */
 .cell-rect {
     background: var(--b-block);
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2), inset -2px -3px 0 rgba(0,0,0,0.2);
@@ -15,7 +14,6 @@
     z-index: 5;
 }
 
-/* ── RAMPA (desde inventario — no usada directamente en grid, pero mantenida) ── */
 .cell-ramp {
     background: var(--b-ramp);
     clip-path: polygon(0% 100%, 100% 100%, 100% 0%);
@@ -29,7 +27,6 @@
     background: linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.12) 100%);
 }
 
-/* ── META ── */
 .cell-goal {
     background-color: rgba(255, 210, 63, 0.35);
     border: 2px solid rgba(255, 210, 63, 0.85);
@@ -39,7 +36,6 @@
     z-index: 2;
 }
 
-/* ── AGUA ── */
 .cell-water {
     background: linear-gradient(180deg, var(--b-water) 0%, #2a8abf 100%);
     opacity: 0.75;
@@ -47,7 +43,6 @@
     animation: waterFlow 2.5s infinite linear;
 }
 
-/* ── ROBOT ── */
 .robot-avatar {
     position: absolute;
     width: 40px;
@@ -74,7 +69,6 @@
     transition: top 1s ease-in, opacity 1s, transform 1s;
 }
 
-/* ── ANIMACIONES ── */
 @keyframes goalPulse {
     0%, 100% {
         background-color: rgba(255, 210, 63, 0.25);

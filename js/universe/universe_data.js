@@ -1,3 +1,18 @@
+/**
+ * UNIVERSE DATA & QUESTION GENERATOR
+ * * This script defines the enemies (`OBSTACLES`) and the core educational question 
+ * generation logic for the game under `window.UniverseData`.
+ * * Key functionalities:
+ * 1. generateBossGauntlet(): Creates a fixed 3-stage question sequence for boss encounters.
+ * 2. generateProblem(): The main engine that randomly selects a subject (Physics, Math, 
+ * Chemistry, Biology, or Tech) and generates a multiple-choice question.
+ * - Physics & Math: Uses dynamic variables (random numbers) to generate unique 
+ * calculations every time.
+ * - Chemistry, Biology & Tech: Selects randomly from a predefined pool of static trivia.
+ * - Answer Validation: Uses a `Set` to ensure all wrong options are strictly unique, 
+ * shuffles the final options array, and tracks the correct answer's index.
+ */
+
 const OBSTACLES = {
     PHYSICS: { emoji: "⚡", color: "#f1c40f", name: "Constructo Volt", img: "us_enemy_physics.webp" },
     CHEMISTRY: { emoji: "🧪", color: "#00b894", name: "Slime Ácido", img: "us_enemy_chemestry.webp" },

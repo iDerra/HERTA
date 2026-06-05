@@ -1,10 +1,5 @@
-/* ============================================================
-   CHATBOT — LAYOUT PREMIUM (Estilo inZOI / Glassmorphism)
-   Paleta: Violeta-índigo limpio con toques suaves
-   ============================================================ */
-
 :root {
-    /* Superficie y fondos */
+    /* Surface and depths */
     --cb-bg:               transparent;
     --cb-surface:          rgba(255, 255, 255, 0.80);
     --cb-surface-deep:     rgba(248, 246, 255, 0.88);
@@ -13,28 +8,28 @@
     --cb-border-highlight: rgba(255, 255, 255, 0.85);
     --cb-border-soft:      rgba(220, 215, 255, 0.5);
 
-    /* Acento principal — violeta índigo */
+    /* Main accent — indigo violet */
     --cb-accent:           #5b3ff8;
     --cb-accent-hover:     #4730d6;
     --cb-accent-glow:      rgba(91, 63, 248, 0.22);
     --cb-accent-mid:       #7b6bfa;
     --cb-accent-light:     rgba(91, 63, 248, 0.10);
 
-    /* Gradiente de marca */
+    /* Brand gradient */
     --cb-grad:             linear-gradient(135deg, #5b3ff8 0%, #a78bfa 100%);
     --cb-grad-soft:        linear-gradient(135deg, rgba(91,63,248,0.15) 0%, rgba(167,139,250,0.15) 100%);
 
-    /* Texto */
+    /* Text */
     --cb-text:             #1a1635;
     --cb-muted:            #6b7280;
     --cb-muted-light:      #9ca3af;
 
-    /* Sombras */
+    /* Shadows */
     --cb-shadow:           0 12px 48px rgba(30, 20, 80, 0.10);
     --cb-shadow-soft:      0 4px 16px rgba(30, 20, 80, 0.06);
     --cb-shadow-accent:    0 8px 30px rgba(91, 63, 248, 0.25);
 
-    /* Forma */
+    /* Shape */
     --cb-radius:           28px;
     --cb-radius-md:        18px;
     --cb-radius-sm:        12px;
@@ -49,7 +44,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* ── FONDO DINÁMICO ── */
+/* ── DYNAMIC BACKGROUND ── */
 .chatbot-bg-layer {
     position: fixed;
     inset: 0;
@@ -74,7 +69,6 @@ html, body {
     -webkit-backdrop-filter: blur(14px);
 }
 
-/* Textura sutil de grano */
 .chatbot-bg-overlay::after {
     content: '';
     position: absolute;
@@ -84,7 +78,7 @@ html, body {
     pointer-events: none;
 }
 
-/* ── CLASES UTILITARIAS DE CRISTAL ── */
+/* ── CRYSTAL UTILITY CLASSES ── */
 .glass-panel {
     background: var(--cb-surface);
     backdrop-filter: blur(28px);
@@ -112,7 +106,7 @@ html, body {
     border-bottom: 1px solid var(--cb-border-soft);
 }
 
-/* Franja de acento en la parte superior del header */
+/* Accent strip at the top of the header */
 .main-header::before {
     content: '';
     display: block;
@@ -136,7 +130,7 @@ html, body {
     gap: 12px;
 }
 
-/* Icono de marca en el header */
+/* Brand icon in the header */
 .header-title::before {
     content: '⬡';
     font-size: 1.4rem;
@@ -211,7 +205,7 @@ html, body {
     border-color: rgba(229, 62, 62, 0.4);
 }
 
-/* ── PESTAÑAS (TABS) ── */
+/* TABS */
 .tabs-nav {
     max-width: 1000px;
     margin: 0 auto 24px;
@@ -295,12 +289,12 @@ html, body {
     cursor: not-allowed;
 }
 
-/* Número de paso en tab */
+/* Line number in tab */
 .tab-link::before {
     display: none;
 }
 
-/* ── CONTENIDO PRINCIPAL ── */
+/* ── MAIN CONTENT ── */
 main {
     max-width: 1000px;
     margin: 0 auto;
@@ -316,7 +310,6 @@ main {
     overflow: hidden;
 }
 
-/* Sutil orbe decorativo en el corner */
 .tab-content::after {
     content: '';
     position: absolute;
@@ -333,7 +326,7 @@ main {
     display: block;
 }
 
-/* Tipografía */
+/* Typography */
 h2 {
     font-weight: 800;
     margin-bottom: 6px;
@@ -366,7 +359,7 @@ h3 {
     line-height: 1.6;
 }
 
-/* ── LAYOUT DE CONFIGURACIÓN ── */
+/* ── CONFIG LAYOUT  ── */
 .config-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -439,7 +432,7 @@ h3 {
     background: linear-gradient(180deg, #22c55e, #16a34a);
 }
 
-/* ── INPUTS Y SELECTORES ── */
+/* ── INPUTS AND SELECTORS ── */
 input[type="text"],
 input[type="number"],
 select {
@@ -470,7 +463,7 @@ input::placeholder {
     color: var(--cb-muted-light);
 }
 
-/* ── BOTONES ── */
+/* ── BUTTONS ── */
 .btn-primary {
     background: var(--cb-grad);
     color: #fff;
@@ -540,7 +533,7 @@ input::placeholder {
     background: var(--cb-accent-light);
 }
 
-/* ── INVENTARIO ── */
+/* ── INVENTORY CONTROLS ── */
 .inventory-controls {
     display: flex;
     gap: 10px;
@@ -588,7 +581,7 @@ input::placeholder {
     font-size: 1.05rem;
 }
 
-/* ── PREVISUALIZACIÓN DE TIENDA ── */
+/* ── STORE PREVIEW ── */
 .shop-visual-preview {
     width: 100%;
     height: 220px;
@@ -614,7 +607,7 @@ input::placeholder {
     border-radius: inherit;
 }
 
-/* ── AVATAR LATERAL ── */
+/* ── SIDE AVATAR ── */
 .robot-side-avatar {
     width: 130px;
     height: 130px;
@@ -630,7 +623,7 @@ input::placeholder {
     transform: scale(1.12) rotate(6deg);
 }
 
-/* ── ANIMACIONES ── */
+/* ── ANIMATIONS ── */
 @keyframes fadeSlideIn {
     from {
         opacity: 0;
@@ -681,7 +674,7 @@ input::placeholder {
 }
 
 /* ══════════════════════════════════════════════
-   MODAL: ¿CÓMO FUNCIONA MI CHATBOT?
+   MODAL: HELP AND INFO
 ══════════════════════════════════════════════ */
 
 .modal-overlay {
@@ -821,7 +814,7 @@ input::placeholder {
 }
 
 /* ══════════════════════════════════════════════
-   OVERLAY: CARGANDO IA
+   OVERLAY: LOADING AI
 ══════════════════════════════════════════════ */
 
 .ai-loading-overlay {
@@ -852,7 +845,6 @@ input::placeholder {
     padding: 20px;
 }
 
-/* Anillos concéntricos */
 .ai-loading-rings {
     position: relative;
     width: 120px;
@@ -948,7 +940,7 @@ input::placeholder {
 }
 
 /* ══════════════════════════════════════════════
-   PANTALLA DE RESULTADOS POST-ENTRENAMIENTO
+   RESULTS SCREEN AFTER TRAINING
 ══════════════════════════════════════════════ */
 
 .results-screen {
@@ -1032,7 +1024,7 @@ input::placeholder {
 }
 
 /* ══════════════════════════════════════════════
-   QUEST LOG (CUADERNO DE MISIONES)
+   QUEST LOG
 ══════════════════════════════════════════════ */
 .quest-log {
     position: fixed;
@@ -1098,7 +1090,7 @@ input::placeholder {
 }
 
 /* ══════════════════════════════════════════════
-   CAJA REGISTRADORA
+   CASH REGISTER
 ══════════════════════════════════════════════ */
 .chat-header-flex {
     display: flex;

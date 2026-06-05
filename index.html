@@ -14,12 +14,10 @@
 </head>
 <body>
 
-    <!-- Canvas de partículas de fondo -->
+    <!-- Background particle canvas -->
     <canvas id="star-canvas"></canvas>
 
-    <!-- Fondo con imagen (si existe) -->
     <div class="bg-layer"></div>
-
     <div class="page-wrapper">
 
         <!-- HEADER -->
@@ -32,7 +30,6 @@
                         <span class="logo-sub">Herramienta Educativa de Robótica y Tecnología Aplicada</span>
                     </div>
                 </div>
-                <!-- Decoración geométrica: engranaje / estrella -->
                 <div class="header-deco" aria-hidden="true">
                     <div class="deco-ring ring-1"></div>
                     <div class="deco-ring ring-2"></div>
@@ -41,7 +38,7 @@
             </div>
         </header>
 
-        <!-- SECCIÓN PRINCIPAL -->
+        <!-- Main Content -->
         <main class="menu-section">
 
             <div class="section-intro">
@@ -50,7 +47,7 @@
 
             <div class="menu-container">
 
-                <!-- Tarjeta 1: Chatbot -->
+                <!-- Card 1: Chatbot -->
                 <article class="card" id="card-chatbot" onclick="location.href='activities/chatbot.html';" role="button" tabindex="0" aria-label="Ir a Simulador Chatbot">
                     <div class="card-glow"></div>
                     <div class="card-icon">🤖</div>
@@ -65,7 +62,7 @@
                     <div class="card-arrow" aria-hidden="true">→</div>
                 </article>
 
-                <!-- Tarjeta 2: Puentes -->
+                <!-- Card 2: Puentes -->
                 <article class="card card-featured" id="card-bridge" onclick="location.href='activities/geometric_bridge.html';" role="button" tabindex="0" aria-label="Ir a Carrera Geométrica">
                     <div class="card-glow"></div>
                     <div class="card-icon">🏎️</div>
@@ -80,7 +77,7 @@
                     <div class="card-arrow" aria-hidden="true">→</div>
                 </article>
 
-                <!-- Tarjeta 3: Universo -->
+                <!-- Card 3: Universo -->
                 <article class="card" id="card-universe" onclick="location.href='activities/simulated_universe.html';" role="button" tabindex="0" aria-label="Ir a Universo Simulado">
                     <div class="card-glow"></div>
                     <div class="card-icon">🧩</div>
@@ -104,7 +101,7 @@
     </div>
 
     <script>
-        // === Partículas de estrellas en canvas ===
+        // Star Particles on Canvas
         const canvas = document.getElementById('star-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -153,7 +150,7 @@
         initStars();
         requestAnimationFrame(loop);
 
-        // === Accesibilidad: activar tarjetas con Enter/Space ===
+        // === Accessibility: Activate cards using Enter or Space ===
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('keydown', e => {
                 if (e.key === 'Enter' || e.key === ' ') card.click();

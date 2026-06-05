@@ -1,14 +1,17 @@
+// Sync the shop name input field with the stored data
 window.updateSetupUI = function () {
     const nameInput = document.getElementById('shop-name-input');
     if (nameInput) nameInput.value = window.shopData.name;
 }
 
+// Update the shop name state, save it, and re-evaluate phase progress
 window.updateShopName = function () {
     window.shopData.name = document.getElementById('shop-name-input').value;
     saveData();
     checkRequirements();
 }
 
+// Validate form inputs and append a new product to the inventory
 window.addProduct = function () {
     const nameInput = document.getElementById('prod-name');
     const priceInput = document.getElementById('prod-price');
@@ -23,6 +26,7 @@ window.addProduct = function () {
         return;
     }
 
+    // Ensure the product name is a single word to simplify chatbot entity parsing later
     if (/\s/.test(name)) {
         alert("⚠️ El nombre del producto debe ser una sola palabra (sin espacios).");
         nameInput.focus();
@@ -35,6 +39,7 @@ window.addProduct = function () {
         return;
     }
 
+    // Normalize comma separators to allow valid floating-point math for pricing
     const priceNum = parseFloat(price.replace(',', '.'));
     if (price === "" || isNaN(priceNum) || priceNum <= 0) {
         alert("⚠️ El precio debe ser un número válido mayor que 0.");
@@ -60,6 +65,7 @@ window.addProduct = function () {
     checkRequirements();
 }
 
+// Remove a product from the array using its unique timestamp ID
 window.removeProduct = function (id) {
     window.shopData.products = window.shopData.products.filter(p => p.id !== id);
     renderProductList();
@@ -67,6 +73,7 @@ window.removeProduct = function (id) {
     checkRequirements();
 }
 
+// Rebuild the DOM element to display the current inventory
 window.renderProductList = function () {
     const list = document.getElementById('products-list-ui');
     if (!list) return;
@@ -86,6 +93,7 @@ window.renderProductList = function () {
     });
 }
 
+// Verify Phase 1 conditions (shop name + 3 products) to unlock the training tab
 window.checkRequirements = function () {
     const minProducts = 3;
     const count = window.shopData.products.length;

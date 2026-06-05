@@ -1,8 +1,7 @@
 /* ============================================================
-   BRIDGE — UI (panel lateral, fabricador, inventario, overlays)
+   BRIDGE — UI
    ============================================================ */
 
-/* ── PANEL LATERAL ── */
 .builder-ui {
     flex: 0 0 300px;
     height: auto;
@@ -16,7 +15,6 @@
     font-family: var(--font);
 }
 
-/* Secciones del panel */
 .panel-section {
     padding: 14px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
@@ -25,12 +23,10 @@
     gap: 10px;
 }
 
-/* Inventario: altura fija pequeña */
 .inventory-section {
     flex: 0 0 auto;
 }
 
-/* Fabricador: ocupa todo el espacio restante */
 .fabricator-section {
     flex: 1;
     overflow: hidden;
@@ -39,7 +35,6 @@
     gap: 10px;
 }
 
-/* Títulos de sección — estilo tag geométrico */
 .panel-section h3 {
     margin: 0;
     font-size: 1.0rem;
@@ -63,7 +58,6 @@
 }
 
 
-/* ── INVENTARIO ── */
 .inventory-grid {
     display: flex;
     gap: 8px;
@@ -128,7 +122,6 @@
 }
 
 
-/* ── FABRICADOR ── */
 .fabricator-controls {
     display: flex;
     flex-direction: column;
@@ -137,7 +130,6 @@
     min-height: 0;
 }
 
-/* Selector de forma */
 .shape-selector {
     display: flex;
     gap: 6px;
@@ -176,7 +168,6 @@
     cursor: not-allowed;
 }
 
-/* Caja de cálculo (fondo oscuro con borde sutil) */
 .math-box {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -188,7 +179,6 @@
     gap: 14px;
 }
 
-/* Fila de inputs */
 .inputs-row {
     display: flex;
     gap: 20px;
@@ -197,7 +187,6 @@
     justify-content: center;
 }
 
-/* Grupo label + input */
 .input-group label {
     display: block;
     font-size: 0.85rem;
@@ -236,7 +225,6 @@
     background: rgba(91, 164, 255, 0.1);
 }
 
-/* Botón principal FABRICAR */
 .btn-craft {
     width: 100%;
     background: linear-gradient(135deg, var(--accent) 0%, #e8b800 100%);
@@ -284,7 +272,6 @@
     margin-bottom: 3px;
 }
 
-/* ── RESULTADO (área de cálculo) ── */
 .result-row {
     background: rgba(46, 219, 133, 0.2);
     border: 1px solid rgba(46, 219, 133, 0.4);
@@ -296,8 +283,6 @@
     font-size: 0.9rem;
 }
 
-
-/* ── PIEZAS COLOCADAS ── */
 .placed-rect {
     background: var(--b-block);
     border: 2px solid rgba(0, 0, 0, 0.22);
@@ -323,8 +308,6 @@
     filter: brightness(var(--cell-brightness, 1));
 }
 
-
-/* ── CHALLENGE (verificación matemática) ── */
 .math-challenge {
     background: rgba(0, 0, 0, 0.35);
     border: 2px solid rgba(255, 210, 63, 0.4);
@@ -449,8 +432,6 @@
     margin: 0;
 }
 
-
-/* ── OVERLAY (victoria / derrota) ── */
 .overlay {
     position: fixed;
     top: 0;
@@ -515,14 +496,11 @@
     border-bottom-width: 1px;
 }
 
-
-/* ── UTILIDADES ── */
 .hidden {
     display: none !important;
 }
 
 
-/* ── ANIMACIONES ── */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -548,7 +526,6 @@
 }
 
 
-/* ── INVENTORY HEADER (eraser row) ── */
 .inventory-header {
     display: flex;
     align-items: center;
@@ -599,7 +576,6 @@
 }
 
 
-/* ── FORMULAS REFERENCE ── */
 .formulas-ref {
     background: rgba(255, 210, 63, 0.06);
     border: 1px solid rgba(255, 210, 63, 0.2);
@@ -671,7 +647,6 @@
 }
 
 
-/* ── HELP MODAL ── */
 .help-modal {
     background: var(--b-surface, #1a1f35);
     border: 2px solid rgba(255, 210, 63, 0.3);

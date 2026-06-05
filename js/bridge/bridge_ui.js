@@ -2,6 +2,7 @@ window.BridgeUI = {
     currentShape: 'rect',
     zoomFactor2D: 1.0,
 
+    // Increase 2D view scale up to a maximum limit
     zoomIn2D: function() {
         this.zoomFactor2D = Math.min(this.zoomFactor2D + 0.1, 2.0);
         this.applyZoom2D();
@@ -12,6 +13,7 @@ window.BridgeUI = {
         this.applyZoom2D();
     },
 
+    // Apply the calculated zoom scale to the CSS transform property
     applyZoom2D: function() {
         const grid = document.getElementById('level-grid');
         if (grid) {
@@ -19,6 +21,7 @@ window.BridgeUI = {
         }
     },
 
+    // Construct the HTML grid based on the level matrix and apply specific cell styles
     renderGrid: function (matrix) {
         const container = document.getElementById('level-grid');
         if (!container) return;
@@ -44,7 +47,6 @@ window.BridgeUI = {
                 if (char === 'm') cell.classList.add('cell-goal');
                 if (char === 'w') cell.classList.add('cell-water');
 
-                // Oscurecer bloques sólidos según cuántos bloques sólidos hay encima
                 if (char === 'x' || char === 'n') {
                     let depth = 0;
                     for (let i = r - 1; i >= 0; i--) {
@@ -52,12 +54,10 @@ window.BridgeUI = {
                         if (above === 'x' || above === 'n') depth++;
                         else break;
                     }
-                    // brightness: 1.0 en superficie → 0.5 con 5+ bloques encima
                     const brightness = Math.max(0.5, 1.0 - depth * 0.10);
                     cell.style.setProperty('--cell-brightness', brightness);
                 }
 
-                // Marcadores 5x5 para guiar al usuario
                 if ((c + 1) % 5 === 0) cell.classList.add('grid-mark-x');
                 if ((r + 1) % 5 === 0) cell.classList.add('grid-mark-y');
 
@@ -76,7 +76,6 @@ window.BridgeUI = {
         robot.innerHTML = `<div class="robot-body"></div><div class="robot-wheel w1"></div><div class="robot-wheel w2"></div>`;
         container.appendChild(robot);
 
-        // CREATE GHOST
         const ghost = document.createElement('div');
         ghost.id = 'placement-ghost';
         ghost.style.position = 'absolute';
@@ -92,6 +91,7 @@ window.BridgeUI = {
         };
     },
 
+    // Calculate placement validity and render a visual preview of the block before clicking
     updateGhost: function (r, c) {
         const ghost = document.getElementById('placement-ghost');
         if (!ghost) return;
@@ -168,6 +168,7 @@ window.BridgeUI = {
         ghost.style.boxShadow = valid ? '0 0 16px rgba(255, 255, 255, 0.3)' : '0 0 16px rgba(255, 79, 109, 0.5)';
     },
 
+    // Draw the user's crafted blocks on top of the level grid using absolute positioning
     renderPlacedItems: function (items) {
         const container = document.getElementById('level-grid');
         const cs = window.BridgeCore.CELL_SIZE;
@@ -189,7 +190,6 @@ window.BridgeUI = {
             el.style.width = (item.w * cs) + 'px';
             el.style.height = (item.h * cs) + 'px';
 
-            // Oscurecer según bloques sólidos que hay encima del borde superior del item
             if (matrix) {
                 const topRow = item.r;
                 let depth = 0;
@@ -208,6 +208,7 @@ window.BridgeUI = {
         });
     },
 
+    // Populate the inventory UI panel with the blocks the player has crafted
     renderInventory: function () {
         const container = document.getElementById('inventory-grid');
         container.innerHTML = '';
@@ -229,12 +230,14 @@ window.BridgeUI = {
         });
     },
 
+    // Visually indicate which block from the inventory is currently selected
     highlightInventory: function (idx) {
         const items = document.querySelectorAll('.inv-item');
         items.forEach(i => i.classList.remove('selected'));
         if (idx !== null && items[idx]) items[idx].classList.add('selected');
     },
 
+    // Switch the active shape type (rectangle or triangle) in the crafting menu
     selectShapeType: function (type) {
         this.currentShape = type;
         document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
@@ -242,6 +245,7 @@ window.BridgeUI = {
         if (type === 'tri') document.querySelector('.shape-btn:nth-child(2)').classList.add('active');
     },
 
+    // Inject educational math formulas into the designated UI grid
     renderFormulas: function () {
         const grid = document.getElementById('formulas-grid');
         if (!grid) return;

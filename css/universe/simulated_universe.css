@@ -50,7 +50,7 @@ header h1 { color: white; margin: 0; text-transform: uppercase; font-weight: 800
 .enemy-sprite img { image-rendering: pixelated; }
 .enemy-emoji { font-size: 8rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); transition: transform 0.2s; }
 
-/* BARRAS DE VIDA (HP) */
+/* HEALTH BARS (HP) */
 .hp-box { position: absolute; width: 150px; color: white; transition: opacity 0.5s; border-radius: 0; border: 4px solid #fff; background: #000; box-shadow: 6px 6px 0px rgba(0,0,0,1); padding: 15px; }
 .hp-enemy { top: 20%; right: 0%; box-shadow: 6px 6px 0 var(--u-danger); }
 .hp-player { bottom: 60%; left: 30%; box-shadow: 6px 6px 0 var(--u-gold); }
@@ -58,7 +58,7 @@ header h1 { color: white; margin: 0; text-transform: uppercase; font-weight: 800
 .hp-bar-bg { width: 100%; overflow: hidden; border-radius: 0; border: 2px solid #fff; background: #222; height: 18px; }
 .hp-bar-fill { height: 100%; width: 100%; transition: width 0.5s; border-radius: 0; }
 
-/* PANEL DE PREGUNTAS Y OPCIONES */
+/* QUESTIONS AND OPTIONS PANEL */
 .battle-panel { position: absolute; bottom: 0; left: 0; width: 100%; min-height: 22%; z-index: 50; display: flex; transition: transform 0.3s; border-radius: 0; background: #000; border-top: 6px solid #fff; box-sizing: border-box; }
 .battle-panel.hidden { transform: translateY(110%); }
 .panel-left { flex: 2; padding: 25px; color: white; display: flex; flex-direction: column; justify-content: center; border-right: 4px solid #fff; font-size: 1.1rem; line-height: 1.8; overflow-y: auto; }
@@ -68,7 +68,7 @@ header h1 { color: white; margin: 0; text-transform: uppercase; font-weight: 800
 .opt-btn { font-weight: bold; cursor: pointer; text-align: left; border-radius: 0; background: #000; color: #fff; border: 4px solid #fff; font-size: 1.05rem; box-shadow: 4px 4px 0 #fff; line-height: 1.6; padding: 18px; }
 .opt-btn:hover { background: var(--u-gold); color: #000; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #fff; }
 
-/* MINIMAPA CUADRICULADO Y MEJORADO */
+/* MINI-MAP */
 .map-overlay { position: absolute; z-index: 100; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); overflow: hidden; border-radius: 0; border: 4px solid #fff; background: #000; box-shadow: 8px 8px 0 rgba(0,0,0,1); }
 .map-overlay.minimized { top: 20px; right: 20px; width: 140px; height: 140px; cursor: pointer; border-radius: 0; border: 4px solid var(--u-gold); box-shadow: 4px 4px 0 #000; }
 .map-overlay.minimized:hover { transform: scale(1.1); border-color: white; }
@@ -119,7 +119,7 @@ line.path-active { stroke: var(--u-blue); stroke-width: 6; }
 .loading-text { color: var(--u-blue); letter-spacing: 2px; animation: pulse 1.5s infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* PANTALLA DE SELECCIÓN DE AVATAR */
+/* AVATAR SELECTION SCREEN */
 .avatar-select-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .avatar-select-overlay h2 { font-size: 1.5rem; text-shadow: 4px 4px 0 var(--u-purple); margin-bottom: 50px; text-align: center; }
 .avatar-container { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;}
@@ -127,7 +127,7 @@ line.path-active { stroke: var(--u-blue); stroke-width: 6; }
 .av-opt:hover { border-color: var(--u-blue); box-shadow: 8px 8px 0 var(--u-blue); transform: translate(-4px, -4px); }
 .av-opt img { width: 160px; height: 160px; object-fit: contain; display: block; image-rendering: pixelated; }
 
-/* RESPONSIVE: Pantallas con poca altura (720p y similares) */
+/* RESPONSIVE: Low-resolution screens (720p and similar) */
 @media (max-height: 800px) {
     .battle-panel { min-height: auto; }
     .panel-left { padding: 12px 18px; font-size: 0.9rem; line-height: 1.5; }

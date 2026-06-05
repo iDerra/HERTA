@@ -1,3 +1,4 @@
+// Defines the level configurations containing the 3D grid matrices (Left, Center, Right) and character mapping: 'x'=solid, 'w'=water, 'o'=spawn, 'm'=goal, 'n'=ramp
 window.BridgeLevels = [
     {
         id: 1,

@@ -1,37 +1,31 @@
 /* ============================================================
    BRIDGE — DESIGN SYSTEM
-   Estética Low-Poly · Dark Mode · Secundaria
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
 :root {
-    /* Paleta principal */
-    --b-bg:        #161b2e;   /* Azul marino profundo */
-    --b-surface:   #1e2740;   /* Superficie de paneles */
-    --b-panel:     #242c47;   /* Panel lateral */
+    --b-bg:        #161b2e;
+    --b-surface:   #1e2740;
+    --b-panel:     #242c47;
     --b-line:      rgba(255,255,255,0.08);
 
-    /* Colores del mundo */
-    --b-ground:    #4cd97b;   /* Verde tierra vivo */
-    --b-block:     #f5a041;   /* Naranja bloque */
-    --b-ramp:      #ff6b7a;   /* Coral rampa */
-    --b-goal:      #ffd23f;   /* Amarillo meta */
-    --b-water:     #4db8f0;   /* Azul agua */
+    --b-ground:    #4cd97b;
+    --b-block:     #f5a041;
+    --b-ramp:      #ff6b7a;
+    --b-goal:      #ffd23f;
+    --b-water:     #4db8f0;
 
-    /* Acentos UI */
-    --accent:      #ffd23f;   /* Amarillo dorado — acción principal */
+    --accent:      #ffd23f;
     --accent-dark: #c9a100;
-    --ok:          #2edb85;   /* Verde confirmar */
+    --ok:          #2edb85;
     --ok-dark:     #1aaa63;
-    --danger:      #ff4f6d;   /* Rojo cancelar */
-    --info:        #5ba4ff;   /* Azul info / títulos */
+    --danger:      #ff4f6d;
+    --info:        #5ba4ff;
 
-    /* Tipografía */
     --font: 'Nunito', 'Segoe UI', sans-serif;
 }
 
-/* ── BASE ── */
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
@@ -45,7 +39,6 @@ html, body {
     flex-direction: column;
 }
 
-/* ── HEADER ── */
 header {
     flex: 0 0 auto;
     height: 58px;
@@ -60,7 +53,6 @@ header {
     z-index: 100;
 }
 
-/* Detalle geométrico en el header: triángulo low-poly */
 header::before {
     content: '';
     position: absolute;
@@ -107,7 +99,6 @@ header p { display: none; }
     letter-spacing: 0.03em;
 }
 
-/* Botones del header */
 .btn-play {
     background: var(--ok);
     color: #0f172a;
@@ -141,7 +132,6 @@ header p { display: none; }
 .btn-back:hover { background: rgba(255,255,255,0.1); color: white; }
 
 
-/* ── WORLD ── */
 .game-container {
     flex: 1;
     display: flex;
@@ -157,7 +147,6 @@ header p { display: none; }
     overflow: hidden;
 }
 
-/* Cielo con gradiente cálido low-poly */
 .sky-bg {
     position: absolute;
     width: 100%; height: 100%;
@@ -168,7 +157,6 @@ header p { display: none; }
         #76c8f5 100%);
 }
 
-/* Nubecillas geométricas de fondo via ::before / ::after */
 .sky-bg::before {
     content: '';
     position: absolute;
@@ -178,7 +166,6 @@ header p { display: none; }
 }
 
 
-/* ── GRID ── */
 .level-grid {
     position: absolute;
     top: 50%; left: 50%;
@@ -192,7 +179,6 @@ header p { display: none; }
     gap: 0;
 }
 
-/* ── CELLS ── */
 .grid-cell {
     width: 100%; height: 100%;
     box-sizing: border-box;
@@ -202,17 +188,14 @@ header p { display: none; }
     transition: background 0.1s;
 }
 
-/* Hover en celdas vacías: guía de colocación */
 .grid-cell:not(.cell-solid):not(.cell-water):not(.cell-goal):not(.cell-natural-ramp):hover {
     background: rgba(255, 210, 63, 0.12);
     outline-color: rgba(255,210,63,0.4);
 }
 
-/* Marcadores de cuadrícula cada 5 celdas */
 .grid-mark-x { border-right:  1px solid rgba(255,255,255,0.25) !important; }
 .grid-mark-y { border-bottom: 1px solid rgba(255,255,255,0.25) !important; }
 
-/* Tierra */
 .cell-solid {
     background: var(--b-ground);
     box-shadow: inset -1px -2px 0 rgba(0,0,0,0.25);
@@ -220,7 +203,6 @@ header p { display: none; }
     z-index: 1;
 }
 
-/* Rampa natural */
 .cell-natural-ramp {
     background: linear-gradient(-45deg, var(--b-ground) 50%, transparent 50%);
     box-shadow: inset -1px -2px 0 rgba(0,0,0,0.2);

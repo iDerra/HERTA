@@ -1,13 +1,16 @@
+// Initialize chat session state for multi-turn interactions
 let chatState = {
     conversationStage: 'IDLE',
     cart: [],
     pendingProduct: null
 };
 
+// Remove accents, special characters, and convert string to lowercase
 function normalizeText(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/gi, '').toLowerCase();
 }
 
+// Process user input, trigger typing animation, and route to the correct logic
 window.handleUserMessage = function () {
     const inputEl = document.getElementById('sim-user-input');
     const text = inputEl.value.trim();
@@ -22,7 +25,6 @@ window.handleUserMessage = function () {
 
         const cleanText = normalizeText(text);
 
-        // Comandos globales de escape
         const abortWords = ["cancelar", "menu", "inicio", "salir", "reiniciar", "volver"];
         if (abortWords.some(w => cleanText === w || cleanText.startsWith(w + " "))) {
             chatState.conversationStage = 'IDLE';
@@ -53,9 +55,9 @@ window.handleUserMessage = function () {
     }, 800);
 }
 
+// Determine intent from user text and return the appropriate text or action
 function generateBotResponse(cleanText) {
 
-    // Arrays de sinónimos para detectar intenciones
     const intCesta = ["cesta", "carrito", "mis cosas", "pedidos", "bolsa"];
     if (intCesta.some(w => cleanText.includes(w))) return showCart();
 
@@ -79,7 +81,6 @@ function generateBotResponse(cleanText) {
 
     const inventory = window.shopData.products;
 
-    // Función de búsqueda flexible (palabras parciales o desordenadas)
     const userWords = cleanText.split(/\s+/).filter(w => w.trim().length > 0);
     
     const foundProduct = inventory.find(p => {
@@ -112,7 +113,6 @@ function generateBotResponse(cleanText) {
     const intGracias = ["gracias", "merci", "agradecido", "genial", "guay", "estupendo", "perfecto", "ok", "vale"];
     if (intGracias.some(w => cleanText.includes(w))) return "¡De nada! ¿En qué más puedo ayudarte?";
 
-    // Fallback: No se entendió el mensaje
     const fallbacks = [
         "😕 Hmm, no estoy seguro de entender eso. ¿Quizás querías ver el catálogo?",
         "No he captado bien lo que buscas. ¿Podrías escribirlo de otra forma o elegir una opción rápida?",
@@ -125,6 +125,7 @@ function generateBotResponse(cleanText) {
     };
 }
 
+// Handle ambiguous product selections requiring user confirmation
 function processAddToCart(cleanText, foundProduct) {
     const featureKey = normalizeText(foundProduct.feature);
 
@@ -140,6 +141,7 @@ function processAddToCart(cleanText, foundProduct) {
     }
 }
 
+// Process YES/NO responses when confirming a specific product model
 function handleSpecificationLogic(cleanText) {
     const pending = chatState.pendingProduct;
 
@@ -162,6 +164,7 @@ function handleSpecificationLogic(cleanText) {
     }
 }
 
+// Add confirmed item to the cart array and return UI commands
 function addToCart(prod) {
     chatState.cart.push(prod);
     return {
@@ -170,6 +173,7 @@ function addToCart(prod) {
     };
 }
 
+// Format and display the current contents of the user's cart
 function showCart() {
     if (chatState.cart.length === 0) return "Tu cesta está vacía 🛒.";
 
@@ -188,6 +192,7 @@ function showCart() {
     };
 }
 
+// Calculate totals, generate receipt HTML, clear cart, and trigger UI effects
 function processCheckout() {
     if (chatState.cart.length === 0) return "No puedes pagar porque la cesta está vacía.";
 
@@ -208,8 +213,6 @@ function processCheckout() {
     receipt += `</div>`;
 
     chatState.cart = [];
-
-    // --- GAMIFICACIÓN: Sumar ventas ---
     playCashRegisterAnimation(subtotal);
 
     return {
@@ -218,11 +221,12 @@ function processCheckout() {
     };
 }
 
+// Update global sales metrics and trigger the cash register CSS animation
 function playCashRegisterAnimation(amount) {
     if (window.shopData) {
         window.shopData.salesTotal = (window.shopData.salesTotal || 0) + amount;
         window.shopData.salesCount = (window.shopData.salesCount || 0) + 1;
-        saveData(); // Llama a checkQuests() indirectamente
+        saveData();
     }
 
     const cashEl = document.getElementById('total-cash');
@@ -236,11 +240,13 @@ function playCashRegisterAnimation(amount) {
     }
 }
 
+// Update the badge displaying the number of items in the cart
 function updateCartUI() {
     const countEl = document.getElementById('cart-count');
     if (countEl) countEl.innerText = chatState.cart.length;
 }
 
+// Search inventory for the product the user wishes to return
 function handleReturnProductInput(cleanText) {
     const inventory = window.shopData.products;
 
@@ -266,8 +272,8 @@ function handleReturnProductInput(cleanText) {
     }
 }
 
+// Parse user date string and validate the 14-day return policy
 function handleReturnDateLogic(cleanText) {
-    // Buscar un patrón de fecha, incluso si el texto tiene palabras adicionales
     const match = cleanText.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
 
     if (!match) {
@@ -294,6 +300,7 @@ function handleReturnDateLogic(cleanText) {
     }
 }
 
+// Return the default greeting and primary quick-reply buttons
 function getMainMenu() {
     return {
         text: `¡Hola! Soy Herta, el asistente virtual de <b>${escapeHTML(window.shopData.name) || 'la tienda'}</b>.`,
@@ -301,6 +308,7 @@ function getMainMenu() {
     };
 }
 
+// Generate the DOM structure for a chat message including the avatar
 function createMessageWrapper(type) {
     const wrapper = document.createElement('div');
     wrapper.className = `chat-message-wrapper wrapper-${type}`;
@@ -326,6 +334,7 @@ function createMessageWrapper(type) {
     return wrapper;
 }
 
+// Append a standard text or HTML message bubble to the chat history
 function addBubble(text, type) {
     const container = document.getElementById('chat-history-container');
     const wrapper = createMessageWrapper(type);
@@ -343,6 +352,7 @@ function addBubble(text, type) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Append a message bubble that includes interactive quick-reply buttons
 function addBubbleWithCommands(text, commands) {
     const container = document.getElementById('chat-history-container');
     const wrapper = createMessageWrapper('bot');
@@ -374,21 +384,25 @@ function addBubbleWithCommands(text, commands) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Programmatically insert text into the input field and submit it
 window.simulateUserClick = function (text) {
     const inputEl = document.getElementById('sim-user-input');
     inputEl.value = text;
     handleUserMessage();
 }
 
+// Toggle the visibility of the "bot is typing..." CSS animation
 function showTyping(show) {
     const indicator = document.getElementById('typing-indicator');
     if (indicator) indicator.style.display = show ? 'block' : 'none';
 }
 
+// Fire the message handler when the Enter key is pressed in the input field
 document.getElementById('sim-user-input')?.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') window.handleUserMessage();
 });
 
+// Send the initial greeting if the chat is empty, and update UI metrics
 window.initChatGreeting = function () {
     const container = document.getElementById('chat-history-container');
     showTyping(false);
@@ -398,7 +412,6 @@ window.initChatGreeting = function () {
     }
     updateCartUI();
 
-    // Actualizar visual de la caja registradora
     const cashEl = document.getElementById('total-cash');
     if (cashEl && window.shopData) {
         cashEl.innerText = (window.shopData.salesTotal || 0).toFixed(2);
